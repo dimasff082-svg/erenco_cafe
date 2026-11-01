@@ -18,11 +18,11 @@
                         <span class="text-[11px] text-[#b3a895] font-semibold">Kasir Langsung (Takeaway)</span>
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif-classic text-[#f5ebd7]">
-                        Pesanan Bawa Pulang (Takeaway)
+                        Transaksi Penjualan
                     </h2>
-                    <p class="text-xs sm:text-sm text-[#c7bfb1] mt-0.5 max-w-xl">
+                    <!-- <p class="text-xs sm:text-sm text-[#c7bfb1] mt-0.5 max-w-xl">
                         Layani pelanggan yang membeli langsung untuk dibungkus/dibawa pulang. Transaksi langsung lunas dan otomatis terkirim ke Layar Dapur.
-                    </p>
+                    </p> -->
                 </div>
             </div>
 
