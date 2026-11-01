@@ -111,7 +111,7 @@
                 <span class="text-slate-400">Tipe Pesanan / Meja</span>
                 <span class="text-slate-700 font-bold">
                     @if($sale->table_number === 'TAKEAWAY')
-                        <!-- <span class="text-purple-700 font-black">🛍️ Bawa Pulang (Takeaway)</span> -->
+                        <span class="text-purple-700 font-black">🛍️ Bawa Pulang (Takeaway)</span>
                     @elseif($sale->table_number)
                         Meja {{ $sale->table_number }}
                     @else

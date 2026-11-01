@@ -1207,13 +1207,15 @@ class RestaurantOrderTest extends TestCase
         // 3. Kasir dapat mengakses
         $responseCashier = $this->actingAs($this->cashier)->get(route('takeaway.index'));
         $responseCashier->assertOk();
-        $responseCashier->assertSee('Pesanan Bawa Pulang (Takeaway)');
+        $responseCashier->assertSee('Transaksi Penjualan');
+        $responseCashier->assertSee('Keranjang Bawa Pulang');
         $responseCashier->assertSee('Fira Cake');
 
         // 4. Admin dapat mengakses
         $responseAdmin = $this->actingAs($this->admin)->get(route('takeaway.index'));
         $responseAdmin->assertOk();
-        $responseAdmin->assertSee('Pesanan Bawa Pulang (Takeaway)');
+        $responseAdmin->assertSee('Transaksi Penjualan');
+        $responseAdmin->assertSee('Keranjang Bawa Pulang');
     }
 
     public function test_takeaway_order_can_be_checked_out_successfully_by_cashier(): void

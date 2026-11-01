@@ -48,4 +48,3 @@ class MenuController extends Controller
         return view('cashier.menu.index', compact('products', 'categories'));
     }
 }
-

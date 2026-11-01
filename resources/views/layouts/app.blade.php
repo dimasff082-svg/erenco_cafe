@@ -40,12 +40,12 @@
     </style>
     @stack('styles')
 </head>
-<body class="h-full flex flex-col antialiased text-[#2c261e] bg-[#f7f5ef]">
-    <div class="min-h-full flex relative">
+<body class="h-full flex flex-col antialiased text-[#2c261e] bg-[#f7f5ef] overflow-hidden">
+    <div class="h-screen flex overflow-hidden bg-[#f7f5ef]">
         <!-- Sidebar Navigation (Classic Modern Theme) -->
-        <aside id="app-sidebar" class="w-64 bg-[#191714] text-[#d6cfc2] flex flex-col shrink-0 border-r border-[#2b261f] shadow-2xl transition-all duration-300 ease-in-out z-40">
+        <aside id="app-sidebar" class="w-64 h-full flex flex-col shrink-0 bg-[#191714] text-[#d6cfc2] border-r border-[#2b261f] shadow-2xl transition-[margin] duration-300 ease-in-out z-40">
             <!-- Brand Header: Fira Cake Logo -->
-            <div class="h-16 flex items-center px-5 gap-3 bg-[#12110e] border-b border-[#2b261f]">
+            <div class="h-16 flex items-center px-5 gap-3 bg-[#12110e] border-b border-[#2b261f] shrink-0">
                 <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 object-contain drop-shadow-md shrink-0">
                 <div class="overflow-hidden">
                     <span class="font-serif-classic font-bold text-sm tracking-wide text-[#f2ece1] block truncate">Fira Cake</span>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- User Info Badge -->
-            <div class="p-3.5 mx-3 my-3 rounded-2xl bg-[#23201b] border border-[#383228] flex items-center gap-3">
+            <div class="p-3.5 mx-3 my-3 rounded-2xl bg-[#23201b] border border-[#383228] flex items-center gap-3 shrink-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ auth()->user()->isOwner() ? 'from-amber-600 to-amber-800 border border-amber-400/40 text-amber-100' : (auth()->user()->isAdmin() ? 'from-stone-700 to-stone-900 border border-stone-500/30 text-stone-100' : (auth()->user()->isKitchen() ? 'from-blue-700 to-indigo-900 border border-blue-500/30 text-blue-100' : 'from-emerald-700 to-emerald-900 border border-emerald-500/30 text-emerald-100')) }} flex items-center justify-center font-serif-classic font-bold text-base shadow">
                     {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
@@ -216,7 +216,7 @@
             </nav>
 
             <!-- Logout Section -->
-            <div class="p-3 border-t border-[#2b261f]">
+            <div class="p-3 border-t border-[#2b261f] shrink-0">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition">
@@ -232,10 +232,10 @@
         <!-- Mobile Backdrop Overlay for Sidebar -->
         <div id="sidebar-backdrop" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-stone-900/60 z-30 md:hidden backdrop-blur-2xs transition-opacity"></div>
 
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 bg-[#f7f5ef]">
-            <!-- Topbar Header (Classic Modern with Shopping Bag Logo + Point of Sale text, NO Kasir Baru button) -->
-            <header class="h-16 bg-[#ffffff]/95 backdrop-blur-md border-b border-[#e5dfd3] flex items-center justify-between px-6 sm:px-8 sticky top-0 z-20 shadow-[0_2px_12px_-4px_rgba(40,30,15,0.05)]">
+        <!-- Main Content Area: SEPARATE CONTAINER -->
+        <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#f7f5ef]">
+            <!-- Topbar Header (Fixed at top of content area) -->
+            <header class="h-16 shrink-0 bg-[#ffffff]/95 backdrop-blur-md border-b border-[#e5dfd3] flex items-center justify-between px-6 sm:px-8 z-20 shadow-[0_2px_12px_-4px_rgba(40,30,15,0.05)]">
                 <div class="flex items-center gap-3">
                     <!-- Toggle Sidebar Button (Admin, Kasir, Pemilik, Dapur) -->
                     <button type="button" id="sidebar-toggle-btn" onclick="toggleSidebar()"
@@ -245,17 +245,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-
-                    <!-- Fira Cake Logo -->
-                    <!-- <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 object-contain drop-shadow-sm shrink-0">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-serif-classic font-extrabold text-lg text-[#26211a] tracking-tight">Fira Cake</span>
-                            <span class="text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-[#f4ece0] text-[#8a681c] border border-[#dfb15b]/30">Resto & Bakery</span>
-                        </div>
-                        <p class="text-[11px] text-[#7d7363] font-medium leading-tight">{{ $header ?? 'Panel Kasir Toko' }}</p>
-                    </div>
-                </div> -->
+                </div>
 
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
@@ -266,48 +256,51 @@
                 </div>
             </header>
 
-            <!-- Flash Messages -->
-            <div class="px-8 pt-4">
-                @if(session('success'))
-                    <div class="flex items-center gap-3 p-4 mb-3 text-xs text-emerald-950 rounded-2xl bg-emerald-50/90 border border-emerald-300/80 shadow-xs">
-                        <svg class="w-5 h-5 shrink-0 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span class="font-semibold">{{ session('success') }}</span>
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="flex items-center gap-3 p-4 mb-3 text-xs text-rose-950 rounded-2xl bg-rose-50/90 border border-rose-300/80 shadow-xs">
-                        <svg class="w-5 h-5 shrink-0 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span class="font-semibold">{{ session('error') }}</span>
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="p-4 mb-3 text-xs text-rose-950 rounded-2xl bg-rose-50/90 border border-rose-300/80 shadow-xs">
-                        <div class="flex items-center gap-2 font-bold mb-1">
-                            <svg class="w-5 h-5 shrink-0 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <!-- Scrollable Page Body (Only this area scrolls! Sidebar is completely separate!) -->
+            <div class="flex-1 overflow-y-auto min-h-0">
+                <!-- Flash Messages -->
+                <div class="px-8 pt-4">
+                    @if(session('success'))
+                        <div class="flex items-center gap-3 p-4 mb-3 text-xs text-emerald-950 rounded-2xl bg-emerald-50/90 border border-emerald-300/80 shadow-xs">
+                            <svg class="w-5 h-5 shrink-0 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Terdapat beberapa kesalahan:
+                            <span class="font-semibold">{{ session('success') }}</span>
                         </div>
-                        <ul class="list-disc list-inside text-xs space-y-0.5 ml-2">
-                            @foreach($errors->all() as $err)
-                                <li>{{ $err }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+                    @endif
 
-            <!-- Page Content -->
-            <main class="flex-1 p-8 overflow-y-auto">
-                {{ $slot ?? '' }}
-                @yield('content')
-            </main>
+                    @if(session('error'))
+                        <div class="flex items-center gap-3 p-4 mb-3 text-xs text-rose-950 rounded-2xl bg-rose-50/90 border border-rose-300/80 shadow-xs">
+                            <svg class="w-5 h-5 shrink-0 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="font-semibold">{{ session('error') }}</span>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="p-4 mb-3 text-xs text-rose-950 rounded-2xl bg-rose-50/90 border border-rose-300/80 shadow-xs">
+                            <div class="flex items-center gap-2 font-bold mb-1">
+                                <svg class="w-5 h-5 shrink-0 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Terdapat beberapa kesalahan:
+                            </div>
+                            <ul class="list-disc list-inside text-xs space-y-0.5 ml-2">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Page Content -->
+                <main class="p-8">
+                    {{ $slot ?? '' }}
+                    @yield('content')
+                </main>
+            </div>
         </div>
     </div>
 
