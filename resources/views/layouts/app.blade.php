@@ -247,7 +247,7 @@
                     </button>
 
                     <!-- Fira Cake Logo -->
-                    <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 object-contain drop-shadow-sm shrink-0">
+                    <!-- <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 object-contain drop-shadow-sm shrink-0">
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-serif-classic font-extrabold text-lg text-[#26211a] tracking-tight">Fira Cake</span>
@@ -255,7 +255,7 @@
                         </div>
                         <p class="text-[11px] text-[#7d7363] font-medium leading-tight">{{ $header ?? 'Panel Kasir Toko' }}</p>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
