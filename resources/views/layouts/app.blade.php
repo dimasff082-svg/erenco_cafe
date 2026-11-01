@@ -114,7 +114,7 @@
                     <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Operasional Resto</div>
                     <a href="{{ route('takeaway.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('takeaway.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
                         <span class="text-base leading-none">🛍️</span>
-                        Pesanan Bawa Pulang (Takeaway)
+                        transaksi penjualan
                     </a>
                     <a href="{{ route('cashier.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('cashier.dashboard') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
                         <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
