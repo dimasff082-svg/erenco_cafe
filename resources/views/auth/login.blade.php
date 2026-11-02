@@ -24,6 +24,7 @@
             <h1 class="text-2xl font-serif-classic font-bold tracking-tight text-[#f5ebd7]">FIRA CAKE</h1>
             <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">BAKERY & PASTRY</p>
             <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">Point Of Sales Terintegrasi V 1.2 LJ</p>
+            <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">V 1.2 LJ</p>
         </div>
 
         <!-- Login Card -->
