@@ -1,47 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header Banner (Diperkecil / Compact Bar) -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#201c18] via-[#2d261e] to-[#1a1714] text-white px-5 py-3 shadow-md border border-[#c59b27]/30">
-        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c59b27] via-[#a87f1c] to-[#73550b] flex items-center justify-center text-stone-950 shadow-md border border-[#e5be58]/40 shrink-0 text-lg">
-                    🛍️
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#c59b27]/20 text-[#eac36c] border border-[#c59b27]/40">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            Operasional Resto
-                        </span>
-                        <span class="text-[10px] text-[#b3a895] font-semibold">Kasir Langsung (Takeaway)</span>
-                    </div>
-                    <h2 class="text-lg sm:text-xl font-bold tracking-tight font-serif-classic text-[#f5ebd7] leading-tight mt-0.5">
-                        Transaksi Penjualan
-                    </h2>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-                <a href="{{ auth()->user()->isAdmin() ? route('admin.transactions.index') : route('cashier.transactions.index') }}"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2e2922] hover:bg-[#3b342b] text-[#f2ece1] text-xs font-bold border border-[#4a4235] transition shadow-2xs">
-                    <svg class="w-3.5 h-3.5 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Riwayat Transaksi Lunas
-                </a>
-                <button type="button" onclick="resetTakeawayCart()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-stone-200 text-xs font-bold border border-white/10 transition shadow-2xs">
-                    <svg class="w-3.5 h-3.5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Reset Form
-                </button>
-            </div>
-        </div>
-        <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-[#c59b27]/10 rounded-full blur-2xl pointer-events-none"></div>
-    </div>
-
+<div class="space-y-5">
     <!-- Alert Notifikasi -->
     <div id="alertBox" class="hidden rounded-2xl p-4 text-xs font-semibold flex items-center justify-between shadow-xs">
         <span id="alertMessage"></span>
@@ -57,10 +17,56 @@
         </div>
     @endif
 
-    <!-- Main Split Grid: Left Menu catalog (7 cols), Right Cart & Checkout (5 cols) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <!-- LEFT: Katalog Menu Makanan & Minuman -->
+    <!-- Main Split Grid: Left Menu catalog (7/8 cols), Right Cart & Checkout (5/4 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <!-- LEFT: Header Banner + Katalog Menu Makanan & Minuman (Rata dengan Katalog) -->
         <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+            <!-- Header Banner (Diperpendek rata dengan katalog menu, rapi & terstruktur) -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#201c18] via-[#2d261e] to-[#1a1714] text-white px-4 py-3 shadow-md border border-[#c59b27]/30">
+                <div class="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                    <!-- Left: Icon + Title & Badges in orderly hierarchy -->
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c59b27] via-[#a87f1c] to-[#73550b] flex items-center justify-center text-stone-950 shadow-md border border-[#e5be58]/40 shrink-0 text-lg">
+                            🛍️
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 class="text-base sm:text-lg font-black tracking-tight font-serif-classic text-[#f5ebd7] whitespace-nowrap leading-tight">
+                                    Transaksi Penjualan
+                                </h2>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-[#c59b27]/25 text-[#f0cf75] border border-[#c59b27]/40 whitespace-nowrap">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                    Takeaway
+                                </span>
+                            </div>
+                            <p class="text-[10px] text-[#b3a895] font-medium whitespace-nowrap truncate mt-0.5">
+                                Operasional Resto &bull; Layanan Kasir Langsung
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Action Buttons (Riwayat Transaksi & Reset) -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a href="{{ auth()->user()->isAdmin() ? route('admin.transactions.index') : route('cashier.transactions.index') }}"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2e2922] hover:bg-[#3b342b] text-[#f2ece1] text-xs font-bold border border-[#4a4235] transition shadow-2xs whitespace-nowrap"
+                            title="Buka Riwayat Transaksi">
+                            <svg class="w-3.5 h-3.5 text-[#c59b27] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Riwayat Transaksi</span>
+                        </a>
+                        <button type="button" onclick="resetTakeawayCart()"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-stone-200 text-xs font-bold border border-white/10 transition shadow-2xs whitespace-nowrap"
+                            title="Reset Pesanan & Form">
+                            <svg class="w-3.5 h-3.5 text-stone-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Reset Form</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-[#c59b27]/10 rounded-full blur-2xl pointer-events-none"></div>
+            </div>
             <!-- Search & Filter Bar -->
             <div class="bg-white rounded-2xl p-4 border border-[#e5dfd3] shadow-xs space-y-3">
                 <div class="relative">
@@ -174,153 +180,148 @@
             </div>
         </div>
 
-        <!-- RIGHT: Form Pesanan Bawa Pulang & Kasir Checkout -->
+        <!-- RIGHT: Form Pesanan Bawa Pulang & Kasir Checkout (Naik ke atas sejajar banner katalog) -->
         <div class="lg:col-span-5 xl:col-span-4">
-            <div class="sticky top-4 z-10 space-y-4">
-                <div class="bg-white rounded-3xl border border-[#e5dfd3] shadow-lg overflow-hidden flex flex-col max-h-[calc(100vh-6rem)]">
+            <div class="sticky top-2 z-10">
+                <div class="bg-white rounded-2xl border border-[#e5dfd3] shadow-md overflow-hidden flex flex-col">
                     <!-- Cart Header (Fixed at top of cart) -->
-                    <div class="p-3.5 sm:px-4 sm:py-3 bg-gradient-to-r from-[#1f1c18] to-[#2d261e] text-[#f5ebd7] flex items-center justify-between border-b border-[#3d3428] shrink-0">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-[#c59b27] text-stone-950 flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                    <div class="px-3.5 py-2 bg-gradient-to-r from-[#1f1c18] to-[#2d261e] text-[#f5ebd7] flex items-center justify-between border-b border-[#3d3428] shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-[#c59b27] text-stone-950 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                                 🛍️
                             </div>
                             <div>
-                                <h3 class="text-xs sm:text-sm font-extrabold tracking-tight font-serif-classic">Keranjang Bawa Pulang</h3>
-                                <span class="text-[9px] uppercase font-bold tracking-widest text-[#c59b27]">Kemasan Takeaway</span>
+                                <h3 class="text-xs sm:text-sm font-extrabold tracking-tight font-serif-classic leading-tight">Keranjang Bawa Pulang</h3>
+                                <span class="text-[8.5px] uppercase font-bold tracking-wider text-[#c59b27]">Kemasan Takeaway</span>
                             </div>
                         </div>
-                        <span id="cartCountBadge" class="px-2 py-0.5 rounded-full text-xs font-black bg-[#c59b27] text-stone-950">
+                        <span id="cartCountBadge" class="px-2 py-0.5 rounded-full text-[11px] font-black bg-[#c59b27] text-stone-950">
                             0 Item
                         </span>
                     </div>
 
-                    <!-- Scrollable Cart Content Area -->
-                    <div class="overflow-y-auto flex-1 divide-y divide-[#e5dfd3]">
-                        <!-- Customer Details Form -->
-                        <div class="p-3 sm:p-3.5 bg-[#faf7f0] space-y-2.5">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase tracking-wider text-[#6b6252] mb-1">
-                                    Nama Pelanggan (Opsional)
-                                </label>
-                                <input type="text" id="customerNameInput" placeholder="Contoh: Ibu Rina / Pelanggan Bawa Pulang"
-                                    class="w-full px-3 py-1.5 rounded-xl border border-[#dcd4c5] bg-white text-xs font-semibold text-[#2c261e] focus:outline-none focus:ring-2 focus:ring-[#c59b27]" />
-                            </div>
+                    <!-- Customer Details Form (Compact 2-col layout) -->
+                    <div class="px-3 py-1.5 bg-[#faf7f0] border-b border-[#e5dfd3] grid grid-cols-2 gap-2 shrink-0">
+                        <div>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-[#6b6252] mb-0.5">
+                                Nama Pelanggan
+                            </label>
+                            <input type="text" id="customerNameInput" placeholder="Ibu Rina / Takeaway"
+                                class="w-full px-2.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-xs font-semibold text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-[#6b6252] mb-0.5">
+                                Catatan Pesanan
+                            </label>
+                            <input type="text" id="orderNotesInput" placeholder="Bungkus terpisah, dll"
+                                class="w-full px-2.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-xs text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
+                        </div>
+                    </div>
 
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase tracking-wider text-[#6b6252] mb-1">
-                                    Catatan Kemasan / Pesanan
-                                </label>
-                                <input type="text" id="orderNotesInput" placeholder="Contoh: Pisahkan sambal, bungkus 2 kotak terpisah"
-                                    class="w-full px-3 py-1.5 rounded-xl border border-[#dcd4c5] bg-white text-xs text-[#2c261e] focus:outline-none focus:ring-2 focus:ring-[#c59b27]" />
-                            </div>
+                    <!-- Cart Items Container (Scrollable internally if many items, all cart always visible) -->
+                    <div class="px-3 py-1 max-h-[140px] sm:max-h-[160px] overflow-y-auto custom-sidebar-scroll divide-y divide-[#f0e8db]">
+                        <!-- Cart Empty State (Permanent element, hidden when has items) -->
+                        <div id="cartEmptyState" class="py-3 text-center text-[#8f8573]">
+                            <span class="text-xl block mb-0.5">🛍️</span>
+                            <p class="text-xs font-bold text-[#26211a]">Keranjang Masih Kosong</p>
+                            <p class="text-[9.5px] text-[#8f8573]">Pilih menu dari katalog di sebelah kiri.</p>
                         </div>
 
-                        <!-- Cart Items Container -->
-                        <div class="p-3 sm:p-3.5 max-h-[220px] overflow-y-auto">
-                            <!-- Cart Empty State (Permanent element, hidden when has items) -->
-                            <div id="cartEmptyState" class="py-6 text-center text-[#8f8573]">
-                                <span class="text-3xl block mb-1">🛍️</span>
-                                <p class="text-xs font-bold text-[#26211a]">Keranjang Masih Kosong</p>
-                                <p class="text-[10px] text-[#8f8573] mt-0.5">Pilih menu dari katalog di sebelah kiri untuk membuat pesanan.</p>
-                            </div>
+                        <!-- Dynamic Cart Item List (Injected here) -->
+                        <div id="cartItemsList" class="space-y-1 divide-y divide-[#f0e8db]"></div>
+                    </div>
 
-                            <!-- Dynamic Cart Item List (Injected here) -->
-                            <div id="cartItemsList" class="space-y-2 divide-y divide-[#f0e8db]"></div>
+                    <!-- Payment Details Section (Fully Visible, Compact) -->
+                    <div class="p-2.5 sm:p-3 bg-[#faf7f0] border-t border-[#e5dfd3] space-y-2 shrink-0">
+                        <!-- Subtotal & Total -->
+                        <div class="flex items-center justify-between pb-1 border-b border-[#e5dfd3]">
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-[#8f8573] block leading-tight">Total Tagihan</span>
+                                <span class="text-[10px] text-[#6b6252]" id="subtotalDisplay">Subtotal: Rp 0</span>
+                            </div>
+                            <span class="font-black text-base sm:text-lg text-[#a87f1c]" id="totalAmountDisplay">Rp 0</span>
                         </div>
 
-                        <!-- Payment Details Section -->
-                        <div class="p-3 sm:p-4 bg-[#faf7f0] space-y-3">
-                            <!-- Subtotal & Total -->
-                            <div class="space-y-1 text-xs">
-                                <div class="flex justify-between text-[#6b6252]">
-                                    <span>Subtotal Menu</span>
-                                    <span class="font-bold text-[#2c261e]" id="subtotalDisplay">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between items-baseline pt-1.5 border-t border-[#e5dfd3]">
-                                    <span class="font-extrabold text-xs sm:text-sm text-[#2c261e]">Total Tagihan</span>
-                                    <span class="font-black text-lg text-[#a87f1c]" id="totalAmountDisplay">Rp 0</span>
-                                </div>
-                            </div>
-
-                            <!-- Payment Method Select -->
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase tracking-wider text-[#6b6252] mb-1">
+                        <!-- Payment Method Select -->
+                        <div>
+                            <div class="flex items-center justify-between mb-0.5">
+                                <label class="text-[9px] font-bold uppercase tracking-wider text-[#6b6252]">
                                     Metode Pembayaran
                                 </label>
-                                <div class="grid grid-cols-3 gap-1.5">
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="payment_method" value="cash" checked onchange="handlePaymentMethodChange()" class="peer sr-only">
-                                        <div class="px-2 py-1.5 rounded-xl border border-[#dcd4c5] bg-white text-center text-[11px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                            💵 Tunai
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="payment_method" value="qris" onchange="handlePaymentMethodChange()" class="peer sr-only">
-                                        <div class="px-2 py-1.5 rounded-xl border border-[#dcd4c5] bg-white text-center text-[11px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                            📱 QRIS
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="payment_method" value="transfer" onchange="handlePaymentMethodChange()" class="peer sr-only">
-                                        <div class="px-2 py-1.5 rounded-xl border border-[#dcd4c5] bg-white text-center text-[11px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                            🏦 Transfer
-                                        </div>
-                                    </label>
-                                </div>
                             </div>
-
-                            <!-- Cash Calculation Box (Shown only for cash) -->
-                            <div id="cashCalculationBox" class="space-y-2 pt-1.5 border-t border-[#e5dfd3]">
-                                <div>
-                                    <div class="flex items-center justify-between mb-1">
-                                        <label class="text-[10px] font-bold uppercase tracking-wider text-[#6b6252]">
-                                            Uang Diterima (Tunai) <span class="text-rose-600">*</span>
-                                        </label>
-                                        <button type="button" onclick="setExactAmount()" class="text-[10px] font-extrabold text-[#a87f1c] hover:underline cursor-pointer">
-                                            ⚡ Uang Pas
-                                        </button>
+                            <div class="grid grid-cols-3 gap-1">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="cash" checked onchange="handlePaymentMethodChange()" class="peer sr-only">
+                                    <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
+                                        💵 Tunai
                                     </div>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-[#8f8573]">
-                                            Rp
-                                        </span>
-                                        <input type="text" id="amountTenderedInput" inputmode="numeric" oninput="formatRupiahInput(this)" placeholder="0"
-                                            class="w-full pl-9 pr-3 py-2 rounded-xl border border-[#dcd4c5] bg-white text-xs font-black text-[#2c261e] focus:outline-none focus:ring-2 focus:ring-[#c59b27]" />
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="qris" onchange="handlePaymentMethodChange()" class="peer sr-only">
+                                    <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
+                                        📱 QRIS
                                     </div>
-                                </div>
-
-                                <!-- Quick Denomination Buttons -->
-                                <div class="grid grid-cols-4 gap-1">
-                                    <button type="button" onclick="setCashTendered(10000)" class="py-1 rounded-lg bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[10px] font-bold text-[#2c261e]">
-                                        10.000
-                                    </button>
-                                    <button type="button" onclick="setCashTendered(20000)" class="py-1 rounded-lg bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[10px] font-bold text-[#2c261e]">
-                                        20.000
-                                    </button>
-                                    <button type="button" onclick="setCashTendered(50000)" class="py-1 rounded-lg bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[10px] font-bold text-[#2c261e]">
-                                        50.000
-                                    </button>
-                                    <button type="button" onclick="setCashTendered(100000)" class="py-1 rounded-lg bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[10px] font-bold text-[#2c261e]">
-                                        100.000
-                                    </button>
-                                </div>
-
-                                <!-- Change Amount Display -->
-                                <div class="p-2 rounded-xl bg-white border border-[#dcd4c5] flex items-center justify-between">
-                                    <span class="text-[11px] font-bold text-[#6b6252]">Kembalian:</span>
-                                    <span class="text-xs font-black text-emerald-700" id="changeAmountDisplay">Rp 0</span>
-                                </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="transfer" onchange="handlePaymentMethodChange()" class="peer sr-only">
+                                    <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
+                                        🏦 Transfer
+                                    </div>
+                                </label>
                             </div>
-
-                            <!-- Process Button -->
-                            <button type="button" id="btnProcessCheckout" onclick="processTakeawayCheckout()"
-                                class="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-gradient-to-r from-[#c59b27] via-[#a87f1c] to-[#8a681c] hover:from-[#d4a833] hover:to-[#99741f] active:scale-[0.98] text-stone-950 font-black text-xs sm:text-sm tracking-wide shadow-md shadow-amber-950/20 transition flex items-center justify-center gap-2 cursor-pointer">
-                                <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span>Bayar & Kirim ke Dapur</span>
-                            </button>
                         </div>
+
+                        <!-- Cash Calculation Box (Shown only for cash) -->
+                        <div id="cashCalculationBox" class="space-y-1.5 pt-1.5 border-t border-[#e5dfd3]">
+                            <div>
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <label class="text-[9px] font-bold uppercase tracking-wider text-[#6b6252]">
+                                        Uang Tunai Diterima <span class="text-rose-600">*</span>
+                                    </label>
+                                    <button type="button" onclick="setExactAmount()" class="text-[9.5px] font-extrabold text-[#a87f1c] hover:underline cursor-pointer">
+                                        ⚡ Uang Pas
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[11px] font-bold text-[#8f8573]">
+                                        Rp
+                                    </span>
+                                    <input type="text" id="amountTenderedInput" inputmode="numeric" oninput="formatRupiahInput(this)" placeholder="0"
+                                        class="w-full pl-8 pr-2.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-xs font-black text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
+                                </div>
+                            </div>
+
+                            <!-- Quick Denomination Buttons -->
+                            <div class="grid grid-cols-4 gap-1">
+                                <button type="button" onclick="setCashTendered(10000)" class="py-0.5 rounded bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[9.5px] font-bold text-[#2c261e]">
+                                    10.000
+                                </button>
+                                <button type="button" onclick="setCashTendered(20000)" class="py-0.5 rounded bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[9.5px] font-bold text-[#2c261e]">
+                                    20.000
+                                </button>
+                                <button type="button" onclick="setCashTendered(50000)" class="py-0.5 rounded bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[9.5px] font-bold text-[#2c261e]">
+                                    50.000
+                                </button>
+                                <button type="button" onclick="setCashTendered(100000)" class="py-0.5 rounded bg-white hover:bg-[#ede7da] border border-[#dcd4c5] text-[9.5px] font-bold text-[#2c261e]">
+                                    100.000
+                                </button>
+                            </div>
+
+                            <!-- Change Amount Display -->
+                            <div class="px-2 py-0.5 rounded-lg bg-white border border-[#dcd4c5] flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-[#6b6252]">Kembalian:</span>
+                                <span class="text-xs font-black text-emerald-700" id="changeAmountDisplay">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Process Button -->
+                        <button type="button" id="btnProcessCheckout" onclick="processTakeawayCheckout()"
+                            class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-[#c59b27] via-[#a87f1c] to-[#8a681c] hover:from-[#d4a833] hover:to-[#99741f] active:scale-[0.98] text-stone-950 font-black text-xs sm:text-sm tracking-wide shadow-md shadow-amber-950/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Bayar & Kirim ke Dapur</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -602,34 +603,34 @@
         items.forEach(item => {
             const lineTotal = item.price * item.quantity;
             html += `
-                <div class="pt-2.5 pb-1 space-y-1.5 first:pt-0">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex-1">
-                            <h4 class="text-xs font-bold text-[#26211a] leading-tight">${item.name}</h4>
-                            <span class="text-[11px] text-[#8f8573]">${formatRupiah(item.price)} &times; ${item.quantity}</span>
+                <div class="py-1.5 space-y-1 first:pt-0">
+                    <div class="flex items-start justify-between gap-1.5">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-[#26211a] leading-tight truncate">${item.name}</h4>
+                            <span class="text-[10px] text-[#8f8573]">${formatRupiah(item.price)} &times; ${item.quantity}</span>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                             <span class="text-xs font-black text-[#26211a] block">${formatRupiah(lineTotal)}</span>
-                            <button type="button" onclick="removeCartItem(${item.id})" class="text-[10px] text-rose-500 hover:text-rose-700 font-semibold mt-0.5">
+                            <button type="button" onclick="removeCartItem(${item.id})" class="text-[9.5px] text-rose-500 hover:text-rose-700 font-semibold">
                                 Hapus
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between gap-2 pt-1">
-                        <div class="flex items-center gap-1.5 bg-white border border-[#dcd4c5] rounded-lg p-0.5 shadow-2xs">
-                            <button type="button" onclick="updateCartItemQty(${item.id}, -1)" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold bg-[#faf7f0] hover:bg-[#ede7da] text-[#2c261e]">
+                    <div class="flex items-center justify-between gap-1.5 pt-0.5">
+                        <div class="flex items-center gap-1 bg-white border border-[#dcd4c5] rounded-md p-0.5 shadow-2xs shrink-0">
+                            <button type="button" onclick="updateCartItemQty(${item.id}, -1)" class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold bg-[#faf7f0] hover:bg-[#ede7da] text-[#2c261e]">
                                 -
                             </button>
-                            <span class="w-6 text-center text-xs font-black text-[#26211a]">${item.quantity}</span>
-                            <button type="button" onclick="updateCartItemQty(${item.id}, 1)" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold bg-[#faf7f0] hover:bg-[#ede7da] text-[#2c261e]">
+                            <span class="w-5 text-center text-xs font-black text-[#26211a]">${item.quantity}</span>
+                            <button type="button" onclick="updateCartItemQty(${item.id}, 1)" class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold bg-[#faf7f0] hover:bg-[#ede7da] text-[#2c261e]">
                                 +
                             </button>
                         </div>
 
                         <input type="text" value="${item.notes || ''}" onchange="updateCartItemNotes(${item.id}, this.value)"
-                            placeholder="Catatan porsi (misal: pedas)"
-                            class="flex-1 px-2.5 py-1 rounded-lg border border-[#e5dfd3] bg-white text-[10px] text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
+                            placeholder="Catatan porsi..."
+                            class="flex-1 px-2 py-0.5 rounded border border-[#e5dfd3] bg-white text-[9.5px] text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
                     </div>
                 </div>
             `;
