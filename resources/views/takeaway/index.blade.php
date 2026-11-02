@@ -141,7 +141,7 @@
                                     </span>
                                 </div>
 
-                                <!-- Action Buttons: Add & Qty Counter -->
+                                <!-- Action Button: Add -->
                                 <div id="card-action-{{ $product->id }}" class="shrink-0">
                                     <button type="button" id="btn-add-{{ $product->id }}"
                                         onclick="addToTakeawayCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (float)$product->selling_price }})"
@@ -152,19 +152,6 @@
                                         </svg>
                                         <span>Tambah</span>
                                     </button>
-                                    <div id="counter-{{ $product->id }}" class="hidden items-center gap-1 bg-[#faf7f0] border border-[#c59b27] rounded-xl p-0.5 shadow-2xs">
-                                        <button type="button" onclick="updateCartItemQty({{ $product->id }}, -1)"
-                                            class="w-6 h-6 rounded-lg bg-white text-[#2c261e] border border-[#dcd4c5] flex items-center justify-center font-bold text-xs hover:bg-[#ede7da]">
-                                            -
-                                        </button>
-                                        <span id="qty-{{ $product->id }}" class="font-black text-xs text-stone-950 px-1 min-w-[1.25rem] text-center">
-                                            0
-                                        </span>
-                                        <button type="button" onclick="updateCartItemQty({{ $product->id }}, 1)"
-                                            class="w-6 h-6 rounded-lg bg-[#c59b27] text-stone-950 flex items-center justify-center font-bold text-xs hover:bg-[#a87f1c]">
-                                            +
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -200,14 +187,21 @@
                         </span>
                     </div>
 
-                    <!-- Customer Details Form (Compact 2-col layout) -->
-                    <div class="px-3 py-1.5 bg-[#faf7f0] border-b border-[#e5dfd3] grid grid-cols-2 gap-2 shrink-0">
+                    <!-- Customer Details Form (Compact 3-col layout) -->
+                    <div class="px-3 py-1.5 bg-[#faf7f0] border-b border-[#e5dfd3] grid grid-cols-1 sm:grid-cols-3 gap-1.5 shrink-0">
                         <div>
                             <label class="block text-[9px] font-bold uppercase tracking-wider text-[#6b6252] mb-0.5">
                                 Nama Pelanggan
                             </label>
-                            <input type="text" id="customerNameInput" placeholder="Ibu Rina / Takeaway"
+                            <input type="text" id="customerNameInput" placeholder="Ibu Rina / Pelanggan"
                                 class="w-full px-2.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-xs font-semibold text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-[#6b6252] mb-0.5">
+                                No. HP Pelanggan
+                            </label>
+                            <input type="tel" id="customerPhoneInput" placeholder="08xxxxxxxxxx"
+                                class="w-full px-2.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-xs text-[#2c261e] focus:outline-none focus:ring-1 focus:ring-[#c59b27]" />
                         </div>
                         <div>
                             <label class="block text-[9px] font-bold uppercase tracking-wider text-[#6b6252] mb-0.5">
@@ -541,26 +535,11 @@
         }
     }
 
-    // Sinkronkan tombol tambah & counter jumlah di kartu menu
+    // Sinkronkan tombol tambah di kartu menu (selalu bersih tanpa widget counter di kartu)
     function updateMenuCardUI(id) {
         const btnAdd = document.getElementById(`btn-add-${id}`);
-        const counter = document.getElementById(`counter-${id}`);
-        const qtyText = document.getElementById(`qty-${id}`);
-
-        if (takeawayCart[id] && takeawayCart[id].quantity > 0) {
-            if (btnAdd) btnAdd.classList.add('hidden');
-            if (counter) {
-                counter.classList.remove('hidden');
-                counter.classList.add('inline-flex');
-            }
-            if (qtyText) qtyText.innerText = takeawayCart[id].quantity;
-        } else {
-            if (btnAdd) btnAdd.classList.remove('hidden');
-            if (counter) {
-                counter.classList.add('hidden');
-                counter.classList.remove('inline-flex');
-            }
-            if (qtyText) qtyText.innerText = '0';
+        if (btnAdd) {
+            btnAdd.classList.remove('hidden');
         }
     }
 
@@ -706,6 +685,8 @@
     function resetTakeawayCart() {
         takeawayCart = {};
         document.getElementById('customerNameInput').value = '';
+        const phoneInput = document.getElementById('customerPhoneInput');
+        if (phoneInput) phoneInput.value = '';
         document.getElementById('orderNotesInput').value = '';
         document.getElementById('amountTenderedInput').value = '';
         document.querySelector('input[name="payment_method"][value="cash"]').checked = true;
@@ -744,6 +725,7 @@
         }
 
         const customerName = (document.getElementById('customerNameInput').value || '').trim();
+        const customerPhone = (document.getElementById('customerPhoneInput')?.value || '').trim();
         const notes = (document.getElementById('orderNotesInput').value || '').trim();
 
         const btn = document.getElementById('btnProcessCheckout');
@@ -768,6 +750,7 @@
                 },
                 body: JSON.stringify({
                     customer_name: customerName,
+                    customer_phone: customerPhone,
                     notes: notes,
                     payment_method: method,
                     amount_tendered: method === 'cash' ? rawTendered : totalAmount,

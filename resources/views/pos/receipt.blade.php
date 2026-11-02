@@ -75,7 +75,8 @@
             <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-16 h-16 mx-auto object-contain mb-2 drop-shadow-sm">
             <h3 class="font-extrabold text-lg text-slate-900 tracking-tight">FIRA CAKE</h3>
             <p class="text-xs text-slate-500 mt-0.5">Bakery & Pastry • Cafe & Resto</p>
-            <p class="text-xs text-slate-400">Struk Resmi Pembelian</p>
+            <p class="text-xs font-semibold text-slate-700">Telp / WA Pemilik: 082131117996</p>
+            <p class="text-xs text-slate-400 mt-0.5">Struk Resmi Pembelian</p>
         </div>
 
         <!-- Meta Info -->
@@ -123,6 +124,12 @@
                 <div class="flex justify-between">
                     <span class="text-slate-400">Pelanggan</span>
                     <span class="text-slate-700 font-semibold">{{ $sale->customer_name ?: $sale->openBill->customer_name }}</span>
+                </div>
+            @endif
+            @if($sale->customer_phone)
+                <div class="flex justify-between">
+                    <span class="text-slate-400">No. HP Pelanggan</span>
+                    <span class="text-slate-700 font-semibold">{{ $sale->customer_phone }}</span>
                 </div>
             @endif
             <div class="flex justify-between">
@@ -197,6 +204,7 @@
         <!-- Footer Thank You Note -->
         <div class="text-center pt-6 space-y-1 text-xs text-slate-400">
             <p class="font-bold text-slate-700">Terima kasih atas kunjungan Anda!</p>
+            <p class="text-[11px] font-semibold text-slate-600">Hubungi Pemilik: 082131117996</p>
             <p class="text-[11px]">Barang yang sudah dibeli tidak dapat ditukar/dikembalikan tanpa bukti struk ini.</p>
         </div>
     </div>

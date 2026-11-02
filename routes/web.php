@@ -13,6 +13,7 @@ use App\Http\Controllers\Cashier\MenuController as CashierMenuController;
 use App\Http\Controllers\Cashier\OpenBillController as CashierOpenBillController;
 use App\Http\Controllers\Cashier\TransactionController as CashierTransactionController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\KioskOrderController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\ReportController;
@@ -62,6 +63,13 @@ Route::prefix('order')->name('order.')->group(function () {
 });
 Route::post('/api/midtrans/notification', [CustomerOrderController::class, 'midtransNotification'])->name('midtrans.notification');
 Route::get('/meja/{table_number}', fn ($table_number) => redirect()->route('order.index', $table_number));
+
+// Customer Self-Ordering Kiosk (Layar Pemesanan Mandiri di Toko - Akses langsung via URL tanpa link navigasi)
+Route::prefix('kiosk')->name('kiosk.')->group(function () {
+    Route::get('/', [KioskOrderController::class, 'index'])->name('index');
+    Route::post('/checkout', [KioskOrderController::class, 'checkout'])->name('checkout');
+    Route::get('/receipt/{sale}', [KioskOrderController::class, 'receipt'])->name('receipt');
+});
 
 // Cashier & Terminal Routes (Customer Order Management & Payment Confirmation)
 Route::middleware(['auth', 'role:cashier,admin,owner'])->prefix('cashier')->name('cashier.')->group(function () {

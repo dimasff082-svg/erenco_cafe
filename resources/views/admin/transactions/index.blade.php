@@ -31,6 +31,37 @@
         </div>
     </div>
 
+    <!-- Summary Cards (Hasil Keseluruhan Transaksi & Uang Masuk Toko) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Total Seluruh Transaksi -->
+        <div class="bg-white rounded-2xl border border-[#e5dfd3] p-5 shadow-[0_4px_20px_-4px_rgba(40,30,15,0.05)] flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-bold text-[#8f8573] uppercase tracking-wider block">Keseluruhan Transaksi</span>
+                <span class="text-2xl font-black text-[#26211a] mt-1 block">
+                    {{ number_format($summary['total_transactions'] ?? 0, 0, ',', '.') }} <span class="text-xs font-semibold text-[#8f8573]">Transaksi</span>
+                </span>
+                <p class="text-[11px] text-[#8f8573] mt-0.5">Total akumulasi seluruh transaksi pada sistem</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] flex items-center justify-center text-xl text-[#c59b27] shadow-2xs">
+                📊
+            </div>
+        </div>
+
+        <!-- Total Seluruh Uang Masuk (Omzet) -->
+        <div class="bg-white rounded-2xl border border-[#e5dfd3] p-5 shadow-[0_4px_20px_-4px_rgba(40,30,15,0.05)] flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-bold text-[#8f8573] uppercase tracking-wider block">Total Uang Masuk (Omzet)</span>
+                <span class="text-2xl font-black text-[#15803d] mt-1 block">
+                    Rp {{ number_format($summary['total_revenue'] ?? 0, 0, ',', '.') }}
+                </span>
+                <p class="text-[11px] text-[#8f8573] mt-0.5">Akumulasi uang masuk lunas dari seluruh transaksi</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xl text-emerald-600 shadow-2xs">
+                💵
+            </div>
+        </div>
+    </div>
+
     <!-- Filters Form -->
     <div class="bg-white rounded-2xl border border-[#e5dfd3] shadow-[0_4px_20px_-4px_rgba(40,30,15,0.05)] p-4">
         <form action="{{ $currentRoute }}" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3">

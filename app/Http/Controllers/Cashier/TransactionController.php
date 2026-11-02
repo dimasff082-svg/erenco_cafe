@@ -14,8 +14,9 @@ class TransactionController extends Controller
     {
         $cashierId = $request->user()->isCashier() ? $request->user()->id : null;
         $sales = $historyService->getTransactions($request, $cashierId);
+        $summary = $historyService->getTransactionSummary($request, $cashierId);
 
-        return view('cashier.transactions.index', compact('sales'));
+        return view('cashier.transactions.index', compact('sales', 'summary'));
     }
 
     public function show(Request $request, Sale $sale): View

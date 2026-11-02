@@ -14,9 +14,10 @@ class TransactionController extends Controller
     public function index(Request $request, TransactionHistoryService $historyService): View
     {
         $sales = $historyService->getTransactions($request);
+        $summary = $historyService->getTransactionSummary($request);
         $cashiers = User::whereIn('role', ['cashier', 'admin'])->orderBy('name')->get();
 
-        return view('admin.transactions.index', compact('sales', 'cashiers'));
+        return view('admin.transactions.index', compact('sales', 'cashiers', 'summary'));
     }
 
     public function show(Sale $sale): View

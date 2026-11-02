@@ -51,6 +51,7 @@ class TakeawayOrderController extends Controller
 
         $validated = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:100'],
+            'customer_phone' => ['nullable', 'string', 'max:25'],
             'notes' => ['nullable', 'string', 'max:500'],
             'payment_method' => ['required', 'string', 'in:cash,transfer,qris'],
             'amount_tendered' => ['nullable', 'numeric', 'min:0'],
@@ -140,6 +141,7 @@ class TakeawayOrderController extends Controller
                     'transaction_number' => $orderNumber,
                     'table_number' => 'TAKEAWAY',
                     'customer_name' => (! empty($validated['customer_name'])) ? $validated['customer_name'] : 'Pelanggan Bawa Pulang',
+                    'customer_phone' => $validated['customer_phone'] ?? null,
                     'user_id' => $user->id,
                     'transaction_date' => now(),
                     'subtotal' => $subtotal,

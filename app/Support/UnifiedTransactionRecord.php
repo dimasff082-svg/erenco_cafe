@@ -80,10 +80,10 @@ class UnifiedTransactionRecord
         $record->type = 'sale';
         $record->is_open_bill = false;
         $record->is_takeaway = ($sale->table_number === 'TAKEAWAY');
-        $record->badge_label = $record->is_takeaway ? 'Takeaway' : 'Reguler';
+        $record->badge_label = $record->is_takeaway ? 'Takeaway' : ($sale->table_number === 'KIOSK' ? 'Kiosk Mandiri' : 'Reguler');
         $record->transaction_number = $sale->transaction_number;
         $record->transaction_date = $sale->transaction_date ?? ($sale->created_at ?? now());
-        $record->table_number = $record->is_takeaway ? 'Bawa Pulang (Takeaway)' : $sale->table_number;
+        $record->table_number = $record->is_takeaway ? 'Bawa Pulang (Takeaway)' : ($sale->table_number === 'KIOSK' ? 'Layar Mandiri (Kiosk)' : $sale->table_number);
         $record->customer_name = $sale->customer_name;
         $record->cashier_name = $sale->confirmer?->name ?? ($sale->user?->name ?? 'Kasir');
         $record->user = $sale->user;

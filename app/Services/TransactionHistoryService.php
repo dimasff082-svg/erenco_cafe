@@ -18,14 +18,95 @@ class TransactionHistoryService
      */
     public function getTransactions(Request $request, ?int $onlyCashierId = null, int $perPage = 15): LengthAwarePaginator
     {
+        [$salesQuery, $openBillsQuery] = $this->buildBaseQueries($request, $onlyCashierId);
+
+        // Gabungkan kedua subquery dengan UNION ALL
+        $unionQuery = $salesQuery->unionAll($openBillsQuery);
+
+        $paginator = DB::query()
+            ->fromSub($unionQuery, 'combined_transactions')
+            ->orderByDesc('sort_date')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        // Kumpulkan ID untuk eager loading yang efisien
+        $saleIds = [];
+        $openBillIds = [];
+
+        foreach ($paginator->items() as $item) {
+            if ($item->record_type === 'sale') {
+                $saleIds[] = $item->record_id;
+            } else {
+                $openBillIds[] = $item->record_id;
+            }
+        }
+
+        $sales = ! empty($saleIds)
+            ? Sale::with(['user', 'confirmer', 'payment', 'items.product'])->whereIn('id', $saleIds)->get()->keyBy('id')
+            : collect();
+
+        $openBills = ! empty($openBillIds)
+            ? OpenBill::with(['opener', 'closer', 'sales.user', 'sales.confirmer', 'sales.payment', 'sales.items.product'])
+                ->whereIn('id', $openBillIds)
+                ->get()
+                ->keyBy('id')
+            : collect();
+
+        $unifiedRecords = collect();
+
+        foreach ($paginator->items() as $item) {
+            if ($item->record_type === 'sale' && isset($sales[$item->record_id])) {
+                $unifiedRecords->push(UnifiedTransactionRecord::fromSale($sales[$item->record_id]));
+            } elseif ($item->record_type === 'open_bill' && isset($openBills[$item->record_id])) {
+                $unifiedRecords->push(UnifiedTransactionRecord::fromOpenBill($openBills[$item->record_id]));
+            }
+        }
+
+        $paginator->setCollection($unifiedRecords);
+
+        return $paginator;
+    }
+
+    /**
+     * Hitung ringkasan akumulasi transaksi: total transaksi & total uang masuk.
+     *
+     * @return array{total_transactions: int, total_revenue: float}
+     */
+    public function getTransactionSummary(Request $request, ?int $onlyCashierId = null): array
+    {
+        [$salesQuery, $openBillsQuery] = $this->buildBaseQueries($request, $onlyCashierId);
+        $unionQuery = $salesQuery->unionAll($openBillsQuery);
+
+        $summary = DB::query()
+            ->fromSub($unionQuery, 'combined_transactions')
+            ->selectRaw('COUNT(*) as total_count, COALESCE(SUM(paid_amount), 0) as total_revenue')
+            ->first();
+
+        return [
+            'total_transactions' => (int) ($summary->total_count ?? 0),
+            'total_revenue' => (float) ($summary->total_revenue ?? 0),
+        ];
+    }
+
+    /**
+     * Membangun subquery dasar untuk transaksi Sale mandiri dan Open Bill.
+     */
+    protected function buildBaseQueries(Request $request, ?int $onlyCashierId = null): array
+    {
         // 1. Query Pesanan Mandiri / Reguler (tanpa Open Bill)
         $salesQuery = DB::table('sales')
-            ->selectRaw("'sale' as record_type, id as record_id, transaction_date as sort_date")
+            ->selectRaw("'sale' as record_type, id as record_id, transaction_date as sort_date, total_amount, (CASE WHEN payment_status = 'paid' THEN total_amount ELSE 0 END) as paid_amount")
             ->whereNull('open_bill_id');
 
         // 2. Query Open Bill yang memiliki pesanan
         $openBillsQuery = DB::table('open_bills')
-            ->selectRaw("'open_bill' as record_type, id as record_id, COALESCE(closed_at, opened_at, created_at) as sort_date")
+            ->selectRaw("
+                'open_bill' as record_type,
+                id as record_id,
+                COALESCE(closed_at, opened_at, created_at) as sort_date,
+                COALESCE(NULLIF(open_bills.total_amount, 0), (SELECT COALESCE(SUM(sales.total_amount), 0) FROM sales WHERE sales.open_bill_id = open_bills.id), 0) as total_amount,
+                (CASE WHEN open_bills.status = 'paid' THEN COALESCE(NULLIF(open_bills.total_amount, 0), (SELECT COALESCE(SUM(sales.total_amount), 0) FROM sales WHERE sales.open_bill_id = open_bills.id), 0) ELSE 0 END) as paid_amount
+            ")
             ->whereExists(function ($q) {
                 $q->select(DB::raw(1))
                     ->from('sales')
@@ -154,50 +235,6 @@ class TransactionHistoryService
             });
         }
 
-        // Gabungkan kedua subquery dengan UNION ALL
-        $unionQuery = $salesQuery->unionAll($openBillsQuery);
-
-        $paginator = DB::query()
-            ->fromSub($unionQuery, 'combined_transactions')
-            ->orderByDesc('sort_date')
-            ->paginate($perPage)
-            ->withQueryString();
-
-        // Kumpulkan ID untuk eager loading yang efisien
-        $saleIds = [];
-        $openBillIds = [];
-
-        foreach ($paginator->items() as $item) {
-            if ($item->record_type === 'sale') {
-                $saleIds[] = $item->record_id;
-            } else {
-                $openBillIds[] = $item->record_id;
-            }
-        }
-
-        $sales = ! empty($saleIds)
-            ? Sale::with(['user', 'confirmer', 'payment', 'items.product'])->whereIn('id', $saleIds)->get()->keyBy('id')
-            : collect();
-
-        $openBills = ! empty($openBillIds)
-            ? OpenBill::with(['opener', 'closer', 'sales.user', 'sales.confirmer', 'sales.payment', 'sales.items.product'])
-                ->whereIn('id', $openBillIds)
-                ->get()
-                ->keyBy('id')
-            : collect();
-
-        $unifiedRecords = collect();
-
-        foreach ($paginator->items() as $item) {
-            if ($item->record_type === 'sale' && isset($sales[$item->record_id])) {
-                $unifiedRecords->push(UnifiedTransactionRecord::fromSale($sales[$item->record_id]));
-            } elseif ($item->record_type === 'open_bill' && isset($openBills[$item->record_id])) {
-                $unifiedRecords->push(UnifiedTransactionRecord::fromOpenBill($openBills[$item->record_id]));
-            }
-        }
-
-        $paginator->setCollection($unifiedRecords);
-
-        return $paginator;
+        return [$salesQuery, $openBillsQuery];
     }
 }

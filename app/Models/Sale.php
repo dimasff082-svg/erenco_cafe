@@ -16,6 +16,7 @@ class Sale extends Model
         'transaction_number',
         'table_number',
         'customer_name',
+        'customer_phone',
         'user_id',
         'transaction_date',
         'subtotal',
