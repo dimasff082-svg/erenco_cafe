@@ -22,7 +22,7 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-24 h-24 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300">
             </div>
             <h1 class="text-2xl font-serif-classic font-bold tracking-tight text-[#f5ebd7]">FIRA CAKE</h1>
-            <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">BAKERY & PASTRY</p>
+            <p class="text-sm uppercase font-cinzel tracking-[0.25em] text-white font-semibold mt-1">BAKERY & PASTRY</p>
             <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">Point Of Sales Terintegrasi</p>
             <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">V 1.2 LJ</p>
         </div>
