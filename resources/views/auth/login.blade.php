@@ -95,12 +95,14 @@
             </form>
         </div>
 
-        <p class="text-center text-xs text-[#736858] mt-6">
-            &copy; {{ date('Y') }} Point of Sale &bull; Modern Classic Edition
-        </p>
-        <p class="text-center text-xs text-[#736858] mt-6">
-            <a href="https://linyjayainformatika.co.id" target="_blank" rel="noopener noreferrer">Develop by PT. Liny Jaya Informatika</a>
-        </p>
+        <div class="text-center mt-6 space-y-1">
+            <p class="text-xs text-[#8c8170]">
+                &copy; {{ date('Y') }} Point of Sale &bull; Modern Classic Edition
+            </p>
+            <p class="text-sm font-semibold text-white">
+                <a href="https://linyjayainformatika.co.id" target="_blank" rel="noopener noreferrer" class="hover:text-[#c59b27] transition">Develop by PT. Liny Jaya Informatika</a>
+            </p>
+        </div>
     </div>
 </body>
 </html>
