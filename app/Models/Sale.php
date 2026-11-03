@@ -29,6 +29,9 @@ class Sale extends Model
         'open_bill_id',
         'confirmed_by',
         'confirmed_at',
+        'cancelled_by',
+        'cancelled_at',
+        'cancellation_reason',
         'notes',
     ];
 
@@ -37,6 +40,7 @@ class Sale extends Model
         return [
             'transaction_date' => 'datetime',
             'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
             'subtotal' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
@@ -51,6 +55,11 @@ class Sale extends Model
     public function confirmer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     public function openBill(): BelongsTo
@@ -93,11 +102,17 @@ class Sale extends Model
         return $this->payment_status === 'unpaid';
     }
 
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled' || $this->order_status === 'cancelled';
+    }
+
     public function orderStatusLabel(): string
     {
         return match ($this->order_status) {
             'processing' => 'Diproses',
             'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
             default => 'Menunggu',
         };
     }
@@ -106,6 +121,7 @@ class Sale extends Model
     {
         return match ($this->payment_status) {
             'paid' => 'Lunas',
+            'cancelled' => 'Dibatalkan',
             default => 'Belum Dibayar',
         };
     }

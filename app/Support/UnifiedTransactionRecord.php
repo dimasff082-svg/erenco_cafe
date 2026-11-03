@@ -63,6 +63,14 @@ class UnifiedTransactionRecord
 
     public string $payment_status = 'paid';
 
+    public bool $is_cancelled = false;
+
+    public ?string $cancellation_reason = null;
+
+    public ?User $canceller = null;
+
+    public ?Carbon $cancelled_at = null;
+
     public ?string $notes = null;
 
     public string $receipt_url = '#';
@@ -97,6 +105,10 @@ class UnifiedTransactionRecord
         $record->total_amount = (float) $sale->total_amount;
         $record->status = $sale->status;
         $record->payment_status = $sale->payment_status;
+        $record->is_cancelled = $sale->isCancelled();
+        $record->cancellation_reason = $sale->cancellation_reason;
+        $record->canceller = $sale->canceller;
+        $record->cancelled_at = $sale->cancelled_at;
         $record->notes = $sale->notes;
         $record->receipt_url = route('pos.receipt', $sale->id);
         $record->sale = $sale;
@@ -166,6 +178,11 @@ class UnifiedTransactionRecord
         $record->openBill = $openBill;
 
         return $record;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->is_cancelled || $this->status === 'cancelled' || $this->payment_status === 'cancelled';
     }
 
     public function __get(string $name): mixed

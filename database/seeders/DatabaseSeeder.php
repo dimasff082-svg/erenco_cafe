@@ -57,6 +57,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'warehouse@pos.test'],
+            [
+                'name' => 'Staf Gudang Utama',
+                'password' => bcrypt('password'),
+                'role' => 'warehouse',
+                'is_active' => true,
+            ]
+        );
+
         // Kategori Awal
         $catFood = Category::firstOrCreate(['name' => 'Makanan & Snack'], ['description' => 'Aneka makanan ringan dan porsi utama', 'is_active' => true]);
         $catDrink = Category::firstOrCreate(['name' => 'Minuman Segar'], ['description' => 'Minuman kemasan dan racikan dingin', 'is_active' => true]);

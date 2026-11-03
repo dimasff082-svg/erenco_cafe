@@ -21,6 +21,9 @@ class AuthController extends Controller
             if (Auth::user()->isKitchen()) {
                 return redirect()->route('kitchen.index');
             }
+            if (Auth::user()->isWarehouse()) {
+                return redirect()->route('warehouse.expenses.index');
+            }
 
             return redirect()->route('cashier.dashboard');
         }
@@ -66,6 +69,10 @@ class AuthController extends Controller
 
         if ($user->isKitchen()) {
             return redirect()->route('kitchen.index');
+        }
+
+        if ($user->isWarehouse()) {
+            return redirect()->route('warehouse.expenses.index');
         }
 
         return redirect()->route('cashier.dashboard');

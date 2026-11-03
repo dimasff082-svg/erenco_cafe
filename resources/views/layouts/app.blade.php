@@ -60,9 +60,9 @@
                 </div>
                 <div class="overflow-hidden">
                     <p class="text-xs font-semibold text-[#f2ece1] truncate">{{ auth()->user()->name }}</p>
-                    <span class="inline-flex items-center gap-1.5 text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-amber-500/20 text-[#eac36c] border border-amber-500/30' : (auth()->user()->isAdmin() ? 'bg-stone-500/20 text-stone-300 border border-stone-600/30' : (auth()->user()->isKitchen() ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30')) }}">
-                        <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-amber-400' : (auth()->user()->isAdmin() ? 'bg-stone-400' : (auth()->user()->isKitchen() ? 'bg-blue-400' : 'bg-emerald-400')) }}"></span>
-                        {{ auth()->user()->isOwner() ? 'PEMILIK TOKO' : (auth()->user()->isAdmin() ? 'ADMINISTRATOR' : (auth()->user()->isKitchen() ? 'STAF DAPUR' : 'KASIR')) }}
+                    <span class="inline-flex items-center gap-1.5 text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-amber-500/20 text-[#eac36c] border border-amber-500/30' : (auth()->user()->isAdmin() ? 'bg-stone-500/20 text-stone-300 border border-stone-600/30' : (auth()->user()->isKitchen() ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : (auth()->user()->isWarehouse() ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'))) }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-amber-400' : (auth()->user()->isAdmin() ? 'bg-stone-400' : (auth()->user()->isKitchen() ? 'bg-blue-400' : (auth()->user()->isWarehouse() ? 'bg-purple-400' : 'bg-emerald-400'))) }}"></span>
+                        {{ auth()->user()->roleLabel() }}
                     </span>
                 </div>
             </div>
@@ -84,11 +84,52 @@
                         </svg>
                         Laporan Penjualan
                     </a>
+                    <a href="{{ route('owner.profit_loss.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('owner.profit_loss.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md shadow-amber-950/30' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Laporan Laba / Rugi
+                    </a>
+                    <a href="{{ route('owner.salaries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('owner.salaries.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md shadow-amber-950/30' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Penggajian Karyawan
+                    </a>
                     <a href="{{ route('owner.transactions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('owner.transactions.*') || request()->routeIs('admin.transactions.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md shadow-amber-950/30' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
                         <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Riwayat Transaksi
+                    </a>
+                    <a href="{{ route('owner.attendances.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('owner.attendances.*') || request()->routeIs('admin.attendances.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md shadow-amber-950/30' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Rekap Presensi Karyawan
+                    </a>
+
+                @elseif(auth()->user()->isWarehouse())
+                    <!-- Warehouse Staff Navigation -->
+                    <div class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Gudang & Operasional</div>
+                    <a href="{{ route('warehouse.expenses.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('warehouse.expenses.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        Transaksi Pengeluaran
+                    </a>
+                    <a href="{{ route('attendance.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('attendance.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Presensi Kehadiran
+                    </a>
+                    <a href="{{ route('my_salaries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('my_salaries.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Slip Gaji Saya
                     </a>
 
                 @elseif(auth()->user()->isKitchen())
@@ -113,8 +154,10 @@
 
                     <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Operasional Resto</div>
                     <a href="{{ route('takeaway.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('takeaway.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
-                        <span class="text-base leading-none">🛍️</span>
-                        transaksi penjualan
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Transaksi Penjualan
                     </a>
                     <a href="{{ route('cashier.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('cashier.dashboard') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
                         <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +195,7 @@
                         <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        Data Menu
+                        Daftar Menu
                     </a>
 
                     <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Audit & Penjualan</div>
@@ -168,6 +211,24 @@
                         </svg>
                         Laporan Penjualan
                     </a>
+                    <a href="{{ route('warehouse.expenses.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('warehouse.expenses.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        Pengeluaran Gudang
+                    </a>
+                    <a href="{{ route('admin.salaries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.salaries.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Penggajian Karyawan
+                    </a>
+                    <a href="{{ route('admin.attendances.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.attendances.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Rekap Presensi Karyawan
+                    </a>
 
                     <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Pengaturan</div>
                     <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.users.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
@@ -181,7 +242,9 @@
                     <!-- Cashier Navigation: Operasional Pesanan, Open Bill, & Riwayat Transaksi -->
                     <div class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8c8270]">Operasional Resto</div>
                     <a href="{{ route('takeaway.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('takeaway.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
-                        <span class="text-base leading-none">🛍️</span>
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
                         Transaksi Penjualan
                     </a>
                     <a href="{{ route('cashier.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('cashier.dashboard') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
@@ -211,6 +274,19 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Riwayat Transaksi Lunas
+                    </a>
+                    <a href="{{ route('attendance.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('attendance.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Presensi Kehadiran
+                    </a>
+                    <a href="{{ route('my_salaries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('my_salaries.*') ? 'bg-[#c59b27] text-stone-950 font-bold shadow-md' : 'text-[#c7bfb1] hover:bg-[#25221c] hover:text-[#f3eee5]' }}">
+                        <svg class="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Slip Gaji Saya
                     </a>
                 @endif
             </nav>
@@ -265,7 +341,7 @@
                             <svg class="w-5 h-5 shrink-0 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span class="font-semibold">{{ session('success') }}</span>
+                            <span class="font-semibold">{{ is_array(session('success')) ? implode(', ', session('success')) : session('success') }}</span>
                         </div>
                     @endif
 
@@ -274,7 +350,7 @@
                             <svg class="w-5 h-5 shrink-0 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span class="font-semibold">{{ session('error') }}</span>
+                            <span class="font-semibold">{{ is_array(session('error')) ? implode(', ', session('error')) : session('error') }}</span>
                         </div>
                     @endif
 
@@ -297,7 +373,9 @@
 
                 <!-- Page Content -->
                 <main class="p-8">
-                    {{ $slot ?? '' }}
+                    @if(isset($slot) && ! is_array($slot))
+                        {{ $slot }}
+                    @endif
                     @yield('content')
                 </main>
             </div>

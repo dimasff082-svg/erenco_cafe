@@ -20,7 +20,10 @@ class KitchenController extends Controller
         // Aturan KDS Dapur:
         // 1. Meja dengan Open Bill langsung masuk dapur meskipun belum lunas.
         // 2. Meja tanpa Open Bill WAJIB sudah lunas (paid) baru masuk antrean dapur.
+        // 3. Pesanan yang DIBATALKAN (cancelled) tidak boleh masuk ke antrean dapur.
         $kitchenBaseQuery = Sale::whereDate('transaction_date', today())
+            ->where('order_status', '!=', 'cancelled')
+            ->where('status', '!=', 'cancelled')
             ->where(function ($q) {
                 $q->whereNotNull('open_bill_id')
                     ->orWhere('payment_status', 'paid');

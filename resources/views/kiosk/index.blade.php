@@ -83,7 +83,7 @@
             <div class="bg-white rounded-xl border border-[#e5dfd3] p-2 sm:p-2.5 shadow-2xs space-y-2 shrink-0">
                 <div class="relative">
                     <input type="text" id="kioskSearchInput" oninput="handleKioskSearch()"
-                        placeholder="🔍 Cari menu (misal: Roti, Brownies, Kopi)..."
+                        placeholder="Cari menu (misal: Roti, Brownies, Kopi)..."
                         class="w-full pl-3 pr-8 py-1.5 rounded-lg border border-[#dcd4c5] bg-[#faf7f0] text-xs text-[#26211a] font-medium focus:ring-1 focus:ring-[#c59b27] focus:bg-white focus:outline-none transition">
                     <button type="button" onclick="clearKioskSearch()" id="btnClearSearch"
                         class="hidden absolute right-2.5 top-1.5 text-[#8f8573] hover:text-[#26211a] text-sm font-bold">
@@ -123,8 +123,10 @@
                                     @if($product->image_url)
                                         <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                     @else
-                                        <div class="text-center p-1.5">
-                                            <span class="text-2xl block mb-0.5">🍰</span>
+                                        <div class="text-center p-1.5 text-stone-300">
+                                            <svg class="w-6 h-6 mx-auto mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
                                             <span class="text-[8.5px] font-bold text-[#8f8573] uppercase tracking-wider block truncate max-w-[90px]">{{ $category->name }}</span>
                                         </div>
                                     @endif
@@ -174,7 +176,9 @@
 
                 <!-- Empty Search Fallback -->
                 <div id="kioskNoMatch" class="hidden bg-white rounded-2xl p-8 text-center border border-[#e5dfd3] shadow-xs my-4">
-                    <span class="text-3xl block mb-2">🔍</span>
+                    <svg class="w-8 h-8 mx-auto text-stone-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                     <h3 class="text-xs font-bold text-[#26211a]">Menu tidak ditemukan</h3>
                     <p class="text-[10px] text-[#8f8573] mt-0.5 max-w-xs mx-auto">Menu yang Anda cari tidak tersedia. Coba gunakan kata kunci lain atau pilih kategori.</p>
                 </div>
@@ -188,7 +192,9 @@
             <div class="px-3.5 py-2.5 bg-[#191714] text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-[#c59b27] text-stone-950 flex items-center justify-center font-bold text-xs">
-                        🛒
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
                     </div>
                     <div>
                         <h2 class="text-xs font-extrabold tracking-wide text-[#f7f5f0]">Keranjang Pesanan</h2>
@@ -231,7 +237,9 @@
             <!-- Cart Items List (Scrollable) -->
             <div class="flex-1 overflow-y-auto p-2.5 space-y-2">
                 <div id="kioskEmptyCart" class="py-8 text-center text-[#8f8573] space-y-1.5">
-                    <span class="text-3xl block">🛍️</span>
+                    <svg class="w-8 h-8 mx-auto text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
                     <h4 class="text-xs font-bold text-[#26211a]">Keranjang Masih Kosong</h4>
                     <p class="text-[10px] text-[#8f8573] max-w-xs mx-auto">Sentuh tombol "+ Pesan" pada menu untuk menambahkan.</p>
                 </div>
@@ -260,7 +268,6 @@
                         <label class="cursor-pointer">
                             <input type="radio" name="kiosk_payment" value="cash" checked onchange="toggleKioskPaymentInfo()" class="peer sr-only">
                             <div class="p-1.5 rounded-lg border border-[#dcd4c5] bg-white text-center peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-2xs transition">
-                                <span class="text-sm block leading-tight">💵</span>
                                 <span class="text-[10.5px] font-black block">Tunai</span>
                                 <span class="text-[8.5px] text-[#6b6252] peer-checked:text-stone-800 block">Bayar di Kasir</span>
                             </div>
@@ -268,7 +275,6 @@
                         <label class="cursor-pointer">
                             <input type="radio" name="kiosk_payment" value="qris" onchange="toggleKioskPaymentInfo()" class="peer sr-only">
                             <div class="p-1.5 rounded-lg border border-[#dcd4c5] bg-white text-center peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-2xs transition">
-                                <span class="text-sm block leading-tight">📱</span>
                                 <span class="text-[10.5px] font-black block">QRIS</span>
                                 <span class="text-[8.5px] text-[#6b6252] peer-checked:text-stone-800 block">Gateway Instan</span>
                             </div>
@@ -276,7 +282,7 @@
                     </div>
 
                     <div id="paymentInfoNote" class="mt-1.5 p-1.5 rounded-lg bg-amber-50 border border-amber-200 text-[9.5px] text-amber-900 leading-tight">
-                        💵 <strong>Tunai:</strong> Ambil struk pesanan & bayar di kasir. Pesanan akan dimasak dapur setelah lunas di kasir.
+                        <strong>Tunai:</strong> Ambil struk pesanan & bayar di kasir. Pesanan akan dimasak dapur setelah lunas di kasir.
                     </div>
                 </div>
 
@@ -300,7 +306,9 @@
         <div class="bg-white rounded-2xl max-w-xs w-full p-4 text-center shadow-xl border border-[#e5dfd3] space-y-3">
             <div class="flex items-center justify-between pb-2 border-b border-[#f0e8db]">
                 <div class="flex items-center gap-1.5">
-                    <span class="text-lg">📱</span>
+                    <svg class="w-4 h-4 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
                     <h3 class="text-xs font-extrabold text-[#26211a]">QRIS Payment Gateway</h3>
                 </div>
                 <button type="button" onclick="closeQrisModal()" class="text-[#8f8573] hover:text-[#26211a] text-lg font-bold">
@@ -536,9 +544,9 @@
             const method = document.querySelector('input[name="kiosk_payment"]:checked')?.value || 'cash';
             const noteEl = document.getElementById('paymentInfoNote');
             if (method === 'cash') {
-                noteEl.innerHTML = '💵 <strong>Tunai:</strong> Ambil struk pesanan & bayar di kasir. Pesanan akan dimasak dapur setelah lunas di kasir.';
+                noteEl.innerHTML = '<strong>Tunai:</strong> Ambil struk pesanan & bayar di kasir. Pesanan akan dimasak dapur setelah lunas di kasir.';
             } else {
-                noteEl.innerHTML = '📱 <strong>QRIS:</strong> Bayar instan di layar ini. Pesanan langsung lunas & langsung masuk dapur.';
+                noteEl.innerHTML = '<strong>QRIS:</strong> Bayar instan di layar ini. Pesanan langsung lunas & langsung masuk dapur.';
             }
         }
 

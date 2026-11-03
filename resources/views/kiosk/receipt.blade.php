@@ -48,20 +48,27 @@
         <div class="no-print text-center space-y-2">
             @if($sale->isPaid())
                 <div class="w-14 h-14 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-600 flex items-center justify-center mx-auto text-2xl shadow-sm">
-                    ✓
+                    <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
                 </div>
                 <h2 class="text-lg font-black text-[#26211a]">Pesanan Lunas & Dikirim ke Dapur!</h2>
                 <p class="text-xs text-[#786e60]">Pembayaran QRIS berhasil. Dapur sedang menyiapkan pesanan Anda.</p>
             @else
                 <div class="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center mx-auto text-2xl shadow-sm">
-                    💵
+                    <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
                 </div>
                 <h2 class="text-lg font-black text-[#26211a]">Pesanan Berhasil Dibuat!</h2>
                 <p class="text-xs text-[#786e60]">Silakan tunjukkan struk ini dan bayar di kasir. Pesanan akan dimasak Dapur setelah pembayaran lunas.</p>
             @endif
 
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold">
-                ⏱️ Kembali ke menu dalam <span id="countdownTimer" class="font-black text-amber-950">30</span> detik
+                <svg class="w-3.5 h-3.5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Kembali ke menu dalam <span id="countdownTimer" class="font-black text-amber-950">30</span> detik</span>
             </div>
         </div>
 
@@ -77,7 +84,10 @@
 
             <a href="{{ route('kiosk.index') }}"
                 class="py-3 px-4 rounded-2xl bg-[#c59b27] hover:bg-[#a87f1c] active:scale-95 text-stone-950 font-black text-xs shadow-md transition flex items-center justify-center gap-2">
-                <span>🔄 Pesan Lagi / Selesai</span>
+                <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Pesan Lagi / Selesai</span>
             </a>
         </div>
 

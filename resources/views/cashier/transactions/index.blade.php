@@ -45,8 +45,10 @@
                 </span>
                 <p class="text-[11px] text-[#8f8573] mt-0.5">Transaksi lunas yang tercatat atas ID akun Anda</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] flex items-center justify-center text-xl text-[#c59b27] shadow-2xs">
-                🧾
+            <div class="w-12 h-12 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] flex items-center justify-center text-[#c59b27] shadow-2xs">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
             </div>
         </div>
 
@@ -59,8 +61,10 @@
                 </span>
                 <p class="text-[11px] text-[#8f8573] mt-0.5">Akumulasi uang masuk transaksi lunas kasir Anda</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xl text-emerald-600 shadow-2xs">
-                💰
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
             </div>
         </div>
     </div>
@@ -137,14 +141,22 @@
                             <td class="py-4 px-6 font-mono text-xs font-bold text-[#1b4332]">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <span>{{ $sale->transaction_number }}</span>
+                                    @if($sale->isCancelled())
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
+                                            Dibatalkan
+                                        </span>
+                                    @endif
                                     @if($sale->is_open_bill)
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                             Open Bill ({{ $sale->orders_count }} Pesanan)
                                         </span>
                                     @elseif($sale->is_takeaway || $sale->badge_label === 'Takeaway' || $sale->table_number === 'TAKEAWAY' || str_contains($sale->table_number ?? '', 'Takeaway'))
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
-                                            🛍️ Takeaway
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
+                                            <svg class="w-3 h-3 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            Takeaway
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
@@ -156,7 +168,12 @@
                             <td class="py-4 px-6 text-xs text-slate-700">
                                 <span class="font-bold block text-[#262017]">
                                     @if($sale->is_takeaway || $sale->badge_label === 'Takeaway' || $sale->table_number === 'TAKEAWAY' || str_contains($sale->table_number ?? '', 'Takeaway'))
-                                        🛍️ Bawa Pulang
+                                        <span class="inline-flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            Bawa Pulang
+                                        </span>
                                     @elseif($sale->table_number)
                                         {{ str_starts_with($sale->table_number, 'Meja') ? $sale->table_number : 'Meja ' . $sale->table_number }}
                                     @else
@@ -192,6 +209,32 @@
                         <tr id="trx-detail-{{ $sale->accordion_id }}" class="hidden bg-[#fdfcf9] border-b border-[#e5dfd3]/80">
                             <td colspan="8" class="p-4 sm:p-6">
                                 <div class="bg-white rounded-2xl border border-[#e5dfd3] p-4 sm:p-5 shadow-xs space-y-4">
+                                    @if($sale->isCancelled())
+                                        <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-base font-bold">⚠️</span>
+                                                <div>
+                                                    <span class="font-bold">Pesanan Ini Telah Dibatalkan oleh Pemilik Toko</span>
+                                                    @if($sale->canceller)
+                                                        <span>({{ $sale->canceller->name }})</span>
+                                                    @endif
+                                                    @if($sale->cancelled_at)
+                                                        <span>pada {{ $sale->cancelled_at->format('d/m/Y H:i') }} WIB</span>
+                                                    @endif
+                                                    @if($sale->cancellation_reason)
+                                                        <div class="mt-0.5 text-[11px] text-rose-700">
+                                                            <strong>Alasan:</strong> "{{ $sale->cancellation_reason }}"
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-[#786e60] text-[11px] flex items-center justify-between">
+                                            <span>ℹ️ Jika terjadi salah input menu, silakan hubungi <strong>Pemilik Toko (Owner)</strong> untuk membatalkan pesanan ini.</span>
+                                        </div>
+                                    @endif
+
                                     <!-- Header Info Detail -->
                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f0ebd9] gap-2">
                                         <div class="flex items-center gap-3">

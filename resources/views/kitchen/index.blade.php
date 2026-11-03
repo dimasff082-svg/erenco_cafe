@@ -91,8 +91,11 @@
                         <div class="flex items-start justify-between gap-2 pb-3 border-b border-slate-100">
                             <div>
                                 @if($order->table_number === 'TAKEAWAY')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs mb-1">
-                                        🛍️ BAWA PULANG (TAKEAWAY)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs mb-1">
+                                        <svg class="w-3.5 h-3.5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                        </svg>
+                                        BAWA PULANG (TAKEAWAY)
                                     </span>
                                 @else
                                     <span class="text-xl font-black text-slate-900 tracking-tight block">

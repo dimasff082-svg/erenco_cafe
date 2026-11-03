@@ -42,8 +42,10 @@
                 </span>
                 <p class="text-[11px] text-[#8f8573] mt-0.5">Total akumulasi seluruh transaksi pada sistem</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] flex items-center justify-center text-xl text-[#c59b27] shadow-2xs">
-                📊
+            <div class="w-12 h-12 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] flex items-center justify-center text-[#c59b27] shadow-2xs">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
             </div>
         </div>
 
@@ -56,8 +58,10 @@
                 </span>
                 <p class="text-[11px] text-[#8f8573] mt-0.5">Akumulasi uang masuk lunas dari seluruh transaksi</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xl text-emerald-600 shadow-2xs">
-                💵
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
             </div>
         </div>
     </div>
@@ -144,14 +148,22 @@
                             <td class="py-4 px-6 font-mono text-xs font-bold text-[#8a681c]">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <span>{{ $sale->transaction_number }}</span>
+                                    @if($sale->isCancelled())
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
+                                            ✕ Dibatalkan
+                                        </span>
+                                    @endif
                                     @if($sale->is_open_bill)
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                             Open Bill ({{ $sale->orders_count }} Pesanan)
                                         </span>
                                     @elseif($sale->is_takeaway || $sale->badge_label === 'Takeaway' || $sale->table_number === 'TAKEAWAY' || str_contains($sale->table_number ?? '', 'Takeaway'))
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
-                                            🛍️ Takeaway
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
+                                            <svg class="w-3 h-3 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            Takeaway
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#f0ebd9] text-[#786e60]">
@@ -166,7 +178,12 @@
                             <td class="py-4 px-6 text-xs text-[#262017]">
                                 <span class="font-bold block">
                                     @if($sale->is_takeaway || $sale->badge_label === 'Takeaway' || $sale->table_number === 'TAKEAWAY' || str_contains($sale->table_number ?? '', 'Takeaway'))
-                                        🛍️ Bawa Pulang
+                                        <span class="inline-flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            Bawa Pulang
+                                        </span>
                                     @elseif($sale->table_number)
                                         {{ str_starts_with($sale->table_number, 'Meja') ? $sale->table_number : 'Meja ' . $sale->table_number }}
                                     @else
@@ -215,6 +232,28 @@
                         <tr id="trx-detail-{{ $sale->accordion_id }}" class="hidden bg-[#faf7f0]/60 border-b-2 border-[#dfb15b]/40">
                             <td colspan="9" class="p-4 sm:p-6">
                                 <div class="bg-white rounded-2xl border border-[#e5dfd3] shadow-sm p-5 space-y-4">
+                                    @if($sale->isCancelled())
+                                        <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-base font-bold">⚠️</span>
+                                                <div>
+                                                    <span class="font-bold">Transaksi Ini Telah Dibatalkan oleh Pemilik Toko</span>
+                                                    @if($sale->canceller)
+                                                        <span>({{ $sale->canceller->name }})</span>
+                                                    @endif
+                                                    @if($sale->cancelled_at)
+                                                        <span>pada {{ $sale->cancelled_at->format('d/m/Y H:i') }} WIB</span>
+                                                    @endif
+                                                    @if($sale->cancellation_reason)
+                                                        <div class="mt-0.5 text-[11px] text-rose-700">
+                                                            <strong>Alasan Pembatalan:</strong> "{{ $sale->cancellation_reason }}"
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#f0ebd9]">
                                         <div class="flex items-center gap-3">
                                             <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 border border-amber-200/80 flex items-center justify-center font-bold text-xs">
@@ -353,6 +392,14 @@
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-2">
+                                                @if(auth()->check() && auth()->user()->isOwner() && ! $sale->isCancelled())
+                                                    <button type="button"
+                                                        onclick="openCancelOrderModal('{{ $sale->id }}', '{{ $sale->transaction_number }}')"
+                                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-xs font-bold transition">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                        Batalkan Pesanan
+                                                    </button>
+                                                @endif
                                                 <a href="{{ $sale->receipt_url }}" target="_blank"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
@@ -392,6 +439,53 @@
     </div>
 </div>
 
+<!-- Modal Pembatalan Pesanan Khusus Pemilik Toko -->
+@if(auth()->check() && auth()->user()->isOwner())
+    <div id="modal-cancel-order" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-black/60" onclick="closeCancelOrderModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-rose-200">
+                <form id="form-cancel-order" method="POST" action="">
+                    @csrf
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 text-rose-600 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center font-bold text-lg">⚠️</div>
+                            <div>
+                                <h3 class="font-serif-classic text-lg font-bold text-[#262017]">Batalkan Transaksi</h3>
+                                <p class="text-xs text-[#786e60]" id="cancel-trx-title">Transaksi: -</p>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-[#5c5346] leading-relaxed mb-4">
+                            Wewenang pembatalan pesanan berada di tangan <strong>Pemilik Toko</strong>. Pesanan yang dibatalkan akan ditandai batal dan dikeluarkan dari perhitungan omzet serta antrean dapur.
+                        </p>
+
+                        <div>
+                            <label class="block text-xs font-bold text-[#262017] mb-1">
+                                Alasan Pembatalan <span class="text-rose-600">*</span>
+                            </label>
+                            <textarea name="cancellation_reason" rows="3" required
+                                placeholder="Contoh: Kasir salah input menu / Pelanggan batalkan pesanan..."
+                                class="w-full text-xs p-3 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-[#faf8f5] border-t border-[#f0ece1] flex items-center justify-end gap-2">
+                        <button type="button" onclick="closeCancelOrderModal()" class="px-4 py-2 rounded-xl border border-[#d6cfc2] text-xs font-semibold text-[#786e60] hover:bg-white">
+                            Tutup
+                        </button>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition">
+                            Ya, Batalkan Pesanan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endif
+
 <script>
     function toggleTrxDetail(id) {
         const detailRow = document.getElementById('trx-detail-' + id);
@@ -405,6 +499,22 @@
             detailRow.classList.add('hidden');
             if (chevron) chevron.classList.remove('rotate-180');
         }
+    }
+
+    function openCancelOrderModal(saleId, trxNumber) {
+        const modal = document.getElementById('modal-cancel-order');
+        const form = document.getElementById('form-cancel-order');
+        const title = document.getElementById('cancel-trx-title');
+        if (!modal || !form) return;
+
+        form.action = '/owner/transactions/' + saleId + '/cancel';
+        if (title) title.innerText = 'No. Transaksi: ' + trxNumber;
+        modal.classList.remove('hidden');
+    }
+
+    function closeCancelOrderModal() {
+        const modal = document.getElementById('modal-cancel-order');
+        if (modal) modal.classList.add('hidden');
     }
 </script>
 @endsection

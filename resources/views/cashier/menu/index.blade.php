@@ -24,7 +24,9 @@
 
         <div class="shrink-0 flex items-center gap-3">
             <a href="{{ route('takeaway.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#c59b27] hover:bg-[#b0881e] text-stone-950 font-bold text-xs transition shadow-md hover:scale-105 active:scale-95">
-                <span>🛍️</span>
+                <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
                 Transaksi Takeaway
             </a>
             <a href="{{ route('cashier.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-stone-200 font-semibold text-xs transition border border-white/10">
@@ -134,7 +136,9 @@
                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         @else
                             <div class="w-full h-full flex flex-col items-center justify-center text-stone-300 bg-gradient-to-b from-[#faf7f0] to-[#eee8db]">
-                                <span class="text-4xl mb-1">🍰</span>
+                                <svg class="w-10 h-10 mb-1 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                                 <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">Fira Cake Menu</span>
                             </div>
                         @endif
@@ -238,7 +242,9 @@
         <div class="relative h-48 bg-[#faf7f0] overflow-hidden border-b border-[#e5dfd3]">
             <img id="modal-menu-image" src="" alt="Foto Menu" class="w-full h-full object-cover hidden">
             <div id="modal-menu-fallback" class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#2a241b] to-[#1c1812] text-stone-200">
-                <span class="text-5xl mb-2">🍰</span>
+                <svg class="w-12 h-12 mb-2 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
                 <span class="text-xs font-serif-classic font-bold text-[#eac36c] tracking-widest uppercase">Fira Cake & Resto</span>
             </div>
 
@@ -284,7 +290,9 @@
 
             <!-- Cashier Consultation Tip -->
             <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-950 text-xs">
-                <span class="text-base leading-none">💡</span>
+                <svg class="w-4 h-4 text-amber-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <div class="space-y-0.5">
                     <span class="font-bold">Tips Penjelasan ke Pelanggan:</span>
                     <p class="text-[11px] text-amber-900 leading-normal">

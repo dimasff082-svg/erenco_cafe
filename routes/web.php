@@ -1,24 +1,31 @@
 <?php
 
+use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\RestaurantTableController as AdminRestaurantTableController;
+use App\Http\Controllers\Admin\SalaryController as AdminSalaryController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Cashier\DashboardController as CashierDashboardController;
 use App\Http\Controllers\Cashier\MenuController as CashierMenuController;
 use App\Http\Controllers\Cashier\OpenBillController as CashierOpenBillController;
 use App\Http\Controllers\Cashier\TransactionController as CashierTransactionController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\KioskOrderController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\Owner\DashboardController;
+use App\Http\Controllers\Owner\OrderCancellationController as OwnerOrderCancellationController;
+use App\Http\Controllers\Owner\ProfitLossController as OwnerProfitLossController;
 use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TakeawayOrderController;
+use App\Http\Controllers\Warehouse\ExpenseController as WarehouseExpenseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +40,9 @@ Route::get('/', function () {
         }
         if (auth()->user()->isKitchen()) {
             return redirect()->route('kitchen.index');
+        }
+        if (auth()->user()->isWarehouse()) {
+            return redirect()->route('warehouse.expenses.index');
         }
 
         return redirect()->route('cashier.dashboard');
@@ -162,12 +172,53 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/tables/{table}/print-qr', [AdminRestaurantTableController::class, 'printQr'])->name('tables.print_qr');
 });
 
+// Admin & Owner Shared Management Routes (Monitoring Presensi & Penggajian Karyawan)
+Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
+    // Monitoring Rekap Presensi Karyawan
+    Route::get('/attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index');
+
+    // Penggajian Karyawan
+    Route::get('/salaries', [AdminSalaryController::class, 'index'])->name('salaries.index');
+    Route::post('/salaries', [AdminSalaryController::class, 'store'])->name('salaries.store');
+    Route::put('/salaries/{salary}', [AdminSalaryController::class, 'update'])->name('salaries.update');
+    Route::delete('/salaries/{salary}', [AdminSalaryController::class, 'destroy'])->name('salaries.destroy');
+    Route::get('/salaries/{salary}/print', [AdminSalaryController::class, 'print'])->name('salaries.print');
+});
+
 // Owner Routes (Role Pemilik)
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{sale}', [AdminTransactionController::class, 'show'])->name('transactions.show');
+    Route::post('/transactions/{sale}/cancel', [OwnerOrderCancellationController::class, 'cancel'])->name('transactions.cancel');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export_excel');
     Route::get('/reports/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export_csv');
+    Route::get('/reports/profit-loss', [OwnerProfitLossController::class, 'index'])->name('profit_loss.index');
+    Route::get('/attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('/salaries', [AdminSalaryController::class, 'index'])->name('salaries.index');
+    Route::post('/salaries', [AdminSalaryController::class, 'store'])->name('salaries.store');
+    Route::put('/salaries/{salary}', [AdminSalaryController::class, 'update'])->name('salaries.update');
+    Route::delete('/salaries/{salary}', [AdminSalaryController::class, 'destroy'])->name('salaries.destroy');
+    Route::get('/salaries/{salary}/print', [AdminSalaryController::class, 'print'])->name('salaries.print');
+});
+
+// Warehouse Staff Routes (Staf Gudang)
+Route::middleware(['auth', 'role:warehouse,admin'])->prefix('warehouse')->name('warehouse.')->group(function () {
+    // Satu Halaman Transaksi Pengeluaran (Bahan Baku & Operasional)
+    Route::get('/expenses', [WarehouseExpenseController::class, 'index'])->name('expenses.index');
+    Route::post('/expenses', [WarehouseExpenseController::class, 'store'])->name('expenses.store');
+    Route::delete('/expenses/{expense}', [WarehouseExpenseController::class, 'destroy'])->name('expenses.destroy');
+});
+
+// Presensi Karyawan Mandiri (Kasir & Staf Warehouse)
+Route::middleware(['auth', 'role:cashier,warehouse,admin,owner'])->prefix('attendance')->name('attendance.')->group(function () {
+    Route::get('/', [AttendanceController::class, 'index'])->name('index');
+    Route::post('/', [AttendanceController::class, 'store'])->name('store');
+});
+
+// Slip Gaji Karyawan Mandiri (Kasir & Staf Warehouse)
+Route::middleware(['auth', 'role:cashier,warehouse,admin,owner'])->prefix('my-salaries')->name('my_salaries.')->group(function () {
+    Route::get('/', [EmployeeSalaryController::class, 'index'])->name('index');
+    Route::get('/{salary}/print', [EmployeeSalaryController::class, 'print'])->name('print');
 });

@@ -54,7 +54,10 @@
             @if(auth()->user()->isCashier() || auth()->user()->isAdmin())
                 <a href="{{ route('takeaway.index') }}"
                     class="inline-flex items-center gap-2 bg-[#c59b27] hover:bg-[#a87f1c] text-stone-950 text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-md transition transform active:scale-95">
-                    <span>🛍️ Pesanan Bawa Pulang Baru</span>
+                    <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span>Pesanan Bawa Pulang Baru</span>
                 </a>
             @else
                 <a href="{{ route('pos.index') }}"
@@ -112,7 +115,7 @@
                 <span class="text-slate-400">Tipe Pesanan / Meja</span>
                 <span class="text-slate-700 font-bold">
                     @if($sale->table_number === 'TAKEAWAY')
-                        <span class="text-purple-700 font-black">🛍️ Bawa Pulang (Takeaway)</span>
+                        <span class="text-purple-700 font-black">Bawa Pulang (Takeaway)</span>
                     @elseif($sale->table_number)
                         Meja {{ $sale->table_number }}
                     @else

@@ -4,7 +4,7 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-serif-classic font-bold text-[#262017] tracking-tight">Data Menu</h2>
+            <h2 class="text-2xl font-serif-classic font-bold text-[#262017] tracking-tight">Daftar Menu</h2>
             <p class="text-sm text-[#736858] mt-0.5">Kelola katalog menu makanan & minuman, kategori, foto, dan harga menu.</p>
         </div>
         <div class="flex items-center gap-3">

@@ -42,11 +42,11 @@ class TransactionHistoryService
         }
 
         $sales = ! empty($saleIds)
-            ? Sale::with(['user', 'confirmer', 'payment', 'items.product'])->whereIn('id', $saleIds)->get()->keyBy('id')
+            ? Sale::with(['user', 'confirmer', 'canceller', 'payment', 'items.product'])->whereIn('id', $saleIds)->get()->keyBy('id')
             : collect();
 
         $openBills = ! empty($openBillIds)
-            ? OpenBill::with(['opener', 'closer', 'sales.user', 'sales.confirmer', 'sales.payment', 'sales.items.product'])
+            ? OpenBill::with(['opener', 'closer', 'sales.user', 'sales.confirmer', 'sales.canceller', 'sales.payment', 'sales.items.product'])
                 ->whereIn('id', $openBillIds)
                 ->get()
                 ->keyBy('id')

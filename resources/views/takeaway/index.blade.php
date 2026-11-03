@@ -26,8 +26,10 @@
                 <div class="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
                     <!-- Left: Icon + Title & Badges in orderly hierarchy -->
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c59b27] via-[#a87f1c] to-[#73550b] flex items-center justify-center text-stone-950 shadow-md border border-[#e5be58]/40 shrink-0 text-lg">
-                            🛍️
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c59b27] via-[#a87f1c] to-[#73550b] flex items-center justify-center text-stone-950 shadow-md border border-[#e5be58]/40 shrink-0">
+                            <svg class="w-5 h-5 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
@@ -113,8 +115,10 @@
                                 @if($product->image_url)
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                 @else
-                                    <div class="text-center p-2">
-                                        <span class="text-3xl block">🍰</span>
+                                    <div class="text-center p-2 text-stone-400">
+                                        <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
                                         <span class="text-[10px] font-bold text-[#8f8573] uppercase tracking-wider block mt-1">{{ $category->name }}</span>
                                     </div>
                                 @endif
@@ -161,7 +165,9 @@
 
             <!-- Empty Search State -->
             <div id="noMatchState" class="hidden bg-white rounded-2xl p-10 text-center border border-[#e5dfd3] shadow-xs">
-                <span class="text-4xl block mb-2">🔍</span>
+                <svg class="w-10 h-10 mx-auto text-stone-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
                 <h4 class="text-sm font-bold text-[#26211a]">Menu tidak ditemukan</h4>
                 <p class="text-xs text-[#8f8573] mt-1">Coba gunakan kata kunci pencarian atau kategori lain.</p>
             </div>
@@ -175,7 +181,9 @@
                     <div class="px-3.5 py-2 bg-gradient-to-r from-[#1f1c18] to-[#2d261e] text-[#f5ebd7] flex items-center justify-between border-b border-[#3d3428] shrink-0">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 rounded-lg bg-[#c59b27] text-stone-950 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                🛍️
+                                <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
                             </div>
                             <div>
                                 <h3 class="text-xs sm:text-sm font-extrabold tracking-tight font-serif-classic leading-tight">Keranjang Bawa Pulang</h3>
@@ -216,7 +224,9 @@
                     <div class="px-3 py-1 max-h-[140px] sm:max-h-[160px] overflow-y-auto custom-sidebar-scroll divide-y divide-[#f0e8db]">
                         <!-- Cart Empty State (Permanent element, hidden when has items) -->
                         <div id="cartEmptyState" class="py-3 text-center text-[#8f8573]">
-                            <span class="text-xl block mb-0.5">🛍️</span>
+                            <svg class="w-7 h-7 mx-auto text-stone-300 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
                             <p class="text-xs font-bold text-[#26211a]">Keranjang Masih Kosong</p>
                             <p class="text-[9.5px] text-[#8f8573]">Pilih menu dari katalog di sebelah kiri.</p>
                         </div>
@@ -247,19 +257,19 @@
                                 <label class="cursor-pointer">
                                     <input type="radio" name="payment_method" value="cash" checked onchange="handlePaymentMethodChange()" class="peer sr-only">
                                     <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                        💵 Tunai
+                                        Tunai
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="payment_method" value="qris" onchange="handlePaymentMethodChange()" class="peer sr-only">
                                     <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                        📱 QRIS
+                                        QRIS
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="payment_method" value="transfer" onchange="handlePaymentMethodChange()" class="peer sr-only">
                                     <div class="px-1.5 py-1 rounded-lg border border-[#dcd4c5] bg-white text-center text-[10px] font-bold text-[#2c261e] peer-checked:bg-[#c59b27] peer-checked:text-stone-950 peer-checked:border-[#c59b27] peer-checked:shadow-xs transition">
-                                        🏦 Transfer
+                                        Transfer
                                     </div>
                                 </label>
                             </div>

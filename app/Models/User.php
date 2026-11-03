@@ -105,6 +105,26 @@ class User extends Authenticatable
         return $this->role === 'kitchen';
     }
 
+    public function isWarehouse(): bool
+    {
+        return $this->role === 'warehouse';
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function salaries(): HasMany
+    {
+        return $this->hasMany(Salary::class);
+    }
+
     public function roleLabel(): string
     {
         return match ($this->role) {
@@ -112,6 +132,7 @@ class User extends Authenticatable
             'owner' => 'PEMILIK TOKO',
             'cashier' => 'KASIR',
             'kitchen' => 'DAPUR',
+            'warehouse' => 'STAF WAREHOUSE',
             default => strtoupper((string) $this->role),
         };
     }

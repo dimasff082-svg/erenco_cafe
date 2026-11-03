@@ -34,7 +34,7 @@
                     @foreach($users as $user)
                         <tr class="hover:bg-[#faf7f0]/70 transition">
                             <td class="py-4 px-6 font-bold text-[#262017] flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full {{ $user->isOwner() ? 'bg-amber-100 text-[#8a681c] border border-amber-300' : ($user->isAdmin() ? 'bg-[#262017] text-[#f7f5f0]' : ($user->isKitchen() ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300')) }} flex items-center justify-center font-bold text-xs shadow-2xs">
+                                <div class="w-9 h-9 rounded-full {{ $user->isOwner() ? 'bg-amber-100 text-[#8a681c] border border-amber-300' : ($user->isAdmin() ? 'bg-[#262017] text-[#f7f5f0]' : ($user->isKitchen() ? 'bg-blue-100 text-blue-800 border border-blue-300' : ($user->isWarehouse() ? 'bg-orange-100 text-orange-800 border border-orange-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'))) }} flex items-center justify-center font-bold text-xs shadow-2xs">
                                     {{ strtoupper(substr($user->name, 0, 2)) }}
                                 </div>
                                 <div>
@@ -48,7 +48,7 @@
                                 {{ $user->email }}
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold {{ $user->isOwner() ? 'bg-amber-50 text-amber-800 border border-amber-300' : ($user->isAdmin() ? 'bg-[#f0ebd9] text-[#262017] border border-[#dcd4c5]' : ($user->isKitchen() ? 'bg-blue-50 text-blue-800 border border-blue-300' : 'bg-emerald-50 text-emerald-700 border border-emerald-200')) }}">
+                                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold {{ $user->isOwner() ? 'bg-amber-50 text-amber-800 border border-amber-300' : ($user->isAdmin() ? 'bg-[#f0ebd9] text-[#262017] border border-[#dcd4c5]' : ($user->isKitchen() ? 'bg-blue-50 text-blue-800 border border-blue-300' : ($user->isWarehouse() ? 'bg-orange-50 text-orange-800 border border-orange-300' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'))) }}">
                                     {{ $user->roleLabel() }}
                                 </span>
                             </td>
@@ -127,6 +127,7 @@
                 <label class="block text-xs font-bold text-[#5c5346] mb-1 font-serif-classic">Peran Akses (Role) *</label>
                 <select name="role" required class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3.5 py-2 text-sm text-[#262017] focus:ring-2 focus:ring-amber-500 focus:outline-none">
                     <option value="cashier" selected>Kasir (Melayani Transaksi & Pembayaran)</option>
+                    <option value="warehouse">Staf Warehouse (Input Pengeluaran & Absensi)</option>
                     <option value="kitchen">Dapur (Mengelola Antrean Masakan KDS)</option>
                     <option value="admin">Administrator (Akses Manajemen Master Data & Sistem)</option>
                     <option value="owner">Pemilik Toko (Dashboard Eksekutif & Laporan Penjualan)</option>
@@ -174,6 +175,7 @@
                 <label class="block text-xs font-bold text-[#5c5346] mb-1 font-serif-classic">Peran Akses (Role) *</label>
                 <select id="edit-user-role" name="role" required class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3.5 py-2 text-sm text-[#262017] focus:ring-2 focus:ring-amber-500 focus:outline-none">
                     <option value="cashier">Kasir</option>
+                    <option value="warehouse">Staf Warehouse</option>
                     <option value="kitchen">Dapur</option>
                     <option value="admin">Administrator</option>
                     <option value="owner">Pemilik Toko</option>
