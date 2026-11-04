@@ -203,8 +203,8 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/salaries/{salary}/print', [AdminSalaryController::class, 'print'])->name('salaries.print');
 });
 
-// Warehouse Staff Routes (Staf Gudang)
-Route::middleware(['auth', 'role:warehouse,admin'])->prefix('warehouse')->name('warehouse.')->group(function () {
+// Warehouse Staff Routes (Staf Gudang & Admin/Owner)
+Route::middleware(['auth', 'role:warehouse,admin,owner'])->prefix('warehouse')->name('warehouse.')->group(function () {
     // Satu Halaman Transaksi Pengeluaran (Bahan Baku & Operasional)
     Route::get('/expenses', [WarehouseExpenseController::class, 'index'])->name('expenses.index');
     Route::post('/expenses', [WarehouseExpenseController::class, 'store'])->name('expenses.store');
