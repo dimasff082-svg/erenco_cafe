@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
-    <script src="{{ $midtransSnapUrl }}" data-client-key="{{ $midtransClientKey }}"></script>
+    <script src="{{ $midtransSnapUrl ?? config('services.midtrans.snap_url') }}" data-client-key="{{ $midtransClientKey ?? config('services.midtrans.client_key') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         body {
@@ -40,12 +40,6 @@
 
         <main class="flex-1 p-5 space-y-4">
             
-            <!-- Success Status Card -->
-            <div class="bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-emerald-50 border border-emerald-300 rounded-3xl p-5 text-center shadow-xs space-y-2">
-                <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
             @if($sale->isUnpaid())
                 <!-- Unpaid Pending Card -->
                 <div class="bg-gradient-to-br from-amber-50 via-amber-100/40 to-amber-50 border border-amber-300 rounded-3xl p-5 text-center shadow-xs space-y-2">
@@ -73,14 +67,6 @@
                         </button>
                     </div>
                 </div>
-                <div>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-200 text-emerald-900 mb-1">
-                        Pembayaran Lunas
-                    </span>
-                    <h2 class="font-serif-classic text-xl font-bold text-emerald-950">Pesanan Online Diterima!</h2>
-                    <p class="text-xs text-emerald-900/80 leading-relaxed mt-1">
-                        Terima kasih, <strong>{{ $sale->customer_name }}</strong>! Pesanan Anda telah lunas via Payment Gateway dan langsung diteruskan ke kasir & dapur Fira Cake.
-                    </p>
             @else
                 <!-- Success Status Card -->
                 <div class="bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-emerald-50 border border-emerald-300 rounded-3xl p-5 text-center shadow-xs space-y-2">
@@ -99,23 +85,15 @@
                         </p>
                     </div>
                 </div>
-            </div>
             @endif
 
             <!-- Order Progress Stepper -->
             <div class="bg-[#faf7f0] border border-[#e5dfd3] rounded-2xl p-4 space-y-3">
                 <div class="text-[10px] font-bold uppercase tracking-wider text-[#786e60]">Tahapan Status Pesanan</div>
-                <div class="relative pl-6 space-y-4 border-l-2 border-emerald-400 ml-2">
                 <div class="relative pl-6 space-y-4 border-l-2 {{ $sale->isPaid() ? 'border-emerald-400' : 'border-amber-400' }} ml-2">
                     
-                    <!-- Step 1: Lunas -->
                     <!-- Step 1: Lunas / Menunggu -->
                     <div class="relative">
-                        <span class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold shadow-xs">
-                            ✓
-                        </span>
-                        <div class="text-xs font-bold text-[#26211a]">Pembayaran Terverifikasi (Lunas)</div>
-                        <div class="text-[10px] text-[#786e60]">Payment Gateway QRIS &bull; {{ $sale->transaction_date->format('d/m/Y H:i') }} WIB</div>
                         @if($sale->isPaid())
                             <span class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold shadow-xs">
                                 ✓
@@ -138,9 +116,7 @@
                                 ✓
                             </span>
                             <div class="text-xs font-bold text-emerald-900">Sedang Disiapkan Dapur</div>
-                        @else
                         @elseif($sale->isPaid())
-                            <span class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center text-[9px] font-bold shadow-xs animate-ping"></span>
                             <span class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-amber-500 text-stone-900 flex items-center justify-center text-[9px] font-bold shadow-xs">
                                 &bull;
                             </span>
@@ -149,7 +125,7 @@
                             <span class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-stone-300 text-stone-600 flex items-center justify-center text-[9px] font-bold">
                                 2
                             </span>
-                            <div class="text-xs font-bold text-stone-400">Antrean Dapur & Kasir</div>
+                            <div class="text-xs font-bold text-stone-400">Menunggu Pembayaran Selesai</div>
                         @endif
                         <div class="text-[10px] text-[#786e60]">Kue & hidangan diproses higienis dan fresh</div>
                     </div>
@@ -230,12 +206,9 @@
                     </div>
                     <div class="flex justify-between text-[#786e60]">
                         <span>Metode Bayar</span>
-                        <span class="font-bold text-[#26211a]">Payment Gateway QRIS</span>
                         <span class="font-bold text-[#26211a]">Midtrans Payment Gateway</span>
                     </div>
                     <div class="pt-2 border-t border-[#e5dfd3] flex justify-between items-center">
-                        <span class="font-bold text-[#26211a]">Total Lunas:</span>
-                        <span class="font-serif-classic font-black text-base text-emerald-800">
                         <span class="font-bold text-[#26211a]">Total Tagihan:</span>
                         <span class="font-serif-classic font-black text-base {{ $sale->isPaid() ? 'text-emerald-800' : 'text-amber-800' }}">
                             Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
@@ -336,4 +309,3 @@
 
 </body>
 </html>
-

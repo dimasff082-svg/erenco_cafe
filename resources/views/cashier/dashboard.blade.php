@@ -368,8 +368,6 @@
                             <!-- Aksi -->
                             <td class="py-4 px-6 text-right">
                                 <div class="inline-flex items-center gap-2 justify-end">
-                                    <!-- Tombol Aksi WhatsApp Khusus Pesanan Online / Berkontak Pelanggan -->
-                                    @if($sale->customer_phone)
                                     <!-- Tombol Aksi WhatsApp Khusus Pesanan Online Saja (Takeaway tidak ada tombol WA) -->
                                     @if($sale->table_number === 'ONLINE' && $sale->customer_phone)
                                         @php

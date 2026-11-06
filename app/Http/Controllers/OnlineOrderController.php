@@ -30,7 +30,6 @@ class OnlineOrderController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('online_order.index', compact('categories'));
         $midtransClientKey = config('services.midtrans.client_key');
         $midtransSnapUrl = config('services.midtrans.snap_url');
 
