@@ -92,6 +92,21 @@ class Sale extends Model
         return $this->status === 'completed';
     }
 
+    public function isOnline(): bool
+    {
+        return $this->table_number === 'ONLINE';
+    }
+
+    public function isTakeaway(): bool
+    {
+        return $this->table_number === 'TAKEAWAY';
+    }
+
+    public function isKiosk(): bool
+    {
+        return $this->table_number === 'KIOSK';
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === 'paid';

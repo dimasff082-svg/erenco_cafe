@@ -31,7 +31,17 @@ class RoleMiddleware
             ]);
         }
 
-        if (! in_array($user->role, $roles, true)) {
+        $allowedRoles = [];
+        foreach ($roles as $roleItem) {
+            foreach (explode(',', $roleItem) as $r) {
+                $r = trim($r);
+                if ($r !== '') {
+                    $allowedRoles[] = $r;
+                }
+            }
+        }
+
+        if (! in_array($user->role, $allowedRoles, true)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
 

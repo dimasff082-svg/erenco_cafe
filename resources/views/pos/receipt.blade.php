@@ -116,6 +116,10 @@
                 <span class="text-slate-700 font-bold">
                     @if($sale->table_number === 'TAKEAWAY')
                         <span class="text-purple-700 font-black">Bawa Pulang (Takeaway)</span>
+                    @elseif($sale->table_number === 'ONLINE')
+                        <span class="text-blue-700 font-black">Pesanan Online</span>
+                    @elseif($sale->table_number === 'KIOSK')
+                        <span class="text-indigo-700 font-black">Kiosk Mandiri</span>
                     @elseif($sale->table_number)
                         Meja {{ $sale->table_number }}
                     @else

@@ -19,6 +19,7 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\KioskOrderController;
 use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\OnlineOrderController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\OrderCancellationController as OwnerOrderCancellationController;
 use App\Http\Controllers\Owner\ProfitLossController as OwnerProfitLossController;
@@ -80,6 +81,16 @@ Route::prefix('kiosk')->name('kiosk.')->group(function () {
     Route::post('/checkout', [KioskOrderController::class, 'checkout'])->name('checkout');
     Route::get('/receipt/{sale}', [KioskOrderController::class, 'receipt'])->name('receipt');
 });
+
+// Customer Online Ordering (Pemesanan Online via Link yang dibagikan Kasir - Public & Mobile-First)
+Route::prefix('online-order')->name('online_order.')->group(function () {
+    Route::get('/', [OnlineOrderController::class, 'index'])->name('index');
+    Route::post('/checkout', [OnlineOrderController::class, 'checkout'])->name('checkout');
+    Route::get('/status/{transaction_number}', [OnlineOrderController::class, 'status'])->name('status');
+    Route::post('/{sale}/midtrans-success', [OnlineOrderController::class, 'markMidtransSuccess'])->name('midtrans_success');
+    Route::post('/{sale}/snap-token', [OnlineOrderController::class, 'getSnapToken'])->name('snap_token');
+});
+Route::get('/pesan-online', fn () => redirect()->route('online_order.index'));
 
 // Cashier & Terminal Routes (Customer Order Management & Payment Confirmation)
 Route::middleware(['auth', 'role:cashier,admin,owner'])->prefix('cashier')->name('cashier.')->group(function () {

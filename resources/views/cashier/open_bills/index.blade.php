@@ -85,9 +85,13 @@
                                     Setujui Open Bill
                                 </button>
                             </form>
-                            <form action="{{ route('cashier.open_bills.reject', $req->id) }}" method="POST">
+                            <form action="{{ route('cashier.open_bills.reject', $req->id) }}" method="POST"
+                                data-confirm="Apakah Anda yakin ingin menolak permintaan Open Bill untuk Meja {{ $req->restaurantTable?->table_number ?? '-' }}?"
+                                data-confirm-title="Tolak Open Bill"
+                                data-confirm-btn="Ya, Tolak Permintaan"
+                                data-confirm-type="danger">
                                 @csrf
-                                <button type="submit" onclick="return confirm('Tolak permintaan Open Bill meja ini?')" class="py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+                                <button type="submit" class="py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
                                     Tolak
                                 </button>
                             </form>

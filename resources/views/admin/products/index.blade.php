@@ -142,7 +142,10 @@
 
                                     <!-- Delete Icon Button -->
                                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="inline"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus menu \'{{ addslashes($product->name) }}\'?')">
+                                        data-confirm="Apakah Anda yakin ingin menghapus menu '{{ $product->name }}' dari katalog toko?"
+                                        data-confirm-title="Hapus Menu Produk"
+                                        data-confirm-btn="Ya, Hapus Menu"
+                                        data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

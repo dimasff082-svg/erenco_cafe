@@ -250,7 +250,11 @@
                                     </button>
 
                                     <!-- Tombol Hapus -->
-                                    <form method="POST" action="{{ route($routePrefix . '.destroy', $sal) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus slip gaji {{ $sal->payroll_number }}?');">
+                                    <form method="POST" action="{{ route($routePrefix . '.destroy', $sal) }}"
+                                        data-confirm="Apakah Anda yakin ingin menghapus arsip slip gaji {{ $sal->payroll_number }} ({{ $sal->user->name ?? 'Karyawan' }})?"
+                                        data-confirm-title="Hapus Slip Gaji"
+                                        data-confirm-btn="Ya, Hapus Slip Gaji"
+                                        data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-1.5 rounded-lg text-rose-600 hover:text-rose-900 hover:bg-rose-50 transition" title="Hapus Slip Gaji">
@@ -289,8 +293,8 @@
         <div class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs transition-opacity" @click="showAddModal = false"></div>
 
         <!-- Centered Dialog Container -->
-        <div class="relative z-10 flex min-h-screen items-center justify-center p-4">
-            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-xl border border-[#e5dfd3]" @click.stop>
+        <div class="relative z-10 flex min-h-screen items-center justify-center p-4 pointer-events-none">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-xl border border-[#e5dfd3] pointer-events-auto" @click.stop>
                 <form method="POST" action="{{ route($routePrefix . '.store') }}">
                     @csrf
                     <div class="p-6">
@@ -430,8 +434,8 @@
         <div class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs transition-opacity" @click="showEditModal = false"></div>
 
         <!-- Centered Dialog Container -->
-        <div class="relative z-10 flex min-h-screen items-center justify-center p-4">
-            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-xl border border-[#e5dfd3]" @click.stop>
+        <div class="relative z-10 flex min-h-screen items-center justify-center p-4 pointer-events-none">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-xl border border-[#e5dfd3] pointer-events-auto" @click.stop>
                 <form method="POST" :action="'/{{ $isOwner ? 'owner' : 'admin' }}/salaries/' + editForm.id">
                     @csrf
                     @method('PUT')

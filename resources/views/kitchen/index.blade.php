@@ -97,6 +97,17 @@
                                         </svg>
                                         BAWA PULANG (TAKEAWAY)
                                     </span>
+                                @elseif($order->table_number === 'ONLINE')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-blue-100 text-blue-900 border border-blue-300 shadow-2xs mb-1">
+                                        <svg class="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                        </svg>
+                                        PESANAN ONLINE
+                                    </span>
+                                @elseif($order->table_number === 'KIOSK')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-indigo-100 text-indigo-900 border border-indigo-300 shadow-2xs mb-1">
+                                        KIOSK MANDIRI
+                                    </span>
                                 @else
                                     <span class="text-xl font-black text-slate-900 tracking-tight block">
                                         {{ $order->table_number ?? 'Meja M001' }}
@@ -127,9 +138,12 @@
                             </div>
                         </div>
 
-                        @if($order->customer_name)
-                            <div class="py-2 text-xs text-slate-600 font-semibold border-b border-slate-100">
-                                Pemesan: <span class="text-slate-800 font-bold">{{ $order->customer_name }}</span>
+                        @if($order->customer_name || $order->customer_phone)
+                            <div class="py-2 text-xs text-slate-600 font-semibold border-b border-slate-100 flex items-center justify-between">
+                                <span>Pemesan: <strong class="text-slate-800">{{ $order->customer_name ?? 'Pelanggan' }}</strong></span>
+                                @if($order->customer_phone)
+                                    <span class="text-slate-500 font-mono text-[11px]">{{ $order->customer_phone }}</span>
+                                @endif
                             </div>
                         @endif
 

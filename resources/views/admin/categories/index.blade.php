@@ -100,7 +100,10 @@
 
                                     <!-- Delete Icon Button -->
                                     <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" class="inline"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori \'{{ addslashes($category->name) }}\'?')">
+                                        data-confirm="Apakah Anda yakin ingin menghapus kategori '{{ $category->name }}'? Seluruh menu terkait mungkin terpengaruh."
+                                        data-confirm-title="Hapus Kategori Menu"
+                                        data-confirm-btn="Ya, Hapus Kategori"
+                                        data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

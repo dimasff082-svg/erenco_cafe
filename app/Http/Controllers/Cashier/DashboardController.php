@@ -29,6 +29,12 @@ class DashboardController extends Controller
 
         $query = Sale::with(['items.product', 'confirmer', 'openBill'])->latest();
 
+        // Pesanan Online wajib lunas terlebih dahulu (via Midtrans) sebelum masuk ke antrean kasir
+        $query->where(function ($q) {
+            $q->where('table_number', '!=', 'ONLINE')
+                ->orWhere('payment_status', 'paid');
+        });
+
         // Filter nomor pesanan / pencarian
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -57,6 +63,10 @@ class DashboardController extends Controller
         // Statistik hari ini untuk terminal kasir (dioptimalkan dalam 1 query gabungan)
         $today = now()->toDateString();
         $stats = Sale::whereDate('transaction_date', $today)
+            ->where(function ($q) {
+                $q->where('table_number', '!=', 'ONLINE')
+                    ->orWhere('payment_status', 'paid');
+            })
             ->selectRaw("
                 SUM(CASE WHEN payment_status = 'unpaid' THEN 1 ELSE 0 END) as unpaid_count,
                 SUM(CASE WHEN payment_status = 'unpaid' THEN total_amount ELSE 0 END) as unpaid_total,

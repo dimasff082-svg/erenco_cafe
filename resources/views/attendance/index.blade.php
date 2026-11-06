@@ -343,8 +343,8 @@
         <div class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs transition-opacity" @click="closeModal()"></div>
 
         <!-- Centered Dialog Container -->
-        <div class="relative z-10 flex min-h-screen items-center justify-center p-4">
-            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-lg border border-[#e5dfd3]" @click.stop>
+        <div class="relative z-10 flex min-h-screen items-center justify-center p-4 pointer-events-none">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-lg border border-[#e5dfd3] pointer-events-auto" @click.stop>
                 <form method="POST" action="{{ route('attendance.store') }}">
                     @csrf
                     <input type="hidden" name="type" :value="selectedType" id="attendanceInputType">

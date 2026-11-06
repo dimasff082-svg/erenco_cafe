@@ -192,7 +192,10 @@
                             </td>
                             <td class="py-3 px-5 text-center">
                                 <form action="{{ route('warehouse.expenses.destroy', $exp->id) }}" method="POST"
-                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan pengeluaran {{ $exp->expense_number }} ini?')">
+                                    data-confirm="Apakah Anda yakin ingin menghapus catatan pengeluaran {{ $exp->expense_number }} (Rp {{ number_format($exp->amount, 0, ',', '.') }}) ini?"
+                                    data-confirm-title="Hapus Transaksi Pengeluaran"
+                                    data-confirm-btn="Ya, Hapus Pengeluaran"
+                                    data-confirm-type="danger">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-rose-600 hover:text-rose-800 font-bold text-xs p-1" title="Hapus Pengeluaran">
@@ -235,7 +238,8 @@
             <button type="button" onclick="document.getElementById('modal-add-expense').classList.add('hidden')" class="text-stone-400 hover:text-stone-600 text-xl font-bold">&times;</button>
         </div>
 
-        <form action="{{ route('warehouse.expenses.store') }}" method="POST" enctype="multipart/form-data" class="space-y-3.5">
+        <form action="{{ route('warehouse.expenses.store') }}" method="POST" enctype="multipart/form-data" class="space-y-3.5"
+            onsubmit="document.getElementById('expenseAmountRaw').value = document.getElementById('expenseAmountDisplay').value.replace(/\D/g, '');">
             @csrf
 
             <!-- Pilihan Jenis Pengeluaran -->

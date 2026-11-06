@@ -208,7 +208,10 @@
 
                                     <!-- Tombol Hapus Meja -->
                                     <form action="{{ route('admin.tables.destroy', $table->id) }}" method="POST" class="inline"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus Meja {{ $table->table_number }}?');">
+                                        data-confirm="Apakah Anda yakin ingin menghapus Meja {{ $table->table_number }}? Seluruh riwayat QR Code dan pesanan terkait meja ini akan terpengaruh."
+                                        data-confirm-title="Hapus Meja Resto"
+                                        data-confirm-btn="Ya, Hapus Meja"
+                                        data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

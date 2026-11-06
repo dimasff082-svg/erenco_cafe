@@ -378,8 +378,21 @@
         renderCart();
     }
 
-    function clearCart() {
+    function clearCart(skipConfirm) {
         if (Object.keys(cart).length === 0) return;
+        if (!skipConfirm && typeof window.showConfirmDialog === 'function') {
+            window.showConfirmDialog({
+                title: 'Kosongkan Keranjang POS',
+                message: 'Apakah Anda yakin ingin mengosongkan seluruh item dalam keranjang belanja kasir?',
+                confirmText: 'Ya, Kosongkan',
+                cancelText: 'Batal',
+                type: 'danger',
+                onConfirm: function() {
+                    clearCart(true);
+                }
+            });
+            return;
+        }
         cart = {};
         if (document.getElementById('cart-discount')) {
             document.getElementById('cart-discount').value = 0;
@@ -769,11 +782,7 @@
         // Alt + C: Clear Cart
         if (e.altKey && (e.key === 'c' || e.key === 'C')) {
             e.preventDefault();
-            if (Object.keys(cart).length > 0) {
-                if (confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?')) {
-                    clearCart();
-                }
-            }
+            clearCart();
             return;
         }
 

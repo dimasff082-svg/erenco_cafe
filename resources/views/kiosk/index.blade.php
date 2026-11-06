@@ -57,19 +57,10 @@
 
         <div class="flex items-center gap-3">
             <!-- Digital Clock Display -->
-            <div class="hidden sm:flex flex-col text-right">
+            <div class="flex flex-col text-right">
                 <span id="kioskClock" class="font-mono text-xs font-bold text-[#e8dfcf]">--:--:--</span>
                 <span id="kioskDate" class="text-[9px] text-[#8f8573]">Hari Ini</span>
             </div>
-
-            <!-- Reset / Bersihkan Pesanan Button -->
-            <button type="button" onclick="confirmResetKiosk()"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2a2620] hover:bg-[#38332b] text-[#d6cfc2] hover:text-white border border-[#423c31] text-[10.5px] font-semibold transition active:scale-95">
-                <svg class="w-3.5 h-3.5 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Reset</span>
-            </button>
         </div>
     </header>
 
@@ -166,7 +157,7 @@
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
-                                        <span>+ Pesan</span>
+                                        <span>Tambah</span>
                                     </button>
                                 </div>
                             </div>
@@ -289,14 +280,24 @@
                 <!-- Alert Error Box -->
                 <div id="kioskAlert" class="hidden p-2 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-[10.5px] font-medium"></div>
 
-                <!-- Checkout Action Button -->
-                <button type="button" id="btnKioskCheckout" onclick="submitKioskOrder()"
-                    class="w-full py-2.5 rounded-xl bg-[#c59b27] hover:bg-[#a87f1c] active:scale-[0.98] text-stone-950 font-black text-xs shadow-sm transition flex items-center justify-center gap-1.5">
-                    <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Konfirmasi & Buat Pesanan</span>
-                </button>
+                <!-- Checkout Action Buttons (Reset & Konfirmasi Pesanan) -->
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="confirmResetKiosk()"
+                        class="px-3.5 py-2.5 rounded-xl bg-[#f0ebd9] hover:bg-[#e4dec8] text-[#5c5344] hover:text-[#26211a] border border-[#dcd4c5] font-bold text-xs transition active:scale-[0.98] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                        title="Kosongkan Keranjang Pesanan">
+                        <svg class="w-4 h-4 text-[#8f8573]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Reset</span>
+                    </button>
+                    <button type="button" id="btnKioskCheckout" onclick="submitKioskOrder()"
+                        class="flex-1 py-2.5 rounded-xl bg-[#c59b27] hover:bg-[#a87f1c] active:scale-[0.98] text-stone-950 font-black text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Konfirmasi & Buat Pesanan</span>
+                    </button>
+                </div>
             </div>
         </aside>
     </div>
@@ -336,6 +337,29 @@
                 <button type="button" onclick="closeQrisModal()"
                     class="w-full py-1.5 rounded-lg bg-[#faf7f0] hover:bg-[#ede7da] text-[#6b6252] font-semibold text-[10.5px] transition">
                     Batal / Ganti Metode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kiosk Custom Confirmation Modal (Fira Cake Theme) -->
+    <div id="kioskConfirmModal" class="hidden fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-[#e5dfd3] space-y-4 animate-scale-up" onclick="event.stopPropagation()">
+            <div id="kioskConfirmIconBox" class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center shadow-inner">
+                <!-- SVG Icon -->
+            </div>
+            <div class="space-y-1.5">
+                <h3 id="kioskConfirmTitle" class="font-serif-classic font-bold text-lg text-[#26211a]">Konfirmasi</h3>
+                <p id="kioskConfirmMessage" class="text-xs text-[#6b6252] leading-relaxed whitespace-pre-line">Pesan konfirmasi</p>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t border-[#f0ebd9]">
+                <button type="button" id="kioskConfirmBtnCancel" onclick="closeKioskConfirm(false)"
+                    class="flex-1 py-2.5 rounded-xl text-xs font-bold text-[#5c5344] bg-[#f0ebd9] hover:bg-[#e4dec8] transition active:scale-95 cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" id="kioskConfirmBtnOk" onclick="closeKioskConfirm(true)"
+                    class="flex-1 py-2.5 rounded-xl text-xs font-bold text-white shadow-sm transition active:scale-95 cursor-pointer">
+                    Ya, Lanjutkan
                 </button>
             </div>
         </div>
@@ -550,11 +574,69 @@
             }
         }
 
+        let kioskConfirmCallback = null;
+
+        function showKioskConfirm(options) {
+            options = options || {};
+            const title = options.title || 'Konfirmasi';
+            const message = options.message || 'Apakah Anda yakin?';
+            const confirmText = options.confirmText || 'Ya, Lanjutkan';
+            const cancelText = options.cancelText || 'Batal';
+            const type = options.type || 'warning';
+
+            kioskConfirmCallback = typeof options.onConfirm === 'function' ? options.onConfirm : null;
+
+            const titleEl = document.getElementById('kioskConfirmTitle');
+            const msgEl = document.getElementById('kioskConfirmMessage');
+            const okBtn = document.getElementById('kioskConfirmBtnOk');
+            const cancelBtn = document.getElementById('kioskConfirmBtnCancel');
+            const iconBox = document.getElementById('kioskConfirmIconBox');
+
+            if (titleEl) titleEl.innerText = title;
+            if (msgEl) msgEl.innerText = message;
+            if (okBtn) okBtn.innerText = confirmText;
+            if (cancelBtn) cancelBtn.innerText = cancelText;
+
+            if (iconBox && okBtn) {
+                if (type === 'danger') {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+                    okBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition active:scale-95 cursor-pointer';
+                } else if (type === 'success') {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                    okBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition active:scale-95 cursor-pointer';
+                } else {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 text-[#c59b27] flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+                    okBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-stone-950 bg-[#c59b27] hover:bg-[#a87f1c] shadow-sm transition active:scale-95 cursor-pointer';
+                }
+            }
+
+            document.getElementById('kioskConfirmModal').classList.remove('hidden');
+        }
+
+        function closeKioskConfirm(confirmed) {
+            document.getElementById('kioskConfirmModal').classList.add('hidden');
+            if (confirmed && kioskConfirmCallback) {
+                const cb = kioskConfirmCallback;
+                kioskConfirmCallback = null;
+                cb();
+            }
+        }
+
         function confirmResetKiosk() {
             if (Object.keys(kioskCart).length > 0) {
-                if (confirm('Apakah Anda ingin membatalkan dan membersihkan seluruh keranjang pesanan?')) {
-                    resetKioskState();
-                }
+                showKioskConfirm({
+                    title: 'Reset Keranjang Pesanan',
+                    message: 'Apakah Anda yakin ingin membatalkan dan mengosongkan seluruh pesanan yang ada di keranjang?',
+                    confirmText: 'Ya, Kosongkan',
+                    cancelText: 'Kembali',
+                    type: 'danger',
+                    onConfirm: function() {
+                        resetKioskState();
+                    }
+                });
             } else {
                 resetKioskState();
             }
@@ -599,15 +681,25 @@
             }
 
             const method = document.querySelector('input[name="kiosk_payment"]:checked')?.value || 'cash';
+            const totalFormatted = formatRupiah(getKioskTotal());
+            const totalCount = items.reduce((acc, it) => acc + it.quantity, 0);
+            const methodLabel = method === 'cash' ? 'Tunai (Bayar di Kasir)' : 'QRIS (Gateway Instan)';
 
-            if (method === 'qris') {
-                // Tampilkan Modal QRIS Payment Gateway
-                document.getElementById('qrisModalTotal').innerText = formatRupiah(getKioskTotal());
-                document.getElementById('qrisModal').classList.remove('hidden');
-            } else {
-                // Langsung proses Tunai
-                executeKioskOrderSubmission('cash');
-            }
+            showKioskConfirm({
+                title: 'Konfirmasi Pesanan',
+                message: `Pelanggan: ${name}\nJumlah: ${totalCount} item (${items.length} menu)\nTotal: ${totalFormatted}\nMetode: ${methodLabel}\n\nBuat pesanan sekarang?`,
+                confirmText: 'Ya, Buat Pesanan',
+                cancelText: 'Periksa Lagi',
+                type: 'warning',
+                onConfirm: function() {
+                    if (method === 'qris') {
+                        document.getElementById('qrisModalTotal').innerText = totalFormatted;
+                        document.getElementById('qrisModal').classList.remove('hidden');
+                    } else {
+                        executeKioskOrderSubmission('cash');
+                    }
+                }
+            });
         }
 
         function closeQrisModal() {

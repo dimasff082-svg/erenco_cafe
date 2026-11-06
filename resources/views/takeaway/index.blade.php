@@ -692,7 +692,22 @@
         document.getElementById('alertBox').classList.add('hidden');
     }
 
-    function resetTakeawayCart() {
+    function resetTakeawayCart(skipConfirm) {
+        if (!skipConfirm && Object.keys(takeawayCart).length > 0) {
+            if (typeof window.showConfirmDialog === 'function') {
+                window.showConfirmDialog({
+                    title: 'Reset Keranjang Pesanan',
+                    message: 'Apakah Anda yakin ingin membatalkan dan mengosongkan seluruh pesanan takeaway saat ini?',
+                    confirmText: 'Ya, Kosongkan',
+                    cancelText: 'Batal',
+                    type: 'danger',
+                    onConfirm: function() {
+                        resetTakeawayCart(true);
+                    }
+                });
+                return;
+            }
+        }
         takeawayCart = {};
         document.getElementById('customerNameInput').value = '';
         const phoneInput = document.getElementById('customerPhoneInput');

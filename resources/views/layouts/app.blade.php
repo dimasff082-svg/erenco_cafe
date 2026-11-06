@@ -293,9 +293,13 @@
 
             <!-- Logout Section -->
             <div class="p-3 border-t border-[#2b261f] shrink-0">
-                <form action="{{ route('logout') }}" method="POST">
+                <form action="{{ route('logout') }}" method="POST" id="sidebar-logout-form"
+                    data-confirm="Apakah Anda yakin ingin keluar dari sistem POS Fira Cake Bakery & Pastry?"
+                    data-confirm-title="Konfirmasi Keluar (Logout)"
+                    data-confirm-btn="Ya, Keluar"
+                    data-confirm-type="warning">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
@@ -599,6 +603,12 @@
 
             // Escape: Close Modal if open
             if (e.key === 'Escape') {
+                const confirmModal = document.getElementById('global-confirm-modal');
+                if (confirmModal && !confirmModal.classList.contains('hidden')) {
+                    e.preventDefault();
+                    window.closeConfirmDialog(false);
+                    return;
+                }
                 const modal = document.getElementById('global-shortcut-modal');
                 if (modal && !modal.classList.contains('hidden')) {
                     e.preventDefault();
@@ -651,6 +661,123 @@
                 return;
             }
             @endif
+        });
+    </script>
+    <!-- Global Custom Confirmation Modal (Modern Classic Fira Cake) -->
+    <div id="global-confirm-modal" class="fixed inset-0 z-[9999] hidden bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="relative w-full max-w-sm bg-white rounded-3xl border border-[#e5dfd3] shadow-2xl p-6 text-center space-y-4 animate-scale-up" onclick="event.stopPropagation()">
+            <!-- Modal Icon -->
+            <div id="global-confirm-icon-box" class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center shadow-inner">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+
+            <!-- Title & Message -->
+            <div class="space-y-1.5">
+                <h3 id="global-confirm-title" class="font-serif-classic font-bold text-lg text-[#262017]">Konfirmasi Tindakan</h3>
+                <p id="global-confirm-message" class="text-xs text-[#6b6252] leading-relaxed">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 pt-2 border-t border-[#f0ebd9]">
+                <button type="button" id="global-confirm-btn-cancel" onclick="window.closeConfirmDialog(false)"
+                    class="flex-1 py-2.5 rounded-xl text-xs font-bold text-[#5c5344] bg-[#f0ebd9] hover:bg-[#e4dec8] transition active:scale-95 cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" id="global-confirm-btn-confirm" onclick="window.closeConfirmDialog(true)"
+                    class="flex-1 py-2.5 rounded-xl text-xs font-bold text-white shadow-sm transition active:scale-95 cursor-pointer">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Confirmation Dialog API
+        let globalConfirmCallback = null;
+        let globalCancelCallback = null;
+
+        window.showConfirmDialog = function(options) {
+            options = options || {};
+            const title = options.title || 'Konfirmasi Tindakan';
+            const message = options.message || 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+            const confirmText = options.confirmText || 'Ya, Lanjutkan';
+            const cancelText = options.cancelText || 'Batal';
+            const type = options.type || 'danger'; // 'danger', 'warning', 'info'
+
+            globalConfirmCallback = typeof options.onConfirm === 'function' ? options.onConfirm : null;
+            globalCancelCallback = typeof options.onCancel === 'function' ? options.onCancel : null;
+
+            const modal = document.getElementById('global-confirm-modal');
+            const titleEl = document.getElementById('global-confirm-title');
+            const messageEl = document.getElementById('global-confirm-message');
+            const confirmBtn = document.getElementById('global-confirm-btn-confirm');
+            const cancelBtn = document.getElementById('global-confirm-btn-cancel');
+            const iconBox = document.getElementById('global-confirm-icon-box');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+            if (confirmBtn) confirmBtn.textContent = confirmText;
+            if (cancelBtn) cancelBtn.textContent = cancelText;
+
+            if (iconBox && confirmBtn) {
+                if (type === 'danger') {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+                    confirmBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition active:scale-95 cursor-pointer';
+                } else if (type === 'warning') {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 text-[#c59b27] flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+                    confirmBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-stone-950 bg-[#c59b27] hover:bg-[#a87f1c] shadow-sm transition active:scale-95 cursor-pointer';
+                } else {
+                    iconBox.className = 'w-14 h-14 mx-auto rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center';
+                    iconBox.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                    confirmBtn.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition active:scale-95 cursor-pointer';
+                }
+            }
+
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeConfirmDialog = function(confirmed) {
+            const modal = document.getElementById('global-confirm-modal');
+            if (modal) modal.classList.add('hidden');
+
+            if (confirmed && globalConfirmCallback) {
+                const cb = globalConfirmCallback;
+                globalConfirmCallback = null;
+                cb();
+            } else if (!confirmed && globalCancelCallback) {
+                const cb = globalCancelCallback;
+                globalCancelCallback = null;
+                cb();
+            }
+        };
+
+        // Automate form submission with data-confirm attribute
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            const confirmMsg = form.getAttribute('data-confirm');
+            if (confirmMsg && !form.dataset.confirmed) {
+                e.preventDefault();
+                const title = form.getAttribute('data-confirm-title') || 'Konfirmasi Tindakan';
+                const confirmBtn = form.getAttribute('data-confirm-btn') || 'Ya, Lanjutkan';
+                const cancelBtn = form.getAttribute('data-cancel-btn') || 'Batal';
+                const type = form.getAttribute('data-confirm-type') || 'danger';
+
+                window.showConfirmDialog({
+                    title: title,
+                    message: confirmMsg,
+                    confirmText: confirmBtn,
+                    cancelText: cancelBtn,
+                    type: type,
+                    onConfirm: function () {
+                        form.dataset.confirmed = 'true';
+                        form.submit();
+                    }
+                });
+            }
         });
     </script>
     @stack('scripts')
