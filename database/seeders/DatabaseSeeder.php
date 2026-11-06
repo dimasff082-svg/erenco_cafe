@@ -139,5 +139,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(RestaurantTableSeeder::class);
+        $this->call(SettingSeeder::class);
     }
 }

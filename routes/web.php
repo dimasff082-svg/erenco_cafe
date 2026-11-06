@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\RestaurantTableController as AdminRestaurantTableController;
 use App\Http\Controllers\Admin\SalaryController as AdminSalaryController;
+use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AttendanceController;
@@ -181,6 +182,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/tables/{table}', [AdminRestaurantTableController::class, 'update'])->name('tables.update');
     Route::delete('/tables/{table}', [AdminRestaurantTableController::class, 'destroy'])->name('tables.destroy');
     Route::get('/tables/{table}/print-qr', [AdminRestaurantTableController::class, 'printQr'])->name('tables.print_qr');
+
+    // Store & System Settings
+    Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
 });
 
 // Admin & Owner Shared Management Routes (Monitoring Presensi & Penggajian Karyawan)

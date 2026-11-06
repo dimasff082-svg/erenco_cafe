@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\MidtransService;
 use Exception;
@@ -30,14 +31,14 @@ class OnlineOrderController extends Controller
             ->orderBy('name')
             ->get();
 
+        $settings = Setting::allMapped();
         $midtransClientKey = config('services.midtrans.client_key');
         $midtransSnapUrl = config('services.midtrans.snap_url');
 
-        return view('online_order.index', compact('categories', 'midtransClientKey', 'midtransSnapUrl'));
+        return view('online_order.index', compact('categories', 'midtransClientKey', 'midtransSnapUrl', 'settings'));
     }
 
     /**
-     * Memproses pesanan online pelanggan dengan pembayaran wajib lunas via Payment Gateway (QRIS).
      * Memproses checkout pesanan online pelanggan dengan Midtrans Snap Payment Gateway.
      */
     public function checkout(Request $request, MidtransService $midtransService): JsonResponse
@@ -47,8 +48,7 @@ class OnlineOrderController extends Controller
             'customer_phone' => ['required', 'string', 'min:9', 'max:25'],
             'address' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:500'],
-            'payment_method' => ['required', 'string', 'in:qris,gateway,midtrans'],
-            'payment_method' => ['required', 'string', 'in:midtrans,qris,gateway'],
+            'payment_method' => ['nullable', 'string', 'in:midtrans,qris,gateway'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -57,8 +57,6 @@ class OnlineOrderController extends Controller
             'customer_name.required' => 'Mohon isi nama lengkap Anda.',
             'customer_phone.required' => 'Mohon isi nomor telepon / WhatsApp Anda.',
             'customer_phone.min' => 'Nomor telepon WhatsApp minimal 9 digit.',
-            'payment_method.in' => 'Metode pembayaran pesanan online hanya boleh melalui Payment Gateway (QRIS).',
-            'payment_method.in' => 'Metode pembayaran pesanan online hanya boleh melalui Payment Gateway Midtrans.',
             'items.required' => 'Keranjang pesanan masih kosong. Silakan pilih menu terlebih dahulu.',
             'items.min' => 'Pilih minimal satu menu untuk membuat pesanan online.',
         ]);
@@ -123,7 +121,6 @@ class OnlineOrderController extends Controller
                 }
                 $fullNotes = implode(' | ', $notesParts);
 
-                // 1. Simpan Transaksi Penjualan Online (Status Lunas & Masuk Antrean Dapur)
                 // 1. Simpan Transaksi Penjualan Online Awal (Status Belum Bayar sebelum Midtrans Lunas)
                 $sale = Sale::create([
                     'transaction_number' => $orderNumber,
@@ -135,15 +132,12 @@ class OnlineOrderController extends Controller
                     'subtotal' => $subtotal,
                     'discount_amount' => 0,
                     'total_amount' => $totalAmount,
-                    'status' => 'completed',
-                    'order_status' => 'pending', // Dikirim langsung ke layar dapur
-                    'payment_status' => 'paid', // Wajib lunas via Payment Gateway
                     'status' => 'pending',
                     'order_status' => 'pending',
                     'payment_status' => 'unpaid', // Wajib lunas via Midtrans sebelum masuk antrean kasir & dapur
                     'open_bill_id' => null,
-                    'confirmed_by' => $activeCashierId,
-                    'confirmed_at' => now(),
+                    'confirmed_by' => null,
+                    'confirmed_at' => null,
                     'notes' => $fullNotes,
                 ]);
 
@@ -161,17 +155,17 @@ class OnlineOrderController extends Controller
                     ]);
                 }
 
-                // 3. Simpan Catatan Pembayaran Payment Gateway (QRIS)
+                // 3. Simpan Catatan Pembayaran Awal (pending)
                 Payment::create([
                     'sale_id' => $sale->id,
-                    'method' => 'qris',
+                    'method' => 'midtrans',
                     'amount_paid' => $totalAmount,
                     'amount_tendered' => $totalAmount,
                     'change_amount' => 0,
-                    'status' => 'paid',
-                    'reference_number' => 'PG-'.strtoupper(Str::random(10)),
-                    'verified_by' => $activeCashierId,
-                    'paid_at' => now(),
+                    'status' => 'pending',
+                    'reference_number' => 'MIDTRANS-'.$orderNumber,
+                    'verified_by' => null,
+                    'paid_at' => null,
                 ]);
 
                 return $sale;
@@ -190,7 +184,6 @@ class OnlineOrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pesanan Online Anda berhasil dibuat dan pembayaran lunas.',
                 'message' => 'Pesanan berhasil dibuat. Silakan selesaikan pembayaran via Midtrans.',
                 'data' => [
                     'sale_id' => $sale->id,

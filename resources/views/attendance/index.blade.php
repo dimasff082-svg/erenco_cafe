@@ -23,7 +23,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h2 class="font-serif-classic text-2xl font-bold text-[#262017] tracking-tight">Presensi Kehadiran Karyawan</h2>
-            <p class="text-xs text-[#786e60] mt-0.5">Absensi mandiri harian dengan verifikasi live foto selfie kamera dan radius lokasi kantor maksimal 50 meter.</p>
+            <p class="text-xs text-[#786e60] mt-0.5">Absensi mandiri harian dengan verifikasi live foto selfie kamera dan radius lokasi kantor maksimal {{ number_format($maxDistance, 0) }} meter.</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <!-- Lokasi GPS Badge -->
@@ -33,29 +33,24 @@
                     <span>Mendeteksi GPS...</span>
                 </span>
             </template>
-            <template x-if="geoStatus === 'ok' && distanceMeters <= 50">
+            <template x-if="geoStatus === 'ok' && distanceMeters <= maxDistance">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span x-text="'Lokasi Sesuai (' + distanceMeters.toFixed(1) + ' m <= 50 m)'"></span>
+                    <span x-text="'Lokasi Sesuai (' + distanceMeters.toFixed(1) + ' m <= ' + maxDistance + ' m)'"></span>
                 </span>
             </template>
-            <template x-if="geoStatus === 'ok' && distanceMeters > 50">
+            <template x-if="geoStatus === 'ok' && distanceMeters > maxDistance">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                    <span x-text="'Di Luar Radius (' + distanceMeters.toFixed(1) + ' m > 50 m)'"></span>
+                    <span x-text="'Di Luar Radius (' + distanceMeters.toFixed(1) + ' m > ' + maxDistance + ' m)'"></span>
                 </span>
             </template>
-
-            <!-- Tombol Refresh / Set Lokasi Kantor (Dev & Toko) -->
-            <button type="button" @click="useOfficeLocation()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#faf7f0] hover:bg-[#ede7da] border border-[#dcd4c5] text-[#4d4436] text-xs font-bold transition shadow-2xs"
-                title="Gunakan koordinat resmi kantor toko Fira Cake (0 meter)">
-                <svg class="w-3.5 h-3.5 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Set Lokasi Kantor</span>
-            </button>
+            <template x-if="geoStatus === 'error'">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                    <span>GPS Gagal Terdeteksi</span>
+                </span>
+            </template>
         </div>
     </div>
 
@@ -88,14 +83,14 @@
         </div>
     @endif
 
-    <!-- Peta Pemantauan Titik Kantor & Radius 50 Meter -->
+    <!-- Peta Pemantauan Titik Kantor & Radius 15 Meter -->
     <div class="bg-white rounded-2xl border border-[#e5dfd3] p-5 shadow-[0_4px_20px_-4px_rgba(38,32,23,0.05)] space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#f0ece1]">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full" :class="distanceMeters <= 50 ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'"></span>
+                    <span class="w-2.5 h-2.5 rounded-full" :class="distanceMeters <= maxDistance ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'"></span>
                     <h3 class="font-serif-classic text-base font-bold text-[#262017]">
-                        Peta Radius Presensi Kantor (Maks. 50 Meter)
+                        Peta Radius Presensi Kantor (Maks. {{ number_format($maxDistance, 0) }} Meter)
                     </h3>
                 </div>
                 <p class="text-xs text-[#786e60] mt-0.5">
@@ -110,14 +105,6 @@
                     </svg>
                     <span>Cek Ulang GPS</span>
                 </button>
-                <button type="button" @click="useOfficeLocation()"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#c59b27] hover:bg-[#a98119] text-stone-950 text-xs font-bold transition shadow-2xs">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Set Posisi ke Kantor (0 m)</span>
-                </button>
                 <a href="https://maps.app.goo.gl/8UpiFYzVZgmKkhmi6?g_st=ac" target="_blank"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition shadow-2xs">
                     <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,11 +117,11 @@
 
         <!-- 3 Info Box Jarak & Koordinat -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3 rounded-xl border transition" :class="distanceMeters <= 50 ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-rose-50 border-rose-300 text-rose-900'">
+            <div class="p-3 rounded-xl border transition" :class="distanceMeters <= maxDistance ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-rose-50 border-rose-300 text-rose-900'">
                 <div class="text-[10px] font-bold uppercase tracking-wider text-stone-500">Status Kelayakan Absensi</div>
                 <div class="text-xs font-black mt-1 flex items-center gap-1.5">
-                    <span x-show="distanceMeters <= 50" class="text-emerald-700">✓ Memenuhi Syarat (Dalam Radius <= 50m)</span>
-                    <span x-show="distanceMeters > 50" class="text-rose-700">✗ Di Luar Radius (Lebih dari 50 meter)</span>
+                    <span x-show="distanceMeters <= maxDistance" class="text-emerald-700" x-text="'✓ Memenuhi Syarat (Dalam Radius <= ' + maxDistance + 'm)'"></span>
+                    <span x-show="distanceMeters > maxDistance" class="text-rose-700" x-text="'✗ Di Luar Radius (Lebih dari ' + maxDistance + ' meter)'"></span>
                 </div>
             </div>
             <div class="p-3 rounded-xl border border-[#e5dfd3] bg-[#faf8f5]">
@@ -291,9 +278,9 @@
                                 {{ \Carbon\Carbon::parse($item->time)->format('H:i:s') }} WITA
                             </td>
                             <td class="py-3 px-4">
-                                <span class="inline-flex items-center gap-1 font-semibold {{ $item->isWithinRadius() ? 'text-emerald-700' : 'text-rose-700' }}">
+                                <span class="inline-flex items-center gap-1 font-semibold {{ $item->isWithinRadius($maxDistance) ? 'text-emerald-700' : 'text-rose-700' }}">
                                     <span>{{ number_format($item->distance_meters, 1) }} m</span>
-                                    <span class="text-[10px]">({{ $item->isWithinRadius() ? '<= 50m' : '> 50m' }})</span>
+                                    <span class="text-[10px]">({{ $item->isWithinRadius($maxDistance) ? '<= ' . number_format($maxDistance, 0) . 'm' : '> ' . number_format($maxDistance, 0) . 'm' }})</span>
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-center">
@@ -363,7 +350,7 @@
 
                         <!-- Distance Banner -->
                         <div class="mt-4 p-3 rounded-xl border flex items-center justify-between text-xs transition"
-                            :class="distanceMeters <= 50 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-rose-50 border-rose-300 text-rose-800'">
+                            :class="distanceMeters <= maxDistance ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-rose-50 border-rose-300 text-rose-800'">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#c59b27] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -375,11 +362,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="font-bold" x-text="distanceMeters <= 50 ? 'Valid (<= 50m)' : 'Luar Radius (> 50m)'"></span>
-                                <button type="button" @click="useOfficeLocation()"
-                                    class="text-[10px] px-2 py-0.5 rounded bg-white border border-[#dcd4c5] font-semibold text-stone-700 hover:bg-stone-100">
-                                    Set 0 m
-                                </button>
+                                <span class="font-bold" x-text="distanceMeters <= maxDistance ? 'Valid (<= ' + maxDistance + 'm)' : 'Luar Radius (> ' + maxDistance + 'm)'"></span>
                             </div>
                         </div>
 
@@ -453,7 +436,7 @@
                                 Batal
                             </button>
                             <button type="submit"
-                                :disabled="distanceMeters > 50 || !capturedImage"
+                                :disabled="distanceMeters > maxDistance || !capturedImage"
                                 class="px-5 py-2 rounded-xl bg-[#c59b27] hover:bg-[#a98119] text-stone-950 text-xs font-bold shadow-xs transition disabled:opacity-50 disabled:cursor-not-allowed">
                                 Simpan Kehadiran
                             </button>
@@ -487,6 +470,7 @@ function attendanceManager() {
         officeLng: {{ $office['longitude'] }},
         userLat: {{ $office['latitude'] }},
         userLng: {{ $office['longitude'] }},
+        maxDistance: {{ (float) ($office['max_distance'] ?? 15) }},
         distanceMeters: 0,
         geoStatus: 'ok',
         showModal: false,
@@ -539,11 +523,11 @@ function attendanceManager() {
                 .addTo(this.map)
                 .bindPopup('<b>Kantor Fira Cake</b><br>BISOLPIN, Ruko Ruby, Jl. Boulevard Rubi II, Masale, Makassar');
 
-            // 2. Lingkaran Radius 50 Meter
+            // 2. Lingkaran Radius 15 Meter
             this.radiusCircle = L.circle([this.officeLat, this.officeLng], {
-                radius: 50,
-                color: this.distanceMeters <= 50 ? '#10b981' : '#e11d48',
-                fillColor: this.distanceMeters <= 50 ? '#10b981' : '#f43f5e',
+                radius: this.maxDistance,
+                color: this.distanceMeters <= this.maxDistance ? '#10b981' : '#e11d48',
+                fillColor: this.distanceMeters <= this.maxDistance ? '#10b981' : '#f43f5e',
                 fillOpacity: 0.2,
                 weight: 2
             }).addTo(this.map);
@@ -580,8 +564,9 @@ function attendanceManager() {
 
             if (this.radiusCircle) {
                 this.radiusCircle.setStyle({
-                    color: this.distanceMeters <= 50 ? '#10b981' : '#e11d48',
-                    fillColor: this.distanceMeters <= 50 ? '#10b981' : '#f43f5e',
+                    radius: this.maxDistance,
+                    color: this.distanceMeters <= this.maxDistance ? '#10b981' : '#e11d48',
+                    fillColor: this.distanceMeters <= this.maxDistance ? '#10b981' : '#f43f5e',
                 });
             }
 
@@ -592,7 +577,7 @@ function attendanceManager() {
                 ]);
             }
 
-            if (this.distanceMeters <= 50) {
+            if (this.distanceMeters <= this.maxDistance) {
                 this.map.setView([this.officeLat, this.officeLng], 17);
             } else {
                 const bounds = L.latLngBounds([
@@ -601,15 +586,6 @@ function attendanceManager() {
                 ]);
                 this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
             }
-        },
-
-        useOfficeLocation() {
-            this.userLat = this.officeLat;
-            this.userLng = this.officeLng;
-            this.distanceMeters = 0;
-            this.geoStatus = 'ok';
-            this.syncHiddenCoordinates();
-            this.updateMapElements();
         },
 
         syncHiddenCoordinates() {
@@ -622,7 +598,7 @@ function attendanceManager() {
         requestLocation() {
             this.geoStatus = 'locating';
             if (!navigator.geolocation) {
-                this.useOfficeLocation();
+                this.geoStatus = 'error';
                 return;
             }
 
@@ -639,10 +615,10 @@ function attendanceManager() {
                     this.updateMapElements();
                 },
                 (err) => {
-                    console.warn('Geolocation warning, menggunakan koordinat kantor default:', err);
-                    this.useOfficeLocation();
+                    console.warn('Geolocation warning / permission denied:', err);
+                    this.geoStatus = 'error';
                 },
-                { enableHighAccuracy: true, timeout: 6000 }
+                { enableHighAccuracy: true, timeout: 10000 }
             );
         },
 

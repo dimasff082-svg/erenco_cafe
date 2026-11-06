@@ -253,8 +253,12 @@
                     <td class="text-right">Rp {{ number_format($salary->basic_salary, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <td>Tunjangan & Bonus Operasional</td>
+                    <td>Tunjangan Operasional</td>
                     <td class="text-right" style="color: #059669;">+ Rp {{ number_format($salary->allowance, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td>Insentif</td>
+                    <td class="text-right" style="color: #c59b27;">+ Rp {{ number_format($salary->incentive ?? 0, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
                     <td>Potongan (BPJS / Keterlambatan / Pinjaman)</td>

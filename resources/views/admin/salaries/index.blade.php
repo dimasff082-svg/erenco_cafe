@@ -178,6 +178,7 @@
                         <th class="py-3 px-4">Karyawan</th>
                         <th class="py-3 px-4 text-right">Gaji Pokok</th>
                         <th class="py-3 px-4 text-right">Tunjangan</th>
+                        <th class="py-3 px-4 text-right">Insentif</th>
                         <th class="py-3 px-4 text-right">Potongan</th>
                         <th class="py-3 px-4 text-right">Gaji Bersih</th>
                         <th class="py-3 px-4 text-center">Status</th>
@@ -203,6 +204,9 @@
                             </td>
                             <td class="py-3 px-4 text-right text-emerald-700">
                                 + Rp {{ number_format($sal->allowance, 0, ',', '.') }}
+                            </td>
+                            <td class="py-3 px-4 text-right text-amber-700">
+                                + Rp {{ number_format($sal->incentive ?? 0, 0, ',', '.') }}
                             </td>
                             <td class="py-3 px-4 text-right text-rose-700">
                                 - Rp {{ number_format($sal->deductions, 0, ',', '.') }}
@@ -268,7 +272,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 text-center text-[#786e60]">
+                            <td colspan="10" class="py-12 text-center text-[#786e60]">
                                 <svg class="w-10 h-10 text-stone-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
@@ -345,11 +349,11 @@
                                 </div>
                             </div>
 
-                            <!-- Komponen Gaji: Pokok, Tunjangan, Potongan (Auto Pemisah Titik Ribuan) -->
+                            <!-- Komponen Gaji: Pokok, Tunjangan, Insentif, Potongan (Auto Pemisah Titik Ribuan) -->
                             <div class="bg-[#faf8f5] p-4 rounded-xl border border-[#e5dfd3] space-y-3">
                                 <div class="text-[11px] font-bold uppercase tracking-wider text-[#786e60]">Rincian Komponen Honor</div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                     <div>
                                         <label class="block text-[11px] font-medium text-[#262017] mb-1">Gaji Pokok (Rp) *</label>
                                         <input type="text" inputmode="numeric" required
@@ -360,13 +364,22 @@
                                         <input type="hidden" name="basic_salary" :value="form.basic_salary">
                                     </div>
                                     <div>
-                                        <label class="block text-[11px] font-medium text-emerald-700 mb-1">Tunjangan / Bonus (Rp)</label>
+                                        <label class="block text-[11px] font-medium text-emerald-700 mb-1">Tunjangan (Rp)</label>
                                         <input type="text" inputmode="numeric"
                                             x-model="form.allowance_display"
                                             @input="handleSalaryInput('allowance', 'form')"
                                             placeholder="0"
                                             class="w-full text-xs px-3 py-2 rounded-xl border border-[#d6cfc2] bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
                                         <input type="hidden" name="allowance" :value="form.allowance">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-amber-700 mb-1">Insentif (Rp)</label>
+                                        <input type="text" inputmode="numeric"
+                                            x-model="form.incentive_display"
+                                            @input="handleSalaryInput('incentive', 'form')"
+                                            placeholder="0"
+                                            class="w-full text-xs px-3 py-2 rounded-xl border border-[#d6cfc2] bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                        <input type="hidden" name="incentive" :value="form.incentive">
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-medium text-rose-700 mb-1">Potongan (Rp)</label>
@@ -463,7 +476,7 @@
                             </div>
 
                             <div class="bg-[#faf8f5] p-4 rounded-xl border border-[#e5dfd3] space-y-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                     <div>
                                         <label class="block text-[11px] font-medium text-[#262017] mb-1">Gaji Pokok (Rp) *</label>
                                         <input type="text" inputmode="numeric" required
@@ -479,6 +492,14 @@
                                             @input="handleSalaryInput('allowance', 'editForm')"
                                             class="w-full text-xs px-3 py-2 rounded-xl border border-[#d6cfc2] bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
                                         <input type="hidden" name="allowance" :value="editForm.allowance">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-amber-700 mb-1">Insentif (Rp)</label>
+                                        <input type="text" inputmode="numeric"
+                                            x-model="editForm.incentive_display"
+                                            @input="handleSalaryInput('incentive', 'editForm')"
+                                            class="w-full text-xs px-3 py-2 rounded-xl border border-[#d6cfc2] bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                        <input type="hidden" name="incentive" :value="editForm.incentive">
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-medium text-rose-700 mb-1">Potongan (Rp)</label>
@@ -555,6 +576,8 @@ function salaryManagement() {
             basic_salary_display: '3.000.000',
             allowance: 0,
             allowance_display: '0',
+            incentive: 0,
+            incentive_display: '0',
             deductions: 0,
             deductions_display: '0',
         },
@@ -567,6 +590,8 @@ function salaryManagement() {
             basic_salary_display: '',
             allowance: 0,
             allowance_display: '',
+            incentive: 0,
+            incentive_display: '',
             deductions: 0,
             deductions_display: '',
             payment_status: 'paid',
@@ -592,6 +617,8 @@ function salaryManagement() {
                 basic_salary_display: formatRupiahDisplay(salary.basic_salary),
                 allowance: Number(salary.allowance) || 0,
                 allowance_display: formatRupiahDisplay(salary.allowance),
+                incentive: Number(salary.incentive) || 0,
+                incentive_display: formatRupiahDisplay(salary.incentive),
                 deductions: Number(salary.deductions) || 0,
                 deductions_display: formatRupiahDisplay(salary.deductions),
                 payment_status: salary.payment_status,
@@ -612,15 +639,17 @@ function salaryManagement() {
         calculateNet() {
             const basic = Number(this.form.basic_salary) || 0;
             const allow = Number(this.form.allowance) || 0;
+            const incent = Number(this.form.incentive) || 0;
             const deduct = Number(this.form.deductions) || 0;
-            return basic + allow - deduct;
+            return basic + allow + incent - deduct;
         },
 
         calculateEditNet() {
             const basic = Number(this.editForm.basic_salary) || 0;
             const allow = Number(this.editForm.allowance) || 0;
+            const incent = Number(this.editForm.incentive) || 0;
             const deduct = Number(this.editForm.deductions) || 0;
-            return basic + allow - deduct;
+            return basic + allow + incent - deduct;
         },
 
         formatRupiah(number) {

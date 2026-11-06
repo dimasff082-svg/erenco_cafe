@@ -8,7 +8,6 @@ use App\Models\Salary;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -83,17 +82,18 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
         $owner = User::factory()->owner()->create();
         $warehouseUser = User::factory()->warehouse()->create();
 
-        // 1. Admin membuat slip gaji karyawan
+        // 1. Admin membuat slip gaji karyawan dengan komponen gaji pokok, tunjangan, insentif, dan potongan
         $createResponse = $this->actingAs($admin)->post(route('admin.salaries.store'), [
             'user_id' => $warehouseUser->id,
             'period_month' => 'November 2026',
             'basic_salary' => 3500000,
             'allowance' => 500000,
+            'incentive' => 250000,
             'deductions' => 100000,
             'payment_date' => now()->toDateString(),
             'payment_status' => 'paid',
             'payment_method' => 'transfer',
-            'notes' => 'Gaji bulanan reguler',
+            'notes' => 'Gaji bulanan reguler + insentif performa',
         ]);
 
         $createResponse->assertRedirect();
@@ -101,7 +101,10 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
             'user_id' => $warehouseUser->id,
             'period_month' => 'November 2026',
             'basic_salary' => 3500000,
-            'net_salary' => 3900000,
+            'allowance' => 500000,
+            'incentive' => 250000,
+            'deductions' => 100000,
+            'net_salary' => 4150000,
             'payment_status' => 'paid',
         ]);
 
@@ -113,6 +116,7 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
         $adminIndex->assertOk();
         $adminIndex->assertSee('November 2026');
         $adminIndex->assertSee($warehouseUser->name);
+        $adminIndex->assertSee('250.000'); // Menampilkan kolom insentif
         $adminIndex->assertDontSee('Chef Dono — DAPUR');
 
         // Admin mencoba membuat slip gaji untuk role kitchen -> Gagal validasi
@@ -129,7 +133,8 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
         $printResponse = $this->actingAs($admin)->get(route('admin.salaries.print', $salary));
         $printResponse->assertOk();
         $printResponse->assertSee('SLIP PENGGAJIAN RESMI');
-        $printResponse->assertSee('3.900.000');
+        $printResponse->assertSee('4.150.000');
+        $printResponse->assertSee('Insentif');
 
         // 3. Pemilik dapat membuka halaman penggajian
         $ownerIndex = $this->actingAs($owner)->get(route('owner.salaries.index'));
@@ -163,9 +168,9 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
     }
 
     /**
-     * Absensi staf berhasil ketika berada dalam radius <= 50 meter dari kantor.
+     * Absensi staf berhasil ketika berada dalam radius <= 15 meter dari kantor.
      */
-    public function test_attendance_succeeds_when_within_50_meters(): void
+    public function test_attendance_succeeds_when_within_15_meters(): void
     {
         $cashier = User::factory()->create(['role' => 'cashier']);
         $fakeCameraBase64 = 'data:image/jpeg;base64,'.base64_encode('fake-camera-selfie-data');
@@ -189,18 +194,18 @@ class WarehouseAndOwnerNewFeaturesTest extends TestCase
         $attendance = Attendance::where('user_id', $cashier->id)->where('type', 'check_in')->first();
         $this->assertNotNull($attendance);
         $this->assertTrue($attendance->isWithinRadius());
-        $this->assertLessThanOrEqual(50.0, (float) $attendance->distance_meters);
+        $this->assertLessThanOrEqual(15.0, (float) $attendance->distance_meters);
     }
 
     /**
-     * Absensi ditolak jika jarak melebihi batas 50 meter dari kantor.
+     * Absensi ditolak jika jarak melebihi batas 15 meter dari kantor.
      */
-    public function test_attendance_is_rejected_when_exceeding_50_meters(): void
+    public function test_attendance_is_rejected_when_exceeding_15_meters(): void
     {
         $warehouseUser = User::factory()->warehouse()->create();
         $fakeCameraBase64 = 'data:image/jpeg;base64,'.base64_encode('fake-camera-selfie-data');
 
-        // Koordinat jauh dari kantor (misal berjarak beberapa kilometer)
+        // Koordinat berjarak > 15 meter dari kantor
         $response = $this->actingAs($warehouseUser)->post(route('attendance.store'), [
             'type' => 'check_in',
             'latitude' => -5.200000,

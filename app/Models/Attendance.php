@@ -49,8 +49,12 @@ class Attendance extends Model
         };
     }
 
-    public function isWithinRadius(): bool
+    public const MAX_ALLOWED_DISTANCE_METERS = 15.0;
+
+    public function isWithinRadius(?float $customMax = null): bool
     {
-        return $this->distance_meters !== null && (float) $this->distance_meters <= 50.0;
+        $max = $customMax ?? Setting::getAttendanceMaxDistance();
+
+        return $this->distance_meters !== null && (float) $this->distance_meters <= $max;
     }
 }

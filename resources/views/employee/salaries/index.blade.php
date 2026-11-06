@@ -152,6 +152,7 @@
                         <th class="py-3 px-4">Tanggal Bayar</th>
                         <th class="py-3 px-4 text-right">Gaji Pokok</th>
                         <th class="py-3 px-4 text-right">Tunjangan</th>
+                        <th class="py-3 px-4 text-right">Insentif</th>
                         <th class="py-3 px-4 text-right">Potongan</th>
                         <th class="py-3 px-4 text-right">Gaji Bersih</th>
                         <th class="py-3 px-4 text-center">Status</th>
@@ -175,6 +176,9 @@
                             </td>
                             <td class="py-3.5 px-4 text-right text-emerald-700 font-medium">
                                 + Rp {{ number_format($salary->allowance, 0, ',', '.') }}
+                            </td>
+                            <td class="py-3.5 px-4 text-right text-amber-700 font-medium">
+                                + Rp {{ number_format($salary->incentive ?? 0, 0, ',', '.') }}
                             </td>
                             <td class="py-3.5 px-4 text-right text-rose-700 font-medium">
                                 - Rp {{ number_format($salary->deductions, 0, ',', '.') }}
@@ -225,7 +229,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 text-center text-[#786e60]">
+                            <td colspan="10" class="py-12 text-center text-[#786e60]">
                                 <div class="w-12 h-12 mx-auto rounded-2xl bg-[#faf8f5] border border-[#e5dfd3] flex items-center justify-center text-[#786e60] mb-3">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

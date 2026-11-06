@@ -208,6 +208,16 @@
                             </td>
                             <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
                                 <div class="inline-flex items-center gap-1.5 justify-center">
+                                    @if(auth()->check() && auth()->user()->isOwner() && ! $sale->isCancelled())
+                                        <button type="button"
+                                            onclick="openCancelOrderModal('{{ $sale->id }}', '{{ $sale->transaction_number }}')"
+                                            title="Batalkan Pesanan Ini"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white border border-rose-300 transition text-xs font-bold shadow-2xs">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            <span>Batal</span>
+                                        </button>
+                                    @endif
+
                                     <button type="button" onclick="toggleTrxDetail('{{ $sale->accordion_id }}')"
                                         title="Lihat Detail Transaksi"
                                         class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-amber-50 text-[#8a681c] hover:bg-[#c59b27] hover:text-stone-950 border border-amber-300/80 transition shadow-2xs">

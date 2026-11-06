@@ -14,9 +14,10 @@
             <p class="text-xs text-[#786e60] mt-0.5">Monitoring catatan kehadiran staf (Kasir, Warehouse, dll) dengan verifikasi jarak GPS dan foto selfie.</p>
         </div>
         <div class="flex items-center gap-2">
+            @php $currentMaxDistance = (float) \App\Models\Setting::get('attendance_max_distance', 15.0); @endphp
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-xs font-semibold">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Radius Maksimal: 50 Meter</span>
+                <span>Radius Maksimal: {{ number_format($currentMaxDistance, 0) }} Meter</span>
             </span>
         </div>
     </div>

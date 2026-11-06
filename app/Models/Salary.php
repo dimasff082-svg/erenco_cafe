@@ -16,6 +16,7 @@ class Salary extends Model
         'period_month',
         'basic_salary',
         'allowance',
+        'incentive',
         'deductions',
         'net_salary',
         'payment_date',
@@ -30,6 +31,7 @@ class Salary extends Model
         return [
             'basic_salary' => 'decimal:2',
             'allowance' => 'decimal:2',
+            'incentive' => 'decimal:2',
             'deductions' => 'decimal:2',
             'net_salary' => 'decimal:2',
             'payment_date' => 'date',

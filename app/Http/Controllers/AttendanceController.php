@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,7 +22,7 @@ class AttendanceController extends Controller
 
     public const OFFICE_NAME = 'Kantor Fira Cake (Ruko Ruby Masale)';
 
-    public const MAX_ALLOWED_DISTANCE_METERS = 50.0;
+    public const MAX_ALLOWED_DISTANCE_METERS = 15.0;
 
     /**
      * Tampilan form & dashboard absensi mandiri untuk Kasir dan Staf Warehouse.
@@ -70,17 +71,19 @@ class AttendanceController extends Controller
             ],
         ];
 
+        $maxDistance = Setting::getAttendanceMaxDistance();
+
         $office = [
             'latitude' => self::OFFICE_LATITUDE,
             'longitude' => self::OFFICE_LONGITUDE,
-            'max_distance' => self::MAX_ALLOWED_DISTANCE_METERS,
+            'max_distance' => $maxDistance,
         ];
 
-        return view('attendance.index', compact('todayAttendances', 'history', 'shiftSlots', 'office'));
+        return view('attendance.index', compact('todayAttendances', 'history', 'shiftSlots', 'office', 'maxDistance'));
     }
 
     /**
-     * Proses penyimpanan data absensi dengan verifikasi foto & radius lokasi (maks 50 meter).
+     * Proses penyimpanan data absensi dengan verifikasi foto & radius lokasi (maksimal sesuai pengaturan toko).
      */
     public function store(Request $request): RedirectResponse
     {
@@ -122,10 +125,11 @@ class AttendanceController extends Controller
             self::OFFICE_LONGITUDE
         );
 
-        // 3. Validasi radius maksimal 50 meter
-        if ($distance > self::MAX_ALLOWED_DISTANCE_METERS) {
+        // 3. Validasi radius maksimal dari pengaturan toko
+        $maxDistance = Setting::getAttendanceMaxDistance();
+        if ($distance > $maxDistance) {
             return back()->withErrors([
-                'attendance' => 'Jarak lokasi Anda saat ini adalah '.number_format($distance, 1).' meter dari kantor. Absensi ditolak karena melebihi batas maksimal 50 meter.',
+                'attendance' => 'Jarak lokasi Anda saat ini adalah '.number_format($distance, 1).' meter dari kantor. Absensi ditolak karena melebihi batas maksimal '.number_format($maxDistance, 0).' meter yang ditentukan toko.',
             ]);
         }
 

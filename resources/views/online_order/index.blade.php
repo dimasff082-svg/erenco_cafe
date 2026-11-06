@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script src="{{ $midtransSnapUrl ?? config('services.midtrans.snap_url') }}" data-client-key="{{ $midtransClientKey ?? config('services.midtrans.client_key') }}"></script>
+    <script src="{{ $midtransSnapUrl ?? config('services.midtrans.snap_url', 'https://app.sandbox.midtrans.com/snap/snap.js') }}" data-client-key="{{ $midtransClientKey ?? config('services.midtrans.client_key', 'SB-Mid-client-cclA53nEGemMIzdKixoGyyx7') }}"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -29,17 +29,22 @@
 </head>
 <body class="h-full flex flex-col text-[#26211a] bg-[#fbf9f4] antialiased selection:bg-[#c59b27] selection:text-white">
 
-    <!-- Container Utama: Dibatasi max-w-md / max-w-lg agar seperti Native App di HP & Rapi di Desktop -->
-    <div class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-white shadow-xl relative pb-24 border-x border-[#ede7dc]">
+    <!-- Container Utama: Mobile-First Responsive Shell -->
+    <div class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-white shadow-xl relative pb-28 border-x border-[#ede7dc]">
 
         <!-- Top Header Toko (Mobile App Bar) -->
-        <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#eee7dc] px-4 py-3">
+        <header class="bg-white border-b border-[#eee7dc] px-4 py-3">
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-10 h-10 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7] shrink-0">
+                    @php
+                        $storeLogo = !empty($settings['app_logo']) ? asset('storage/' . $settings['app_logo']) : asset('images/logo.png');
+                    @endphp
+                    <img src="{{ $storeLogo }}" alt="{{ $settings['store_name'] ?? 'Fira Cake' }}"
+                        class="w-10 h-10 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7] shrink-0"
+                        onerror="this.src='{{ asset('images/default-cake.png') }}'">
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <h1 class="text-sm font-black text-[#26211a] tracking-tight">Fira Cake</h1>
+                            <h1 class="text-sm font-black text-[#26211a] tracking-tight">{{ $settings['store_name'] ?? 'Fira Cake' }}</h1>
                             <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#c59b27] text-stone-950">
                                 Online
                             </span>
@@ -54,23 +59,87 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         Buka
                     </span>
-                    <span class="text-[9px] text-[#8c8270] mt-0.5 font-medium">Pengiriman & Ambil</span>
+                    <span class="text-[9px] text-[#8c8270] mt-0.5 font-medium">{{ $settings['store_hours'] ?? '08:00 - 21:00 WITA' }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. Card Informasi Selamat Datang, Deskripsi & Nomor Kontak Toko (Berada di atas Card Pembayaran Midtrans) -->
+        <div class="m-4 mb-2.5 bg-gradient-to-br from-[#26211a] to-[#3a3227] text-[#f4efe6] rounded-2xl p-4 shadow-md border border-[#4a4032] space-y-3">
+            <div class="flex items-start justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#c59b27]/20 border border-[#c59b27]/40 text-[#f5d97f] text-[10px] font-black uppercase tracking-wider">
+                        <svg class="w-3 h-3 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        <span>Official Online Store</span>
+                    </div>
+                    <h2 class="font-serif-classic text-base font-bold text-white tracking-tight">
+                        {{ $settings['online_welcome_title'] ?? 'Selamat Datang di Fira Cake!' }}
+                    </h2>
                 </div>
             </div>
 
-            <!-- Banner Info Pembayaran Khusus Payment Gateway -->
-            <div class="mt-2.5 p-2 rounded-xl bg-[#faf7f0] border border-[#e8dfcf] flex items-center justify-between text-[10px]">
-                <div class="flex items-center gap-1.5 text-[#5c5344]">
-                    <svg class="w-3.5 h-3.5 text-[#c59b27] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <p class="text-[11px] text-[#d6cfc2] leading-relaxed">
+                {{ $settings['online_welcome_description'] ?? 'Nikmati aneka pilihan roti, bolu fresh, kue tart, dan pastry premium kualitas terbaik kami langsung dibuat segar setiap hari.' }}
+            </p>
+
+            <div class="pt-2.5 border-t border-[#4a4032]/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                <div class="flex items-center gap-1.5 text-[#f5d97f]">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span class="font-bold text-white">Kontak Toko:</span>
+                    <span class="font-mono text-[#f5d97f]">{{ $settings['store_phone'] ?? '082131117996' }}</span>
+                </div>
+
+                @php
+                    $cleanStorePhone = preg_replace('/[^0-9]/', '', $settings['store_phone'] ?? '082131117996');
+                    if (str_starts_with($cleanStorePhone, '0')) {
+                        $storeWaNumber = '62' . substr($cleanStorePhone, 1);
+                    } elseif (!str_starts_with($cleanStorePhone, '62')) {
+                        $storeWaNumber = '62' . $cleanStorePhone;
+                    } else {
+                        $storeWaNumber = $cleanStorePhone;
+                    }
+                    $storeWaUrl = "https://api.whatsapp.com/send?phone={$storeWaNumber}&text=" . urlencode("Halo Fira Cake, saya ingin bertanya seputar pesanan online...");
+                @endphp
+                <a href="{{ $storeWaUrl }}" target="_blank"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow-xs transition active:scale-95">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-1.114-.072-.258-.083-.588-.204-1.013-.39-.884-.388-1.554-1.045-2.002-1.637-.091-.12-.349-.47-.349-.896 0-.426.223-.636.303-.717.08-.08.175-.101.233-.101.059 0 .118.001.17.004.055.003.128-.02.2.152.073.175.25.612.272.656.022.045.037.098.007.158-.03.06-.045.097-.09.15-.045.053-.095.118-.135.158-.045.045-.092.094-.039.185.053.09.236.388.506.629.349.311.644.408.734.453.09.045.15.068.173.105.022.038.022.218-.122.623z"/>
+                    </svg>
+                    <span>Hubungi WA</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Card Pembayaran Online via Midtrans Payment Gateway (Tepat di bawah Card Info Toko) -->
+        <div class="mx-4 mb-3 p-3 rounded-2xl bg-gradient-to-r from-[#faf7f0] to-[#f4eee1] border border-[#e5dfd3] flex items-center justify-between gap-2 shadow-2xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 border border-amber-300/80 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-[#c59b27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
-                    <span>Pembayaran Instan via <strong>Payment Gateway QRIS</strong></span>
                 </div>
-                <span class="text-[9px] font-bold text-amber-800 bg-amber-100/70 px-1.5 py-0.5 rounded">Wajib Lunas</span>
+                <div class="min-w-0">
+                    <div class="text-[11px] font-bold text-[#26211a] truncate">
+                        Pembayaran Online via <span class="text-[#8a681c] font-black">Midtrans</span>
+                    </div>
+                    <div class="text-[10px] text-[#786e60] truncate">
+                        QRIS, GoPay, ShopeePay, VA & Transfer Bank
+                    </div>
+                </div>
             </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/80 border border-amber-300/80 px-2 py-0.5 rounded-lg shrink-0">
+                Wajib Lunas
+            </span>
+        </div>
 
+        <!-- 3. Sticky Search Bar & Category Navigation -->
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-y border-[#eee7dc] px-4 py-2.5 space-y-2 shadow-2xs">
             <!-- Search Bar Menu -->
-            <div class="mt-2.5 relative">
+            <div class="relative">
                 <input type="text" id="onlineSearchInput" oninput="handleOnlineSearch()"
                     placeholder="Cari roti, bolu, kue tart, pastry..."
                     class="w-full bg-[#fbf9f4] border border-[#e0d7c7] rounded-xl pl-9 pr-8 py-2 text-xs text-[#26211a] placeholder:text-[#998f80] focus:outline-none focus:ring-1 focus:ring-[#c59b27] transition">
@@ -83,7 +152,7 @@
             </div>
 
             <!-- Category Pills Bar (Horizontal Scrollable) -->
-            <div class="mt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
                 <button type="button" onclick="selectOnlineCategory('all')" id="catTab-all"
                     class="online-cat-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition shrink-0 bg-[#c59b27] text-stone-950 shadow-2xs">
                     Semua Menu
@@ -95,7 +164,7 @@
                     </button>
                 @endforeach
             </div>
-        </header>
+        </div>
 
         <!-- Menu Product List -->
         <main class="flex-1 p-4 space-y-4">
@@ -187,6 +256,21 @@
                 <p class="text-xs font-bold text-[#5c5344]">Menu tidak ditemukan</p>
                 <p class="text-[11px] text-[#8c8270] mt-0.5">Coba kata kunci lain atau pilih kategori di atas.</p>
             </div>
+
+            <!-- Store Footer Information -->
+            <footer class="pt-6 pb-4 border-t border-[#eee7dc] text-center space-y-2 text-[#786e60]">
+                <div class="flex items-center justify-center gap-1.5 font-serif-classic font-bold text-xs text-[#26211a]">
+                    <span>{{ $settings['store_name'] ?? 'Fira Cake Bakery & Pastry' }}</span>
+                </div>
+                <p class="text-[10px] text-[#8c8270] max-w-xs mx-auto leading-relaxed">
+                    {{ $settings['store_address'] ?? 'BISOLPIN, Ruko Ruby, Jl. Boulevard Rubi II, Masale, Panakkukang, Makassar' }}
+                </p>
+                <div class="text-[10px] flex items-center justify-center gap-3 text-[#8c8270] pt-1">
+                    <span>Jam Buka: {{ $settings['store_hours'] ?? '08:00 - 21:00 WITA' }}</span>
+                    <span>&bull;</span>
+                    <a href="{{ $storeWaUrl }}" target="_blank" class="text-emerald-700 font-bold hover:underline">WA: {{ $settings['store_phone'] ?? '082131117996' }}</a>
+                </div>
+            </footer>
         </main>
 
         <!-- Sticky Floating Bottom Cart Bar (Muncul Otomatis saat ada pesanan) -->
@@ -294,29 +378,23 @@
                         </div>
                     </div>
 
-                    <!-- Metode Pembayaran: Wajib Payment Gateway (QRIS) -->
                     <!-- Metode Pembayaran: Wajib Payment Gateway Midtrans -->
                     <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/90 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-amber-900">Metode Pembayaran</span>
-                            <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-amber-200/80 text-amber-900">Eksklusif Payment Gateway</span>
                             <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-amber-200/80 text-amber-900">Midtrans Gateway</span>
                         </div>
                         <div class="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs">
-                            <div class="w-8 h-8 rounded-lg bg-stone-900 text-[#c59b27] flex items-center justify-center font-black text-xs shrink-0">
-                                QRIS
+                            <div class="w-8 h-8 rounded-lg bg-stone-900 text-[#c59b27] flex items-center justify-center font-black text-[11px] shrink-0">
                                 SNAP
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="text-xs font-bold text-[#26211a]">Payment Gateway QRIS Instan</div>
-                                <div class="text-[10px] text-[#786e60]">GoPay, OVO, Dana, ShopeePay, BCA, Mandiri, dll.</div>
                                 <div class="text-xs font-bold text-[#26211a]">Midtrans Payment Gateway</div>
                                 <div class="text-[10px] text-[#786e60]">QRIS (GoPay, OVO, ShopeePay, Dana), BCA, Mandiri VA, dll.</div>
                             </div>
                             <span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
                         </div>
                         <p class="text-[10px] text-amber-900/90 leading-tight">
-                            Pesanan online wajib lunas via Payment Gateway. Setelah pembayaran terverifikasi lunas, pesanan Anda otomatis langsung masuk ke sistem kasir dan dapur Fira Cake.
                             Pesanan online wajib lunas melalui Midtrans Payment Gateway. Setelah pembayaran selesai, pesanan Anda otomatis langsung masuk ke antrean kasir & dapur Fira Cake.
                         </p>
                     </div>
@@ -331,12 +409,10 @@
                             <span id="modalSubtotal" class="font-bold text-[#26211a]">Rp 0</span>
                         </div>
                         <div class="flex justify-between text-[#786e60]">
-                            <span>Biaya Layanan Payment Gateway</span>
                             <span>Biaya Layanan Midtrans</span>
                             <span class="font-bold text-emerald-700">Gratis (Rp 0)</span>
                         </div>
                         <div class="pt-2 border-t border-[#e5dfd3] flex justify-between items-center">
-                            <span class="font-bold text-xs text-[#26211a]">Total Tagihan Lunas:</span>
                             <span class="font-bold text-xs text-[#26211a]">Total Tagihan:</span>
                             <span id="modalTotalPay" class="font-serif-classic font-black text-base text-amber-900">Rp 0</span>
                         </div>
@@ -349,29 +425,27 @@
                         class="px-4 py-2.5 rounded-xl bg-[#f0ebd9] text-[#5c5344] font-bold text-xs hover:bg-[#e4dec8] transition active:scale-95">
                         Batal
                     </button>
-                    <button type="button" id="btnPayOnline" onclick="openPaymentGatewayModal()"
-                    <button type="button" id="btnPayOnline" onclick="processMidtransCheckout()"
+                    <button type="button" id="btnPayOnline" onclick="processOnlineCheckout()"
                         class="flex-1 py-2.5 rounded-xl bg-[#c59b27] hover:bg-[#a87f1c] active:scale-95 text-stone-950 font-black text-xs shadow-sm transition flex items-center justify-center gap-1.5">
                         <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span>Bayar via Payment Gateway</span>
                         <span>Bayar Sekarang via Midtrans</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Simulasi / Tampilan Pembayaran Payment Gateway (QRIS) -->
+        <!-- Modal Simulasi / Fallback Pembayaran Midtrans (Sandbox / Tanpa Jaringan Eksternal) -->
         <div id="qrisPaymentModal" class="hidden fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-3xl max-w-xs w-full p-5 text-center shadow-2xl border border-[#e5dfd3] space-y-3.5" onclick="event.stopPropagation()">
                 <div class="flex items-center justify-between pb-2 border-b border-[#f0e8db]">
                     <div class="flex items-center gap-1.5 text-left">
                         <div class="w-6 h-6 rounded-lg bg-stone-900 text-[#c59b27] font-black text-[10px] flex items-center justify-center">
-                            QR
+                            SNAP
                         </div>
                         <div>
-                            <h3 class="text-xs font-black text-[#26211a] leading-tight">Payment Gateway QRIS</h3>
+                            <h3 class="text-xs font-black text-[#26211a] leading-tight">Midtrans Simulator</h3>
                             <p class="text-[9px] text-[#786e60]">Fira Cake Bakery & Pastry</p>
                         </div>
                     </div>
@@ -380,28 +454,26 @@
                     </button>
                 </div>
 
-                <p class="text-[10px] text-[#6b6252]">Pindai kode QRIS di bawah ini dengan aplikasi mobile banking atau e-wallet Anda:</p>
+                <p class="text-[10px] text-[#6b6252]">Silakan verifikasi pembayaran pesanan online Anda:</p>
 
                 <!-- QRIS Code Image Simulation -->
                 <div class="p-3 bg-white rounded-2xl border-2 border-dashed border-[#c59b27] inline-block shadow-inner">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=FIRA-CAKE-ONLINE-ORDER-PAYMENT"
-                        alt="QRIS Payment Gateway" class="w-40 h-40 mx-auto rounded-lg">
+                        alt="QRIS Midtrans" class="w-36 h-36 mx-auto rounded-lg">
                 </div>
 
                 <div class="p-2.5 rounded-xl bg-[#faf7f0] border border-[#e8dfcf]">
                     <div class="text-[10px] text-[#786e60]">Total yang Harus Dibayar:</div>
                     <div id="qrisModalPayAmount" class="font-serif-classic text-lg font-black text-emerald-800">Rp 0</div>
-                    <div class="text-[9px] text-[#8c8270] mt-0.5 font-medium">BCA &bull; Mandiri &bull; GoPay &bull; OVO &bull; DANA &bull; ShopeePay</div>
+                    <div class="text-[9px] text-[#8c8270] mt-0.5 font-medium">QRIS &bull; GoPay &bull; BCA &bull; Mandiri &bull; DANA</div>
                 </div>
 
                 <div class="pt-1 space-y-2">
-                    <button type="button" id="btnSimulatePaySuccess" onclick="processOnlineCheckout()"
                     <button type="button" id="btnSimulatePaySuccess" onclick="processFallbackMidtransSuccess()"
                         class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span>Konfirmasi Pembayaran Lunas</span>
                         <span>Konfirmasi Pembayaran Midtrans Lunas</span>
                     </button>
                     <button type="button" onclick="closePaymentGatewayModal()"
@@ -417,6 +489,7 @@
     <!-- JavaScript Application Logic -->
     <script>
         let onlineCart = {};
+        let currentOrderData = null;
 
         // Inisialisasi Cart dari LocalStorage jika ada
         try {
@@ -455,6 +528,7 @@
             renderOnlineCart();
         }
 
+        // Tambah Qty
         function incrementOnlineItem(id) {
             if (onlineCart[id]) {
                 onlineCart[id].quantity += 1;
@@ -463,6 +537,7 @@
             }
         }
 
+        // Kurangi Qty
         function decrementOnlineItem(id) {
             if (onlineCart[id]) {
                 onlineCart[id].quantity -= 1;
@@ -474,14 +549,9 @@
             }
         }
 
-        function removeOnlineItem(id) {
-            delete onlineCart[id];
-            saveCart();
-            renderOnlineCart();
-        }
-
+        // Kosongkan Keranjang
         function confirmClearOnlineCart() {
-            if (confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?')) {
+            if (confirm('Kosongkan semua item dari keranjang?')) {
                 onlineCart = {};
                 saveCart();
                 renderOnlineCart();
@@ -489,64 +559,63 @@
             }
         }
 
-        function formatRupiah(num) {
-            return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+        function getOnlineCartQty() {
+            return Object.values(onlineCart).reduce((sum, item) => sum + item.quantity, 0);
         }
 
         function getOnlineCartTotal() {
-            return Object.values(onlineCart).reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            return Object.values(onlineCart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
         }
 
-        function getOnlineCartQty() {
-            return Object.values(onlineCart).reduce((acc, item) => acc + item.quantity, 0);
+        function formatRupiah(number) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(number || 0);
         }
 
-        // Render Tampilan Keranjang & Stepper
+        // Render Antarmuka Keranjang & Tombol Produk
         function renderOnlineCart() {
             const totalQty = getOnlineCartQty();
             const totalPrice = getOnlineCartTotal();
 
-            // Update Semua Stepper di Menu Card
-            document.querySelectorAll('[id^="btnAdd-"]').forEach(btn => {
-                const id = btn.id.replace('btnAdd-', '');
-                const stepper = document.getElementById('stepper-' + id);
-                const qtyDisp = document.getElementById('qtyDisplay-' + id);
+            // 1. Update Floating Bottom Bar
+            const bar = document.getElementById('floatingCartBar');
+            if (totalQty > 0) {
+                bar.classList.remove('hidden');
+                document.getElementById('floatingTotalQty').innerText = totalQty;
+                document.getElementById('floatingTotalPrice').innerText = formatRupiah(totalPrice);
+            } else {
+                bar.classList.add('hidden');
+            }
 
-                if (onlineCart[id] && onlineCart[id].quantity > 0) {
-                    btn.classList.add('hidden');
+            // 2. Update Tombol Tiap Produk di Menu
+            document.querySelectorAll('.online-product-card').forEach(card => {
+                const pid = card.getAttribute('data-product-id');
+                const btnAdd = document.getElementById('btnAdd-' + pid);
+                const stepper = document.getElementById('stepper-' + pid);
+                const qtySpan = document.getElementById('qtyDisplay-' + pid);
+
+                if (onlineCart[pid] && onlineCart[pid].quantity > 0) {
+                    if (btnAdd) btnAdd.classList.add('hidden');
                     if (stepper) stepper.classList.remove('hidden');
                     if (stepper) stepper.classList.add('flex');
-                    if (qtyDisp) qtyDisp.innerText = onlineCart[id].quantity;
+                    if (qtySpan) qtySpan.innerText = onlineCart[pid].quantity;
                 } else {
-                    btn.classList.remove('hidden');
+                    if (btnAdd) btnAdd.classList.remove('hidden');
                     if (stepper) stepper.classList.add('hidden');
                     if (stepper) stepper.classList.remove('flex');
                 }
             });
 
-            // Update Floating Bottom Bar
-            const bar = document.getElementById('floatingCartBar');
-            if (totalQty > 0) {
-                document.getElementById('floatingTotalQty').innerText = totalQty;
-                document.getElementById('floatingTotalPrice').innerText = formatRupiah(totalPrice);
-                bar.classList.remove('hidden');
-            } else {
-                bar.classList.add('hidden');
-            }
+            // 3. Update Modal Keranjang jika terbuka
+            const listContainer = document.getElementById('cartItemsList');
+            if (listContainer) {
+                document.getElementById('modalSubtotal').innerText = formatRupiah(totalPrice);
+                document.getElementById('modalTotalPay').innerText = formatRupiah(totalPrice);
 
-            // Update Isi Modal Checkout
-            const listEl = document.getElementById('cartItemsList');
-            const subtotalEl = document.getElementById('modalSubtotal');
-            const totalPayEl = document.getElementById('modalTotalPay');
-
-            if (subtotalEl) subtotalEl.innerText = formatRupiah(totalPrice);
-            if (totalPayEl) totalPayEl.innerText = formatRupiah(totalPrice);
-
-            if (listEl) {
-                if (totalQty === 0) {
-                    listEl.innerHTML = '<div class="text-center py-4 text-stone-400">Keranjang masih kosong</div>';
+                const items = Object.values(onlineCart);
+                if (items.length === 0) {
+                    listContainer.innerHTML = '<div class="py-4 text-center text-[#786e60]">Keranjang masih kosong.</div>';
                 } else {
-                    listEl.innerHTML = Object.values(onlineCart).map(item => `
+                    listContainer.innerHTML = items.map(item => `
                         <div class="py-2 flex items-center justify-between gap-2">
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-[#26211a] truncate">${item.name}</div>
@@ -577,16 +646,17 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
-        // Modal Payment Gateway Controllers
-        function openPaymentGatewayModal() {
-        let currentOrderData = null;
+        function closePaymentGatewayModal() {
+            document.getElementById('qrisPaymentModal').classList.add('hidden');
+        }
 
-        async function processMidtransCheckout() {
+        // Proses Checkout & Pembayaran Online via Midtrans
+        async function processOnlineCheckout() {
             const errEl = document.getElementById('checkoutError');
             errEl.classList.add('hidden');
 
             const name = (document.getElementById('custName').value || '').trim();
-            const rawPhone = (document.getElementById('custPhone').value || '').trim();
+            let rawPhone = (document.getElementById('custPhone').value || '').trim().replace(/\D/g, '');
 
             if (!name) {
                 errEl.innerText = 'Mohon isi nama lengkap Anda.';
@@ -602,51 +672,13 @@
                 return;
             }
 
-            const total = getOnlineCartTotal();
-            document.getElementById('qrisModalPayAmount').innerText = formatRupiah(total);
-            document.getElementById('qrisPaymentModal').classList.remove('hidden');
-        }
-            const items = Object.values(onlineCart).map(item => ({
-                id: item.id,
-                quantity: item.quantity,
-                notes: item.notes || null
-            }));
-
-        function closePaymentGatewayModal() {
-            document.getElementById('qrisPaymentModal').classList.add('hidden');
-        }
-            if (items.length === 0) {
-                errEl.innerText = 'Keranjang pesanan masih kosong. Silakan pilih menu terlebih dahulu.';
-                errEl.classList.remove('hidden');
-                return;
-            }
-
-        // Proses Checkout & Simpan Pesanan Online
-        async function processOnlineCheckout() {
-            const btn = document.getElementById('btnSimulatePaySuccess');
-            const btn = document.getElementById('btnPayOnline');
-            const originalBtnHtml = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-stone-950 inline" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Memproses Pembayaran...</span>
-                <span>Menyiapkan Midtrans...</span>
-            `;
-
-            const name = (document.getElementById('custName').value || '').trim();
-            let rawPhone = (document.getElementById('custPhone').value || '').trim();
-            if (rawPhone.startsWith('0')) {
-                rawPhone = rawPhone.substring(1);
+            // Normalisasi nomor telepon: awalan 08xxx atau 62xxx
             let phone = rawPhone;
-            if (phone.startsWith('0')) {
-                phone = phone.substring(1);
+            if (phone.startsWith('62')) {
+                phone = '0' + phone.substring(2);
+            } else if (!phone.startsWith('0')) {
+                phone = '0' + phone;
             }
-            const phone = '0' + rawPhone; // Format standar 08xxxx
-            phone = '0' + phone;
 
             const address = (document.getElementById('custAddress').value || '').trim();
             const notes = (document.getElementById('custNotes').value || '').trim();
@@ -656,6 +688,23 @@
                 quantity: item.quantity,
                 notes: item.notes || null
             }));
+
+            if (items.length === 0) {
+                errEl.innerText = 'Keranjang pesanan masih kosong. Silakan pilih menu terlebih dahulu.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            const btn = document.getElementById('btnPayOnline');
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-stone-950 inline" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Menyiapkan Midtrans...</span>
+            `;
 
             try {
                 const response = await fetch("{{ route('online_order.checkout') }}", {
@@ -670,7 +719,6 @@
                         customer_phone: phone,
                         address: address,
                         notes: notes,
-                        payment_method: 'qris',
                         payment_method: 'midtrans',
                         items: items
                     })
@@ -679,16 +727,11 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // Kosongkan Keranjang Lokal
-                    onlineCart = {};
-                    saveCart();
-                    // Arahkan ke Halaman Status Tracking Pesanan
-                    window.location.href = data.data.redirect_url;
                     const snapToken = data.data.snap_token;
                     const redirectUrl = data.data.redirect_url;
                     const callbackUrl = data.data.success_callback_url;
 
-                    if (snapToken && window.snap) {
+                    if (snapToken && window.snap && typeof window.snap.pay === 'function') {
                         window.snap.pay(snapToken, {
                             onSuccess: async function (result) {
                                 try {
@@ -726,7 +769,7 @@
                             }
                         });
                     } else {
-                        // Jika window.snap tidak termuat atau sandbox fallback
+                        // Jika window.snap tidak termuat atau sandbox fallback simulator
                         currentOrderData = data.data;
                         document.getElementById('qrisModalPayAmount').innerText = formatRupiah(data.data.total_amount);
                         document.getElementById('qrisPaymentModal').classList.remove('hidden');
@@ -734,19 +777,15 @@
                         btn.innerHTML = originalBtnHtml;
                     }
                 } else {
-                    alert(data.message || 'Gagal memproses pesanan online. Silakan coba kembali.');
-                    errEl.innerText = data.message || 'Gagal memproses pesanan online.';
+                    errEl.innerText = data.message || 'Gagal memproses pesanan online. Silakan coba kembali.';
                     errEl.classList.remove('hidden');
                     btn.disabled = false;
-                    btn.innerHTML = 'Konfirmasi Pembayaran Lunas';
                     btn.innerHTML = originalBtnHtml;
                 }
             } catch (err) {
-                alert('Terjadi kesalahan jaringan. Periksa koneksi internet Anda.');
                 errEl.innerText = 'Terjadi kesalahan jaringan. Periksa koneksi internet Anda.';
                 errEl.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = 'Konfirmasi Pembayaran Lunas';
                 btn.innerHTML = originalBtnHtml;
             }
         }
@@ -776,10 +815,6 @@
             window.location.href = currentOrderData.redirect_url;
         }
 
-        function closePaymentGatewayModal() {
-            document.getElementById('qrisPaymentModal').classList.add('hidden');
-        }
-
         // Filter Kategori Menu
         function selectOnlineCategory(catId) {
             document.querySelectorAll('.online-cat-tab').forEach(tab => {
@@ -790,22 +825,22 @@
                 activeTab.className = "online-cat-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition shrink-0 bg-[#c59b27] text-stone-950 shadow-2xs";
             }
 
-            document.querySelectorAll('.online-category-section').forEach(sec => {
-                if (catId === 'all' || sec.dataset.categoryId === String(catId)) {
-                    sec.classList.remove('hidden');
+            document.querySelectorAll('.online-category-section').forEach(section => {
+                if (catId === 'all' || section.getAttribute('data-category-id') === catId) {
+                    section.classList.remove('hidden');
                 } else {
-                    sec.classList.add('hidden');
+                    section.classList.add('hidden');
                 }
             });
         }
 
-        // Pencarian Menu
+        // Pencarian Menu Realtime
         function handleOnlineSearch() {
-            const query = (document.getElementById('onlineSearchInput').value || '').trim().toLowerCase();
+            const q = (document.getElementById('onlineSearchInput').value || '').toLowerCase().trim();
             const clearBtn = document.getElementById('clearSearchBtn');
-            const emptyEl = document.getElementById('emptySearchState');
+            const emptyState = document.getElementById('emptySearchState');
 
-            if (query.length > 0) {
+            if (q) {
                 clearBtn.classList.remove('hidden');
             } else {
                 clearBtn.classList.add('hidden');
@@ -813,29 +848,30 @@
 
             let foundCount = 0;
             document.querySelectorAll('.online-product-card').forEach(card => {
-                const name = card.dataset.productName || '';
-                if (name.includes(query)) {
+                const name = card.getAttribute('data-product-name');
+                if (!q || name.includes(q)) {
                     card.classList.remove('hidden');
+                    card.classList.add('flex');
                     foundCount++;
                 } else {
                     card.classList.add('hidden');
+                    card.classList.remove('flex');
                 }
             });
 
-            // Sembunyikan section kategori jika semua anaknya hidden
-            document.querySelectorAll('.online-category-section').forEach(sec => {
-                const visibleCards = sec.querySelectorAll('.online-product-card:not(.hidden)');
-                if (visibleCards.length > 0) {
-                    sec.classList.remove('hidden');
+            document.querySelectorAll('.online-category-section').forEach(section => {
+                const visibleInCat = section.querySelectorAll('.online-product-card.flex').length;
+                if (visibleInCat === 0 && q) {
+                    section.classList.add('hidden');
                 } else {
-                    sec.classList.add('hidden');
+                    section.classList.remove('hidden');
                 }
             });
 
-            if (foundCount === 0) {
-                emptyEl.classList.remove('hidden');
+            if (foundCount === 0 && q) {
+                emptyState.classList.remove('hidden');
             } else {
-                emptyEl.classList.add('hidden');
+                emptyState.classList.add('hidden');
             }
         }
 
@@ -845,6 +881,6 @@
             selectOnlineCategory('all');
         }
     </script>
+
 </body>
 </html>
-

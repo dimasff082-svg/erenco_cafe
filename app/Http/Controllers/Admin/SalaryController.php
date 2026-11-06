@@ -66,7 +66,7 @@ class SalaryController extends Controller
     public function store(Request $request): RedirectResponse
     {
         // Bersihkan tanda titik ribuan (misal: 3.500.000 -> 3500000)
-        foreach (['basic_salary', 'allowance', 'deductions'] as $field) {
+        foreach (['basic_salary', 'allowance', 'incentive', 'deductions'] as $field) {
             if ($request->has($field)) {
                 $clean = preg_replace('/[^\d]/', '', (string) $request->input($field));
                 $request->merge([$field => $clean !== '' ? (float) $clean : 0]);
@@ -83,6 +83,7 @@ class SalaryController extends Controller
             'period_month' => ['required', 'string', 'max:50'],
             'basic_salary' => ['required', 'numeric', 'min:0'],
             'allowance' => ['nullable', 'numeric', 'min:0'],
+            'incentive' => ['nullable', 'numeric', 'min:0'],
             'deductions' => ['nullable', 'numeric', 'min:0'],
             'payment_date' => ['required', 'date'],
             'payment_status' => ['required', 'in:paid,pending'],
@@ -98,8 +99,9 @@ class SalaryController extends Controller
 
         $basicSalary = (float) $validated['basic_salary'];
         $allowance = (float) ($validated['allowance'] ?? 0);
+        $incentive = (float) ($validated['incentive'] ?? 0);
         $deductions = (float) ($validated['deductions'] ?? 0);
-        $netSalary = $basicSalary + $allowance - $deductions;
+        $netSalary = $basicSalary + $allowance + $incentive - $deductions;
 
         // Generate nomor slip gaji unik: PAY-YYYYMM-001
         $count = Salary::count() + 1;
@@ -116,6 +118,7 @@ class SalaryController extends Controller
             'period_month' => $validated['period_month'],
             'basic_salary' => $basicSalary,
             'allowance' => $allowance,
+            'incentive' => $incentive,
             'deductions' => $deductions,
             'net_salary' => $netSalary,
             'payment_date' => $validated['payment_date'],
@@ -134,7 +137,7 @@ class SalaryController extends Controller
     public function update(Request $request, Salary $salary): RedirectResponse
     {
         // Bersihkan tanda titik ribuan (misal: 3.500.000 -> 3500000)
-        foreach (['basic_salary', 'allowance', 'deductions'] as $field) {
+        foreach (['basic_salary', 'allowance', 'incentive', 'deductions'] as $field) {
             if ($request->has($field)) {
                 $clean = preg_replace('/[^\d]/', '', (string) $request->input($field));
                 $request->merge([$field => $clean !== '' ? (float) $clean : 0]);
@@ -145,6 +148,7 @@ class SalaryController extends Controller
             'period_month' => ['required', 'string', 'max:50'],
             'basic_salary' => ['required', 'numeric', 'min:0'],
             'allowance' => ['nullable', 'numeric', 'min:0'],
+            'incentive' => ['nullable', 'numeric', 'min:0'],
             'deductions' => ['nullable', 'numeric', 'min:0'],
             'payment_date' => ['required', 'date'],
             'payment_status' => ['required', 'in:paid,pending'],
@@ -154,13 +158,15 @@ class SalaryController extends Controller
 
         $basicSalary = (float) $validated['basic_salary'];
         $allowance = (float) ($validated['allowance'] ?? 0);
+        $incentive = (float) ($validated['incentive'] ?? 0);
         $deductions = (float) ($validated['deductions'] ?? 0);
-        $netSalary = $basicSalary + $allowance - $deductions;
+        $netSalary = $basicSalary + $allowance + $incentive - $deductions;
 
         $salary->update([
             'period_month' => $validated['period_month'],
             'basic_salary' => $basicSalary,
             'allowance' => $allowance,
+            'incentive' => $incentive,
             'deductions' => $deductions,
             'net_salary' => $netSalary,
             'payment_date' => $validated['payment_date'],

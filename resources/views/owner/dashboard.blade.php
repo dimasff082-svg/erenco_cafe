@@ -188,21 +188,37 @@
 
             <div class="space-y-3">
                 @forelse($recentSales as $sale)
-                    <div class="p-3 rounded-xl bg-[#faf7f0] border border-[#eee7d8] flex items-center justify-between">
+                    <div class="p-3 rounded-xl bg-[#faf7f0] border border-[#eee7d8] flex items-center justify-between gap-3">
                         <div>
-                            <span class="font-mono text-[10px] font-bold text-[#8a681c] block">{{ $sale->transaction_number }}</span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono text-[10px] font-bold text-[#8a681c]">{{ $sale->transaction_number }}</span>
+                                @if($sale->isCancelled())
+                                    <span class="inline-flex px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-rose-800">
+                                        Dibatalkan
+                                    </span>
+                                @endif
+                            </div>
                             <p class="text-xs text-[#52493d] mt-0.5">
                                 Kasir: <strong class="text-[#262017]">{{ $sale->user->name ?? 'Kasir' }}</strong>
                             </p>
                             <span class="text-[10px] text-[#918778]">{{ $sale->transaction_date->format('d/m/Y H:i') }}</span>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-serif-classic font-bold text-[#262017] block">
+                        <div class="text-right flex flex-col items-end gap-1">
+                            <span class="text-xs font-serif-classic font-bold text-[#262017]">
                                 Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
                             </span>
-                            <span class="inline-block text-[9px] uppercase font-bold px-2 py-0.5 rounded-md bg-stone-200 text-stone-700">
-                                {{ strtoupper($sale->payment->method ?? 'TUNAI') }}
-                            </span>
+                            <div class="flex items-center gap-1">
+                                <span class="inline-block text-[9px] uppercase font-bold px-2 py-0.5 rounded-md bg-stone-200 text-stone-700">
+                                    {{ strtoupper($sale->payment->method ?? 'TUNAI') }}
+                                </span>
+                                @if(! $sale->isCancelled())
+                                    <button type="button"
+                                        onclick="openCancelOrderModal('{{ $sale->id }}', '{{ $sale->transaction_number }}')"
+                                        class="px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-300 text-[10px] font-bold transition">
+                                        Batal
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -214,4 +230,68 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Pembatalan Pesanan oleh Pemilik Toko -->
+<div id="modal-cancel-order" class="fixed inset-0 z-50 hidden overflow-y-auto bg-stone-900/60 backdrop-blur-2xs flex items-center justify-center p-4">
+    <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-md border border-[#e5dfd3]" onclick="event.stopPropagation()">
+        <form id="form-cancel-order" method="POST" action="">
+            @csrf
+            <div class="p-6">
+                <div class="flex items-center gap-3 pb-3 border-b border-[#f0ece1]">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-rose-700">Wewenang Pemilik Toko</span>
+                        <h3 class="font-serif-classic text-lg font-bold text-[#262017]" id="cancel-trx-title">Batalkan Transaksi Pesanan</h3>
+                    </div>
+                </div>
+
+                <p class="text-xs text-[#5c5346] leading-relaxed my-3">
+                    Pesanan yang dibatalkan oleh <strong>Pemilik Toko</strong> akan ditandai status batal, dibatalkan dari antrean dapur, dan dikeluarkan dari perhitungan omzet.
+                </p>
+
+                <div>
+                    <label class="block text-xs font-bold text-[#262017] mb-1">
+                        Alasan Pembatalan <span class="text-rose-600">*</span>
+                    </label>
+                    <textarea name="cancellation_reason" rows="3" required
+                        placeholder="Contoh: Kesalahan input menu / Pembatalan oleh pembeli..."
+                        class="w-full text-xs p-3 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"></textarea>
+                </div>
+            </div>
+
+            <div class="p-4 bg-[#faf8f5] border-t border-[#f0ece1] flex items-center justify-end gap-2">
+                <button type="button" onclick="closeCancelOrderModal()" class="px-4 py-2 rounded-xl border border-[#d6cfc2] text-xs font-semibold text-[#786e60] hover:bg-white">
+                    Tutup
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition">
+                    Ya, Batalkan Pesanan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCancelOrderModal(saleId, trxNumber) {
+        const modal = document.getElementById('modal-cancel-order');
+        const form = document.getElementById('form-cancel-order');
+        const title = document.getElementById('cancel-trx-title');
+        if (!modal || !form) return;
+
+        form.action = '/owner/transactions/' + saleId + '/cancel';
+        if (title) {
+            title.innerText = 'Batalkan ' + (trxNumber || 'Pesanan');
+        }
+        modal.classList.remove('hidden');
+    }
+
+    function closeCancelOrderModal() {
+        const modal = document.getElementById('modal-cancel-order');
+        if (modal) modal.classList.add('hidden');
+    }
+</script>
 @endsection
