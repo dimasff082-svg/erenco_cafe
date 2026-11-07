@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'POS App' }} - Point of Sale</title>
+    <title>{{ $title ?? ($storeName ?? 'POS App') }} - {{ $storeName ?? 'Point of Sale' }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,12 +44,16 @@
     <div class="h-screen flex overflow-hidden bg-[#f7f5ef]">
         <!-- Sidebar Navigation (Classic Modern Theme) -->
         <aside id="app-sidebar" class="w-64 h-full flex flex-col shrink-0 bg-[#191714] text-[#d6cfc2] border-r border-[#2b261f] shadow-2xl transition-[margin] duration-300 ease-in-out z-40">
-            <!-- Brand Header: Fira Cake Logo -->
+            <!-- Brand Header: Store Official Logo & Name (Dua Baris) -->
             <div class="h-16 flex items-center px-5 gap-3 bg-[#12110e] border-b border-[#2b261f] shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 object-contain drop-shadow-md shrink-0">
-                <div class="overflow-hidden">
-                    <span class="font-serif-classic font-bold text-sm tracking-wide text-[#f2ece1] block truncate">Fira Cake</span>
-                    <span class="text-[9px] tracking-widest uppercase font-semibold text-[#c59b27] block">Bakery & Pastry</span>
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-9 h-9 object-contain drop-shadow-md shrink-0" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <div class="overflow-hidden leading-tight">
+                    <span class="font-serif-classic font-bold text-sm tracking-wide text-[#f2ece1] block truncate">{{ $storeNameLine1 }}</span>
+                    @if(!empty($storeNameLine2))
+                        <span class="text-[9.5px] tracking-widest uppercase font-semibold text-[#c59b27] block truncate">{{ $storeNameLine2 }}</span>
+                    @else
+                        <span class="text-[9px] tracking-widest uppercase font-semibold text-[#c59b27] block truncate">{{ $storeSettings['store_hours'] ?? 'Point of Sale' }}</span>
+                    @endif
                 </div>
             </div>
 
@@ -301,7 +305,7 @@
             <!-- Logout Section -->
             <div class="p-3 border-t border-[#2b261f] shrink-0">
                 <form action="{{ route('logout') }}" method="POST" id="sidebar-logout-form"
-                    data-confirm="Apakah Anda yakin ingin keluar dari sistem POS Fira Cake Bakery & Pastry?"
+                    data-confirm="Apakah Anda yakin ingin keluar dari sistem POS {{ addslashes($storeName) }}?"
                     data-confirm-title="Konfirmasi Keluar (Logout)"
                     data-confirm-btn="Ya, Keluar"
                     data-confirm-type="warning">
@@ -808,8 +812,73 @@
     </div>
 
     <script>
+        // Pengecekan status enable / disable suara notifikasi pesanan
+        window.isOrderSoundEnabled = function() {
+            const val = localStorage.getItem('order_sound_enabled');
+            return val === null || val === 'true' || val === '1';
+        };
+
+        window.updateOrderSoundToggleUI = function() {
+            const isEnabled = window.isOrderSoundEnabled();
+            const btn = document.getElementById('btn-toggle-order-sound');
+            const iconEl = document.getElementById('sound-toggle-icon');
+            const labelEl = document.getElementById('sound-toggle-label');
+
+            if (!btn) return;
+
+            if (isEnabled) {
+                btn.classList.remove('bg-rose-950/70', 'border-rose-500/50', 'text-rose-200');
+                btn.classList.add('bg-stone-900/60', 'border-emerald-500/50', 'text-emerald-300');
+                if (labelEl) labelEl.textContent = 'Suara: Aktif';
+                if (iconEl) {
+                    iconEl.innerHTML = `<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>`;
+                }
+                btn.setAttribute('title', 'Suara orderan masuk aktif. Klik untuk menonaktifkan suara.');
+            } else {
+                btn.classList.remove('bg-stone-900/60', 'border-emerald-500/50', 'text-emerald-300');
+                btn.classList.add('bg-rose-950/70', 'border-rose-500/50', 'text-rose-200');
+                if (labelEl) labelEl.textContent = 'Suara: Nonaktif';
+                if (iconEl) {
+                    iconEl.innerHTML = `<svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>`;
+                }
+                btn.setAttribute('title', 'Suara orderan masuk dinonaktifkan (Mute). Klik untuk mengaktifkan kembali suara.');
+            }
+        };
+
+        window.toggleOrderSound = function() {
+            const currentState = window.isOrderSoundEnabled();
+            const newState = !currentState;
+            localStorage.setItem('order_sound_enabled', newState ? 'true' : 'false');
+            window.updateOrderSoundToggleUI();
+
+            if (newState) {
+                window.playOrderAlertSound('Suara notifikasi pesanan diaktifkan', true);
+                if (window.showOrderToast) {
+                    window.showOrderToast('Suara Notifikasi Aktif', 'Suara notifikasi pesanan masuk akan berbunyi otomatis saat ada order baru.');
+                }
+            } else {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
+                if (window.showOrderToast) {
+                    window.showOrderToast('Suara Notifikasi Dinonaktifkan', 'Suara orderan masuk dimatikan (Mute). Notifikasi visual tetap muncul.');
+                }
+            }
+            return newState;
+        };
+
         // Global Audio Alert System: Suara "Halo ada orderan masuk" untuk Kasir & Dapur
-        window.playOrderAlertSound = function(customText) {
+        window.playOrderAlertSound = function(customText, force = false) {
+            if (!force && !window.isOrderSoundEnabled()) {
+                console.log('Suara orderan masuk sedang dinonaktifkan (Mute) oleh pengguna.');
+                return;
+            }
+
             const textToSpeak = customText || 'Halo ada orderan masuk';
 
             // 1. Dual-tone pleasant POS chime dengan Web Audio API
@@ -912,6 +981,13 @@
                 }
             } catch (e) {}
         }, { once: true });
+
+        // Inisialisasi status tombol toggle suara di seluruh halaman
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.updateOrderSoundToggleUI === 'function') {
+                window.updateOrderSoundToggleUI();
+            }
+        });
     </script>
 
     @auth

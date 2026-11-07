@@ -146,7 +146,7 @@
         <div class="p-5 border-b border-[#f0ece1] bg-[#faf8f5] flex items-center justify-between">
             <div>
                 <h3 class="font-serif-classic text-lg font-bold text-[#262017]">Rincian Laporan Laba Rugi</h3>
-                <p class="text-xs text-[#786e60]">Struktur perhitungan akuntansi laba rugi komersial Fira Cake.</p>
+                <p class="text-xs text-[#786e60]">Struktur perhitungan akuntansi laba rugi komersial {{ $storeName }}.</p>
             </div>
             <span class="text-xs font-mono text-[#786e60]">Mata Uang: IDR (Rupiah)</span>
         </div>

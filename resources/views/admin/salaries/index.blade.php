@@ -116,7 +116,7 @@
             <p class="font-serif-classic text-2xl font-bold text-[#262017] mt-3">
                 {{ $summary['total_slips'] }} Slip
             </p>
-            <p class="text-xs text-[#786e60] mt-1">Arsip resmi penggajian Fira Cake</p>
+            <p class="text-xs text-[#786e60] mt-1">Arsip resmi penggajian {{ $storeName }}</p>
         </div>
     </div>
 

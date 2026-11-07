@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Status Pesanan - Meja {{ $tableNumber }} ({{ $sale->transaction_number }})</title>
+    <title>Status Pesanan - Meja {{ $tableNumber }} ({{ $sale->transaction_number }}) | {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,10 +21,13 @@
         <!-- Top Nav Header -->
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center font-serif-resto font-black text-sm shadow">
-                    CR
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-8 h-8 rounded-xl object-contain shadow-xs border border-amber-200 p-0.5 bg-white shrink-0" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <div class="leading-tight">
+                    <span class="font-extrabold text-xs tracking-wider text-slate-900 block truncate">{{ $storeNameLine1 }}</span>
+                    @if(!empty($storeNameLine2))
+                        <span class="text-[10px] font-bold text-[#c59b27] block truncate">{{ $storeNameLine2 }}</span>
+                    @endif
                 </div>
-                <span class="font-extrabold text-xs tracking-wider text-slate-900">CAFE & RESTO</span>
             </div>
             <span class="px-3 py-1 rounded-xl text-xs font-black bg-amber-100 text-amber-900 border border-amber-300">
                 Meja {{ $tableNumber }}

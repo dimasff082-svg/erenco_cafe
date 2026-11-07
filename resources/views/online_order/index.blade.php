@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pemesanan Online - Fira Cake Bakery & Pastry</title>
+    <title>Pemesanan Online - {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,17 +39,22 @@
                     @php
                         $storeLogo = !empty($settings['app_logo']) ? asset('storage/' . $settings['app_logo']) : asset('images/logo.png');
                     @endphp
-                    <img src="{{ $storeLogo }}" alt="{{ $settings['store_name'] ?? 'Fira Cake' }}"
+                    <img src="{{ $storeLogo }}" alt="{{ $storeName }}"
                         class="w-10 h-10 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7] shrink-0"
                         onerror="this.src='{{ asset('images/default-cake.png') }}'">
-                    <div>
+                    <div class="leading-tight">
                         <div class="flex items-center gap-1.5">
-                            <h1 class="text-sm font-black text-[#26211a] tracking-tight">{{ $settings['store_name'] ?? 'Fira Cake' }}</h1>
+                            <h1 class="text-sm font-black text-[#26211a] tracking-tight">
+                                <span>{{ $storeNameLine1 }}</span>
+                                @if(!empty($storeNameLine2))
+                                    <span class="block text-xs font-semibold text-[#c59b27]">{{ $storeNameLine2 }}</span>
+                                @endif
+                            </h1>
                             <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#c59b27] text-stone-950">
                                 Online
                             </span>
                         </div>
-                        <p class="text-[10px] text-[#786e60] leading-tight">Bakery & Pastry &bull; Pesan & Bayar Online</p>
+                        <p class="text-[10px] text-[#786e60] mt-0.5">Pesan & Bayar Online</p>
                     </div>
                 </div>
 
@@ -102,7 +107,7 @@
                     } else {
                         $storeWaNumber = $cleanStorePhone;
                     }
-                    $storeWaUrl = "https://api.whatsapp.com/send?phone={$storeWaNumber}&text=" . urlencode("Halo Fira Cake, saya ingin bertanya seputar pesanan online...");
+                    $storeWaUrl = "https://api.whatsapp.com/send?phone={$storeWaNumber}&text=" . urlencode("Halo {$storeName}, saya ingin bertanya seputar pesanan online...");
                 @endphp
                 <a href="{{ $storeWaUrl }}" target="_blank"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow-xs transition active:scale-95">
@@ -260,13 +265,13 @@
             <!-- Store Footer Information -->
             <footer class="pt-6 pb-4 border-t border-[#eee7dc] text-center space-y-2 text-[#786e60]">
                 <div class="flex items-center justify-center gap-1.5 font-serif-classic font-bold text-xs text-[#26211a]">
-                    <span>{{ $settings['store_name'] ?? 'Fira Cake Bakery & Pastry' }}</span>
+                    <span>{{ $storeName }}</span>
                 </div>
                 <p class="text-[10px] text-[#8c8270] max-w-xs mx-auto leading-relaxed">
-                    {{ $settings['store_address'] ?? 'BISOLPIN, Ruko Ruby, Jl. Boulevard Rubi II, Masale, Panakkukang, Makassar' }}
+                    {{ $storeAddress }}
                 </p>
                 <div class="text-[10px] flex items-center justify-center gap-3 text-[#8c8270] pt-1">
-                    <span>Jam Buka: {{ $settings['store_hours'] ?? '08:00 - 21:00 WITA' }}</span>
+                    <span>Jam Buka: {{ $storeHours }}</span>
                     <span>&bull;</span>
                     <a href="{{ $storeWaUrl }}" target="_blank" class="text-emerald-700 font-bold hover:underline">WA: {{ $settings['store_phone'] ?? '082131117996' }}</a>
                 </div>
@@ -395,7 +400,7 @@
                             <span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
                         </div>
                         <p class="text-[10px] text-amber-900/90 leading-tight">
-                            Pesanan online wajib lunas melalui Midtrans Payment Gateway. Setelah pembayaran selesai, pesanan Anda otomatis langsung masuk ke antrean kasir & dapur Fira Cake.
+                            Pesanan online wajib lunas melalui Midtrans Payment Gateway. Setelah pembayaran selesai, pesanan Anda otomatis langsung masuk ke antrean kasir & dapur {{ $storeName }}.
                         </p>
                     </div>
 
@@ -446,7 +451,7 @@
                         </div>
                         <div>
                             <h3 class="text-xs font-black text-[#26211a] leading-tight">Midtrans Simulator</h3>
-                            <p class="text-[9px] text-[#786e60]">Fira Cake Bakery & Pastry</p>
+                            <p class="text-[9px] text-[#786e60]">{{ $storeName }}</p>
                         </div>
                     </div>
                     <button type="button" onclick="closePaymentGatewayModal()" class="text-stone-400 hover:text-stone-600 text-lg font-bold">
@@ -458,7 +463,7 @@
 
                 <!-- QRIS Code Image Simulation -->
                 <div class="p-3 bg-white rounded-2xl border-2 border-dashed border-[#c59b27] inline-block shadow-inner">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=FIRA-CAKE-ONLINE-ORDER-PAYMENT"
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode(strtoupper(str_replace(' ', '-', $storeName)) . '-ONLINE-ORDER-PAYMENT') }}"
                         alt="QRIS Midtrans" class="w-36 h-36 mx-auto rounded-lg">
                 </div>
 

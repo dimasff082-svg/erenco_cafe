@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pemesanan Mandiri - Fira Cake</title>
+    <title>Pemesanan Mandiri - {{ $storeName }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,15 +43,23 @@
     <!-- Top Compact Kiosk Header Bar -->
     <header class="h-13 bg-[#191714] text-[#f7f5f0] border-b border-[#2b261f] px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-md z-30">
         <div class="flex items-center gap-2.5">
-            <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-8 h-8 object-contain drop-shadow-sm">
-            <div>
+            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-8 h-8 object-contain drop-shadow-sm" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+            <div class="leading-tight">
                 <div class="flex items-center gap-1.5">
-                    <h1 class="font-serif-classic text-sm sm:text-base font-extrabold tracking-wide text-[#f7f5f0]">Fira Cake</h1>
+                    <h1 class="font-serif-classic text-xs sm:text-sm font-extrabold tracking-wide text-[#f7f5f0] truncate">
+                        {{ $storeNameLine1 }}
+                    </h1>
                     <span class="px-1.5 py-0.2 rounded-md text-[8.5px] font-black uppercase tracking-wider bg-[#c59b27] text-stone-950">
                         Self-Order
                     </span>
                 </div>
-                <p class="text-[9.5px] text-[#a49a88] leading-tight">Layar Pemesanan Mandiri Pelanggan</p>
+                <div class="flex items-center gap-1.5 text-[9.5px] text-[#a49a88]">
+                    @if(!empty($storeNameLine2))
+                        <span class="font-semibold text-[#c59b27]">{{ $storeNameLine2 }}</span>
+                        <span>&bull;</span>
+                    @endif
+                    <span>Layar Pemesanan Mandiri</span>
+                </div>
             </div>
         </div>
 
@@ -320,7 +328,7 @@
             <div>
                 <p class="text-[10px] text-[#6b6252]">Pindai QRIS di bawah ini dengan mobile banking atau e-wallet:</p>
                 <div class="my-3 p-3 bg-white rounded-xl border border-dashed border-[#c59b27] inline-block shadow-inner">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=FIRA-CAKE-QRIS-PAYMENT"
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(strtoupper(str_replace(' ', '-', $storeName)) . '-QRIS-PAYMENT') }}"
                         alt="QRIS Code" class="w-36 h-36 mx-auto rounded-lg">
                 </div>
                 <div class="text-[11px] font-bold text-[#26211a]">

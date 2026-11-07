@@ -189,4 +189,25 @@ class OrderVoiceNotificationTest extends TestCase
         $kitchenRes->assertSee('Halo ada orderan masuk');
         $kitchenRes->assertSee('Tes Suara Orderan');
     }
+
+    public function test_incoming_order_screens_contain_sound_disable_toggle_feature(): void
+    {
+        // 1. Kasir / Pesanan Masuk
+        $cashierRes = $this->actingAs($this->cashier)->get(route('cashier.dashboard'));
+        $cashierRes->assertStatus(200);
+        $cashierRes->assertSee('btn-toggle-order-sound');
+        $cashierRes->assertSee('toggleOrderSound');
+        $cashierRes->assertSee('isOrderSoundEnabled');
+        $cashierRes->assertSee('updateOrderSoundToggleUI');
+        $cashierRes->assertSee('order_sound_enabled');
+
+        // 2. Kitchen Display
+        $kitchenRes = $this->actingAs($this->kitchen)->get(route('kitchen.index'));
+        $kitchenRes->assertStatus(200);
+        $kitchenRes->assertSee('btn-toggle-order-sound');
+        $kitchenRes->assertSee('toggleOrderSound');
+        $kitchenRes->assertSee('isOrderSoundEnabled');
+        $kitchenRes->assertSee('updateOrderSoundToggleUI');
+        $kitchenRes->assertSee('order_sound_enabled');
+    }
 }

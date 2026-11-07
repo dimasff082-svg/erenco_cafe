@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak QR Code - Meja {{ $table->table_number }} | Cafe & Resto</title>
+    <title>Cetak QR Code - Meja {{ $table->table_number }} | {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,11 +59,14 @@
     <div class="print-card bg-white rounded-3xl border-2 border-[#262017] p-8 max-w-sm w-full shadow-2xl text-center flex flex-col items-center justify-between relative overflow-hidden">
         
         <!-- Header Brand -->
-        <div class="space-y-1.5 w-full">
-            <div class="w-12 h-12 mx-auto rounded-2xl bg-[#262017] text-amber-400 flex items-center justify-center font-serif-classic font-bold text-xl shadow-md border border-amber-400/30">
-                CR
-            </div>
-            <h1 class="font-cinzel text-sm tracking-[0.25em] text-[#262017] font-bold mt-2 uppercase">CAFE & RESTO</h1>
+        <div class="space-y-1 w-full flex flex-col items-center">
+            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-14 h-14 object-contain mx-auto drop-shadow-md mb-1" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+            <h1 class="font-cinzel text-sm tracking-[0.2em] text-[#262017] font-bold uppercase leading-tight">
+                <span>{{ $storeNameLine1 }}</span>
+                @if(!empty($storeNameLine2))
+                    <span class="block text-xs font-semibold text-[#8a681c] tracking-[0.15em] mt-0.5">{{ $storeNameLine2 }}</span>
+                @endif
+            </h1>
             <p class="text-[11px] text-stone-500 font-medium tracking-wide">Pemesanan Mandiri Pelanggan</p>
         </div>
 

@@ -16,7 +16,19 @@
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button type="button" onclick="window.playOrderAlertSound('Halo ada orderan masuk')"
+                <!-- Tombol Disable / Enable Suara Notifikasi Orderan Masuk -->
+                <button type="button" id="btn-toggle-order-sound" onclick="window.toggleOrderSound()"
+                    title="Nyalakan / Matikan Suara Notifikasi Pesanan Masuk"
+                    class="inline-flex items-center gap-2 bg-stone-900/60 hover:bg-stone-900/80 text-emerald-300 border border-emerald-500/50 text-xs font-bold px-4 py-3 rounded-xl shadow-md transition transform hover:scale-105 active:scale-95">
+                    <span id="sound-toggle-icon">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </span>
+                    <span id="sound-toggle-label">Suara: Aktif</span>
+                </button>
+
+                <button type="button" onclick="window.playOrderAlertSound('Halo ada orderan masuk', true)"
                     title="Tes Notifikasi Suara: Halo ada orderan masuk"
                     class="inline-flex items-center gap-2 bg-stone-900/40 hover:bg-stone-900/60 text-amber-200 border border-amber-300/40 text-xs font-bold px-4 py-3 rounded-xl shadow-md transition transform hover:scale-105 active:scale-95">
                     <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -388,7 +400,7 @@
                                                 $waPhone = $cleanPhone;
                                             }
                                             $itemsList = $sale->items->map(fn($it) => "- {$it->quantity}x {$it->product_name_snapshot}")->implode("\n");
-                                            $waMsg = "Halo Kak {$sale->customer_name}, terima kasih telah memesan di Fira Cake Bakery & Pastry!\n\nPesanan Online Anda ({$sale->transaction_number}) senilai Rp " . number_format($sale->total_amount, 0, ',', '.') . " telah kami terima dan LUNAS via Payment Gateway.\n\nRincian Pesanan:\n{$itemsList}\n\nSaat ini pesanan sedang dipersiapkan fresh oleh dapur kami. Kami akan segera menginfokan kembali saat pesanan siap diantar / diambil. Terima kasih!";
+                                            $waMsg = "Halo Kak {$sale->customer_name}, terima kasih telah memesan di {$storeName}!\n\nPesanan Online Anda ({$sale->transaction_number}) senilai Rp " . number_format($sale->total_amount, 0, ',', '.') . " telah kami terima dan LUNAS via Payment Gateway.\n\nRincian Pesanan:\n{$itemsList}\n\nSaat ini pesanan sedang dipersiapkan fresh oleh dapur kami. Kami akan segera menginfokan kembali saat pesanan siap diantar / diambil. Terima kasih!";
                                             $waHref = "https://api.whatsapp.com/send?phone={$waPhone}&text=" . urlencode($waMsg);
                                         @endphp
                                         <a href="{{ $waHref }}" target="_blank"
@@ -619,7 +631,7 @@
 
             <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-[11px] text-emerald-950 space-y-1">
                 <span class="font-bold block text-emerald-900">Format Pesan Otomatis:</span>
-                <p class="italic">"Halo! Silakan klik link berikut untuk melihat menu dan memesan langsung di Fira Cake Bakery & Pastry: {{ url('/pesan-online') }} Terima kasih!"</p>
+                <p class="italic">"Halo! Silakan klik link berikut untuk melihat menu dan memesan langsung di {{ $storeName }}: {{ url('/pesan-online') }} Terima kasih!"</p>
             </div>
         </div>
 
@@ -875,7 +887,7 @@
             phone = '62' + phone;
         }
 
-        const msg = `Halo! Silakan klik link berikut untuk melihat menu dan memesan langsung di Fira Cake Bakery & Pastry:\n\n${onlineOrderUrl}\n\nPembayaran dapat dilakukan langsung via QRIS/Payment Gateway. Terima kasih!`;
+        const msg = `Halo! Silakan klik link berikut untuk melihat menu dan memesan langsung di ${@js($storeName)}:\n\n${onlineOrderUrl}\n\nPembayaran dapat dilakukan langsung via QRIS/Payment Gateway. Terima kasih!`;
         const waUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
         window.open(waUrl, '_blank');
         closeShareOnlineModal();

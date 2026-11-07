@@ -199,9 +199,14 @@
     <div class="container" id="slip-content">
         <div class="header">
             <div>
-                <h1 class="brand-title">Fira Cake</h1>
-                <p class="brand-subtitle">BAKERY & PASTRY</p>
-                <div style="font-size: 10px; color: #786e60; margin-top: 4px;">Jl. Karunrung No. 5, Kota Makassar</div>
+                <h1 class="brand-title" style="line-height: 1.15;">
+                    <div>{{ $storeNameLine1 }}</div>
+                    @if(!empty($storeNameLine2))
+                        <div style="font-size: 16px; font-weight: 700; color: #786e60; margin-top: 2px;">{{ $storeNameLine2 }}</div>
+                    @endif
+                </h1>
+                <p class="brand-subtitle">SLIP PENGGAJIAN RESMI</p>
+                <div style="font-size: 10px; color: #786e60; margin-top: 4px;">{{ $storeAddress }} &bull; {{ $storePhone }}</div>
             </div>
             <div class="slip-title">
                 <h2>SLIP PENGGAJIAN RESMI</h2>
@@ -284,7 +289,7 @@
             </div>
             <div class="sign-box">
                 <p style="margin: 0; color: #786e60;">Makassar, {{ $salary->payment_date?->format('d M Y') ?? date('d M Y') }}</p>
-                <div class="sign-line">Manajemen Fira Cake</div>
+                <div class="sign-line">Manajemen {{ $storeName }}</div>
             </div>
         </div>
     </div>

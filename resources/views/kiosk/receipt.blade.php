@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Struk Pesanan - {{ $sale->transaction_number }} | Fira Cake Kiosk</title>
+    <title>Struk Pesanan - {{ $sale->transaction_number }} | {{ $storeName }} Kiosk</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,10 +95,15 @@
         <div id="printable-receipt" class="bg-white rounded-3xl border border-[#e5dfd3] shadow-xl p-7 font-sans">
             <!-- Header Toko -->
             <div class="text-center pb-4 border-b border-dashed border-slate-300">
-                <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-14 h-14 mx-auto object-contain mb-2 drop-shadow-sm">
-                <h3 class="font-extrabold text-lg text-slate-900 tracking-tight">FIRA CAKE</h3>
-                <p class="text-xs text-slate-500">Bakery & Pastry • Cafe & Resto</p>
-                <p class="text-xs font-semibold text-slate-700 mt-0.5">Telp / WA Pemilik: 082131117996</p>
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-14 h-14 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <h3 class="font-extrabold text-lg text-slate-900 tracking-tight uppercase leading-tight">
+                    <span>{{ $storeNameLine1 }}</span>
+                    @if(!empty($storeNameLine2))
+                        <span class="block text-sm font-bold text-slate-700 mt-0.5">{{ $storeNameLine2 }}</span>
+                    @endif
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">{{ $storeAddress }}</p>
+                <p class="text-xs font-semibold text-slate-700 mt-0.5">Telp / WA: {{ $storePhone }}</p>
                 <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
                     Layar Pemesanan Mandiri (Kiosk)
                 </span>
@@ -197,7 +202,7 @@
                 @else
                     <p class="text-[11px] text-amber-800 font-bold">Tunjukkan struk ini ke kasir untuk bayar. Pesanan akan dimasak dapur setelah lunas.</p>
                 @endif
-                <p class="text-[11px] font-semibold text-slate-600">Hubungi Pemilik: 082131117996</p>
+                <p class="text-[11px] font-semibold text-slate-600">Hubungi Toko: {{ $storePhone }}</p>
             </div>
         </div>
     </div>

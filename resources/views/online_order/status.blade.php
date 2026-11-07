@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Status Pesanan #{{ $sale->transaction_number }} - Fira Cake</title>
+    <title>Status Pesanan #{{ $sale->transaction_number }} - {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,10 +27,15 @@
         <!-- Top Header -->
         <header class="bg-white border-b border-[#eee7dc] px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-9 h-9 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7]">
-                <div>
-                    <h1 class="text-sm font-black text-[#26211a] leading-tight">Fira Cake</h1>
-                    <p class="text-[10px] text-[#786e60]">Struk & Status Pesanan Online</p>
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-9 h-9 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7]" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <div class="leading-tight">
+                    <h1 class="text-sm font-black text-[#26211a]">
+                        <span>{{ $storeNameLine1 }}</span>
+                        @if(!empty($storeNameLine2))
+                            <span class="block text-xs font-semibold text-[#c59b27]">{{ $storeNameLine2 }}</span>
+                        @endif
+                    </h1>
+                    <p class="text-[10px] text-[#786e60] mt-0.5">Struk & Status Pesanan Online</p>
                 </div>
             </div>
             <a href="{{ route('online_order.index') }}" class="text-[11px] font-bold text-[#c59b27] hover:underline">
@@ -81,7 +86,7 @@
                         </span>
                         <h2 class="font-serif-classic text-xl font-bold text-emerald-950">Pesanan Online Diterima!</h2>
                         <p class="text-xs text-emerald-900/80 leading-relaxed mt-1">
-                            Terima kasih, <strong>{{ $sale->customer_name }}</strong>! Pesanan Anda telah lunas via Midtrans Payment Gateway dan langsung diteruskan ke kasir & dapur Fira Cake.
+                            Terima kasih, <strong>{{ $sale->customer_name }}</strong>! Pesanan Anda telah lunas via Midtrans Payment Gateway dan langsung diteruskan ke kasir & dapur {{ $storeName }}.
                         </p>
                     </div>
                 </div>
@@ -233,7 +238,7 @@
                 } else {
                     $storeWa = $cleanStorePhone;
                 }
-                $waMessage = urlencode("Halo Fira Cake, saya ingin menanyakan status pesanan Online saya #{$sale->transaction_number} atas nama {$sale->customer_name}.");
+                $waMessage = urlencode("Halo {$storeName}, saya ingin menanyakan status pesanan Online saya #{$sale->transaction_number} atas nama {$sale->customer_name}.");
                 $waStoreUrl = "https://api.whatsapp.com/send?phone={$storeWa}&text={$waMessage}";
             @endphp
             <div class="space-y-2 pt-2">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Point of Sale (Modern Classic)</title>
+    <title>Masuk - {{ $storeName }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,15 +16,19 @@
 </head>
 <body class="h-full flex items-center justify-center p-6 bg-[#161412] text-[#f2ece1]">
     <div class="w-full max-w-md">
-        <!-- Brand Header: Fira Cake Official Logo -->
+        <!-- Brand Header: Store Official Logo & Name -->
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center mb-3">
-                <img src="{{ asset('images/logo.png') }}" alt="Fira Cake" class="w-24 h-24 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300">
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-24 h-24 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" onerror="this.src='{{ asset('images/default-cake.png') }}'">
             </div>
-            <h1 class="text-2xl font-serif-classic font-bold tracking-tight text-[#f5ebd7]">FIRA CAKE</h1>
-            <p class="text-sm uppercase font-cinzel tracking-[0.25em] text-white font-semibold mt-1">BAKERY & PASTRY</p>
-            <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">Point Of Sales Terintegrasi</p>
-            <p class="text-xs uppercase font-cinzel tracking-[0.25em] text-[#c59b27] mt-1">V 1.2 LJ</p>
+            <h1 class="text-2xl font-serif-classic font-bold tracking-tight text-[#f5ebd7] uppercase leading-tight">
+                <span>{{ $storeNameLine1 }}</span>
+                @if(!empty($storeNameLine2))
+                    <span class="block text-lg font-cinzel font-semibold tracking-wider text-[#d4af37] mt-0.5">{{ $storeNameLine2 }}</span>
+                @endif
+            </h1>
+            <p class="text-xs uppercase font-cinzel tracking-[0.2em] text-[#c59b27] mt-1">{{ $storeAddress }}</p>
+            <p class="text-[11px] uppercase font-cinzel tracking-[0.2em] text-stone-400 mt-0.5">Point Of Sales Terintegrasi</p>
         </div>
 
         <!-- Login Card -->

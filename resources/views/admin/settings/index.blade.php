@@ -10,7 +10,7 @@
             <div class="flex items-center gap-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#c59b27]">Konfigurasi Sistem</span>
                 <span class="text-stone-300">•</span>
-                <span class="text-xs font-medium text-[#786e60]">Fira Cake Bakery & Pastry</span>
+                <span class="text-xs font-medium text-[#786e60]">{{ $settings['store_name'] ?? 'Toko' }}</span>
             </div>
             <h1 class="font-serif-classic text-2xl sm:text-3xl font-bold text-[#262017] mt-1">
                 Pengaturan Toko & Pemesanan Online
@@ -56,13 +56,18 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Nama Toko -->
                         <div>
-                            <label class="block text-xs font-bold text-[#262017] mb-1.5">
-                                Nama Toko / Bakery <span class="text-rose-600">*</span>
-                            </label>
-                            <input type="text" name="store_name" required
-                                value="{{ old('store_name', $settings['store_name'] ?? 'Fira Cake Bakery & Pastry') }}"
-                                placeholder="Contoh: Fira Cake Bakery & Pastry"
-                                class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#c59b27]">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-[#262017]">
+                                    Nama Toko / Bakery <span class="text-rose-600">*</span>
+                                </label>
+                                <span class="text-[10px] text-[#786e60] bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-md font-medium">
+                                    Mendukung 2 Baris (Tekan Enter)
+                                </span>
+                            </div>
+                            <textarea name="store_name" rows="2" required
+                                placeholder="Contoh:&#10;Fira Cake&#10;Bakery & Pastry"
+                                class="w-full text-xs px-3.5 py-2 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#c59b27] resize-none leading-relaxed">{{ old('store_name', $settings['store_name'] ?? "Fira Cake\nBakery & Pastry") }}</textarea>
+                            <p class="text-[11px] text-[#786e60] mt-1">Gunakan tombol Enter untuk memecah baris 1 dan baris 2 secara presisi pada sidebar, struk, dan header.</p>
                         </div>
 
                         <!-- Nomor Kontak Toko (WA) -->
@@ -197,7 +202,7 @@
                                 </span>
                             </div>
                             <p class="text-[11px] text-[#786e60] mt-1">
-                                Batas toleransi jarak GPS karyawan dari titik kantor toko Fira Cake (BISOLPIN Ruko Ruby) agar absensi dapat dikonfirmasi.
+                                Batas toleransi jarak GPS karyawan dari titik kantor toko {{ $settings['store_name'] ?? 'Toko' }} ({{ $settings['store_address'] ?? 'Alamat Toko' }}) agar absensi dapat dikonfirmasi.
                             </p>
                         </div>
 
@@ -231,14 +236,19 @@
                     </div>
 
                     <div class="flex flex-col items-center justify-center p-4 bg-[#faf8f5] rounded-xl border border-dashed border-[#d6cfc2] text-center">
-                        @if(!empty($settings['app_logo']))
-                            <img src="{{ asset('storage/' . $settings['app_logo']) }}" alt="Logo Toko" class="w-24 h-24 object-contain rounded-xl shadow-xs border border-white mb-3">
-                        @else
-                            <img src="{{ asset('images/logo.png') }}" alt="Logo Toko" class="w-24 h-24 object-contain rounded-xl shadow-xs border border-white mb-3" onerror="this.src='{{ asset('images/default-cake.png') }}'">
-                        @endif
+                        <img src="{{ $storeLogo }}" alt="Logo Toko" class="w-24 h-24 object-contain rounded-xl shadow-xs border border-white mb-3" onerror="this.src='{{ asset('images/default-cake.png') }}'">
                         <span class="text-xs font-semibold text-[#262017]">Logo Saat Ini</span>
                         <span class="text-[11px] text-[#786e60]">Maksimal 2 MB (PNG, JPG, SVG, WEBP)</span>
                     </div>
+
+                    @if(!empty($settings['app_logo']))
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-rose-50 border border-rose-200">
+                            <input type="checkbox" id="remove_logo" name="remove_logo" value="1" class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                            <label for="remove_logo" class="text-xs text-rose-800 font-semibold cursor-pointer">
+                                Hapus logo kustom & kembalikan ke logo default
+                            </label>
+                        </div>
+                    @endif
 
                     <div>
                         <label class="block text-xs font-bold text-[#262017] mb-1.5">Ganti Logo Baru</label>

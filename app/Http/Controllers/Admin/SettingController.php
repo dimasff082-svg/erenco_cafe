@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SettingController extends Controller
@@ -36,6 +37,7 @@ class SettingController extends Controller
             'attendance_max_distance' => ['required', 'numeric', 'min:1', 'max:5000'],
             'order_notification_whatsapp' => ['nullable', 'string', 'max:30'],
             'app_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'],
+            'remove_logo' => ['nullable', 'boolean'],
         ], [
             'store_name.required' => 'Nama toko wajib diisi.',
             'store_phone.required' => 'Nomor kontak telepon / WhatsApp toko wajib diisi.',
@@ -61,8 +63,18 @@ class SettingController extends Controller
         Setting::set('attendance_max_distance', (string) $validated['attendance_max_distance'], 'number', 'attendance');
         Setting::set('order_notification_whatsapp', $validated['order_notification_whatsapp'] ?? '', 'text', 'online_order');
 
-        // Jika upload file logo baru
-        if ($request->hasFile('app_logo')) {
+        // Kelola file logo toko: hapus logo lama jika diminta atau jika mengunggah file baru
+        if ($request->boolean('remove_logo')) {
+            $oldLogo = Setting::get('app_logo');
+            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+                Storage::disk('public')->delete($oldLogo);
+            }
+            Setting::set('app_logo', null, 'image', 'appearance');
+        } elseif ($request->hasFile('app_logo')) {
+            $oldLogo = Setting::get('app_logo');
+            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+                Storage::disk('public')->delete($oldLogo);
+            }
             $logoPath = $request->file('app_logo')->store('settings', 'public');
             Setting::set('app_logo', $logoPath, 'image', 'appearance');
         }

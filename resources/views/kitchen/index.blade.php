@@ -15,8 +15,20 @@
                     Daftar pesanan masuk dari pelanggan meja. Ubah status pesanan saat mulai dimasak dan saat pesanan siap disajikan ke meja.
                 </p>
             </div>
-            <div class="flex items-center gap-3">
-                <button type="button" onclick="window.playOrderAlertSound('Halo ada orderan masuk')"
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Tombol Disable / Enable Suara Notifikasi Orderan Masuk -->
+                <button type="button" id="btn-toggle-order-sound" onclick="window.toggleOrderSound()"
+                    title="Nyalakan / Matikan Suara Notifikasi Pesanan Masuk"
+                    class="inline-flex items-center gap-2 bg-stone-900/60 hover:bg-stone-900/80 text-emerald-300 border border-emerald-500/50 text-xs font-bold px-4 py-3 rounded-2xl shadow-lg transition transform hover:scale-105 active:scale-95">
+                    <span id="sound-toggle-icon">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </span>
+                    <span id="sound-toggle-label">Suara: Aktif</span>
+                </button>
+
+                <button type="button" onclick="window.playOrderAlertSound('Halo ada orderan masuk', true)"
                     title="Tes Notifikasi Suara: Halo ada orderan masuk"
                     class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold px-4 py-3 rounded-2xl shadow-lg transition transform hover:scale-105 active:scale-95">
                     <svg class="w-4 h-4 text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">

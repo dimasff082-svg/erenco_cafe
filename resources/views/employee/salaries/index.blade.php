@@ -6,7 +6,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h2 class="font-serif-classic text-2xl font-bold text-[#262017] tracking-tight">Slip Gaji Saya</h2>
-            <p class="text-xs text-[#786e60] mt-0.5">Riwayat honor, rincian komponen gaji, dan arsip unduhan slip gaji resmi Anda di Fira Cake.</p>
+            <p class="text-xs text-[#786e60] mt-0.5">Riwayat honor, rincian komponen gaji, dan arsip unduhan slip gaji resmi Anda di {{ $storeName }}.</p>
         </div>
         <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-semibold">
