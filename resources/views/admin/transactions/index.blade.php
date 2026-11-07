@@ -68,18 +68,27 @@
 
     <!-- Filters Form -->
     <div class="bg-white rounded-2xl border border-[#e5dfd3] shadow-[0_4px_20px_-4px_rgba(40,30,15,0.05)] p-4">
-        <form action="{{ $currentRoute }}" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <form action="{{ $currentRoute }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-3 items-center">
             @if($isTodayActive && !request('date_from'))
                 <input type="hidden" name="period" value="today">
             @endif
 
-            <div class="sm:col-span-3">
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-3">
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Cari No. TRX / Meja / Nama..."
                     class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3.5 py-2 text-xs text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
             </div>
 
-            <div class="sm:col-span-3">
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-2">
+                <select name="status" class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3 py-2 text-xs text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none font-medium">
+                    <option value="">Semua Status</option>
+                    <option value="paid" {{ request('status') === 'paid' || request('status') === 'completed' ? 'selected' : '' }}>Lunas / Selesai</option>
+                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                    <option value="unpaid" {{ request('status') === 'unpaid' || request('status') === 'pending' ? 'selected' : '' }}>Belum Bayar</option>
+                </select>
+            </div>
+
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-2">
                 <select name="user_id" class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3 py-2 text-xs text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
                     <option value="">Semua Kasir / Petugas</option>
                     @foreach($cashiers as $c)
@@ -90,7 +99,7 @@
                 </select>
             </div>
 
-            <div class="sm:col-span-2">
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-2">
                 <select name="payment_method" class="w-full bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-3 py-2 text-xs text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
                     <option value="">Semua Metode</option>
                     <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
@@ -100,18 +109,18 @@
                 </select>
             </div>
 
-            <div class="sm:col-span-2 flex gap-1.5">
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-2 flex gap-1.5">
                 <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-1/2 bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-2 py-2 text-[11px] text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
                 <input type="date" name="date_to" value="{{ request('date_to') }}" class="w-1/2 bg-[#fcfbf9] border border-[#dcd4c5] rounded-xl px-2 py-2 text-[11px] text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
             </div>
 
-            <div class="sm:col-span-2 flex gap-2">
-                <button type="submit" class="flex-1 bg-[#262017] hover:bg-[#15120c] text-[#f7f5f0] text-xs font-semibold px-4 py-2 rounded-xl transition shadow-xs">
+            <div class="sm:col-span-1 md:col-span-1 lg:col-span-1 flex gap-1.5">
+                <button type="submit" class="flex-1 bg-[#262017] hover:bg-[#15120c] text-[#f7f5f0] text-xs font-semibold px-2.5 py-2 rounded-xl transition shadow-xs text-center">
                     Saring
                 </button>
-                @if(request()->hasAny(['search', 'user_id', 'payment_method', 'date_from', 'date_to', 'period']))
-                    <a href="{{ $currentRoute }}" class="bg-[#f0ebd9] hover:bg-[#e4ddc8] text-[#5c5346] text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center justify-center">
-                        Reset
+                @if(request()->hasAny(['search', 'status', 'user_id', 'payment_method', 'date_from', 'date_to', 'period']))
+                    <a href="{{ $currentRoute }}" title="Reset Filter" class="bg-[#f0ebd9] hover:bg-[#e4ddc8] text-[#5c5346] text-xs font-semibold px-2.5 py-2 rounded-xl transition flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     </a>
                 @endif
             </div>
@@ -208,7 +217,7 @@
                             </td>
                             <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
                                 <div class="inline-flex items-center gap-1.5 justify-center">
-                                    @if(auth()->check() && auth()->user()->isOwner() && ! $sale->isCancelled())
+                                    @if(auth()->check() && (auth()->user()->isOwner() || auth()->user()->isAdmin()) && ! $sale->isCancelled())
                                         <button type="button"
                                             onclick="openCancelOrderModal('{{ $sale->id }}', '{{ $sale->transaction_number }}')"
                                             title="Batalkan Pesanan Ini"
@@ -402,7 +411,7 @@
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                @if(auth()->check() && auth()->user()->isOwner() && ! $sale->isCancelled())
+                                                @if(auth()->check() && (auth()->user()->isOwner() || auth()->user()->isAdmin()) && ! $sale->isCancelled())
                                                     <button type="button"
                                                         onclick="openCancelOrderModal('{{ $sale->id }}', '{{ $sale->transaction_number }}')"
                                                         class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-xs font-bold transition">
@@ -449,49 +458,48 @@
     </div>
 </div>
 
-<!-- Modal Pembatalan Pesanan Khusus Pemilik Toko -->
-@if(auth()->check() && auth()->user()->isOwner())
-    <div id="modal-cancel-order" class="hidden fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity bg-black/60" onclick="closeCancelOrderModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-rose-200">
-                <form id="form-cancel-order" method="POST" action="">
-                    @csrf
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 text-rose-600 mb-3">
-                            <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center font-bold text-lg">⚠️</div>
-                            <div>
-                                <h3 class="font-serif-classic text-lg font-bold text-[#262017]">Batalkan Transaksi</h3>
-                                <p class="text-xs text-[#786e60]" id="cancel-trx-title">Transaksi: -</p>
-                            </div>
+<!-- Modal Pembatalan Pesanan Khusus Pemilik Toko & Administrator -->
+@if(auth()->check() && (auth()->user()->isOwner() || auth()->user()->isAdmin()))
+    <div id="modal-cancel-order" class="fixed inset-0 z-50 hidden overflow-y-auto bg-stone-900/60 backdrop-blur-2xs flex items-center justify-center p-4" onclick="closeCancelOrderModal()">
+        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl w-full max-w-md border border-rose-200" onclick="event.stopPropagation()">
+            <form id="form-cancel-order" method="POST" action="">
+                @csrf
+                <div class="p-6">
+                    <div class="flex items-center gap-3 text-rose-600 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center font-bold text-lg">
+                            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                         </div>
-
-                        <p class="text-xs text-[#5c5346] leading-relaxed mb-4">
-                            Wewenang pembatalan pesanan berada di tangan <strong>Pemilik Toko</strong>. Pesanan yang dibatalkan akan ditandai batal dan dikeluarkan dari perhitungan omzet serta antrean dapur.
-                        </p>
-
                         <div>
-                            <label class="block text-xs font-bold text-[#262017] mb-1">
-                                Alasan Pembatalan <span class="text-rose-600">*</span>
-                            </label>
-                            <textarea name="cancellation_reason" rows="3" required
-                                placeholder="Contoh: Kasir salah input menu / Pelanggan batalkan pesanan..."
-                                class="w-full text-xs p-3 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"></textarea>
+                            <h3 class="font-serif-classic text-lg font-bold text-[#262017]">Batalkan Transaksi</h3>
+                            <p class="text-xs text-[#786e60]" id="cancel-trx-title">Transaksi: -</p>
                         </div>
                     </div>
 
-                    <div class="p-4 bg-[#faf8f5] border-t border-[#f0ece1] flex items-center justify-end gap-2">
-                        <button type="button" onclick="closeCancelOrderModal()" class="px-4 py-2 rounded-xl border border-[#d6cfc2] text-xs font-semibold text-[#786e60] hover:bg-white">
-                            Tutup
-                        </button>
-                        <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition">
-                            Ya, Batalkan Pesanan
-                        </button>
+                    <p class="text-xs text-[#5c5346] leading-relaxed mb-4">
+                        Konfirmasi pembatalan pesanan oleh <strong>{{ auth()->user()->isOwner() ? 'Pemilik Toko' : 'Administrator' }}</strong>. Pesanan yang dibatalkan akan ditandai batal dan dikeluarkan dari perhitungan omzet serta antrean dapur.
+                    </p>
+
+                    <div>
+                        <label class="block text-xs font-bold text-[#262017] mb-1">
+                            Alasan Pembatalan <span class="text-rose-600">*</span>
+                        </label>
+                        <textarea name="cancellation_reason" rows="3" required
+                            placeholder="Contoh: Kasir salah input menu / Pelanggan batalkan pesanan..."
+                            class="w-full text-xs p-3 rounded-xl border border-[#d6cfc2] bg-[#faf8f5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"></textarea>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="p-4 bg-[#faf8f5] border-t border-[#f0ece1] flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeCancelOrderModal()" class="px-4 py-2 rounded-xl border border-[#d6cfc2] text-xs font-semibold text-[#786e60] hover:bg-white">
+                        Tutup
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition">
+                        Ya, Batalkan Pesanan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endif
@@ -517,7 +525,8 @@
         const title = document.getElementById('cancel-trx-title');
         if (!modal || !form) return;
 
-        form.action = '/owner/transactions/' + saleId + '/cancel';
+        const isOwner = window.location.pathname.startsWith('/owner');
+        form.action = (isOwner ? '/owner/transactions/' : '/admin/transactions/') + saleId + '/cancel';
         if (title) title.innerText = 'No. Transaksi: ' + trxNumber;
         modal.classList.remove('hidden');
     }

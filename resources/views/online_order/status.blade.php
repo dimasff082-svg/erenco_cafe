@@ -222,9 +222,22 @@
                 </div>
             </div>
 
-            <!-- WhatsApp Kasir Action Button -->
+            <!-- WhatsApp Hubungi Toko Action Button -->
+            @php
+                $rawStorePhone = $storePhone ?? \App\Models\Setting::get('store_phone', '082131117996');
+                $cleanStorePhone = preg_replace('/[^0-9]/', '', (string) $rawStorePhone);
+                if (str_starts_with($cleanStorePhone, '0')) {
+                    $storeWa = '62' . substr($cleanStorePhone, 1);
+                } elseif (!str_starts_with($cleanStorePhone, '62')) {
+                    $storeWa = '62' . $cleanStorePhone;
+                } else {
+                    $storeWa = $cleanStorePhone;
+                }
+                $waMessage = urlencode("Halo Fira Cake, saya ingin menanyakan status pesanan Online saya #{$sale->transaction_number} atas nama {$sale->customer_name}.");
+                $waStoreUrl = "https://api.whatsapp.com/send?phone={$storeWa}&text={$waMessage}";
+            @endphp
             <div class="space-y-2 pt-2">
-                <a href="https://api.whatsapp.com/send?text={{ urlencode('Halo Kasir Fira Cake, saya ingin menanyakan status pesanan Online saya #' . $sale->transaction_number . ' atas nama ' . $sale->customer_name . '.') }}" target="_blank"
+                <a href="{{ $waStoreUrl }}" target="_blank"
                     class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-1.114-.072-.258-.083-.588-.204-1.013-.39-.884-.388-1.554-1.045-2.002-1.637-.091-.12-.349-.47-.349-.896 0-.426.223-.636.303-.717.08-.08.175-.101.233-.101.059 0 .118.001.17.004.055.003.128-.02.2.152.073.175.25.612.272.656.022.045.037.098.007.158-.03.06-.045.097-.09.15-.045.053-.095.118-.135.158-.045.045-.092.094-.039.185.053.09.236.388.506.629.349.311.644.408.734.453.09.045.143.038.196-.023.053-.06.226-.263.286-.353.06-.09.12-.075.203-.045.083.03.526.248.616.293.09.045.15.068.173.105.022.038.022.218-.122.623z"/>

@@ -7,6 +7,7 @@ use App\Models\OpenBill;
 use App\Models\Payment;
 use App\Models\RestaurantTable;
 use App\Models\Sale;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,51 @@ class DashboardController extends Controller
             'activeOpenBillsCount',
             'pendingOpenBillRequests'
         ));
+    }
+
+    /**
+     * Polling endpoint untuk mendeteksi orderan baru masuk bagi Kasir.
+     */
+    public function checkNewOrders(Request $request): JsonResponse
+    {
+        $lastId = (int) $request->input('last_id', 0);
+
+        $baseQuery = Sale::whereDate('transaction_date', today())
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($q) {
+                $q->where('table_number', '!=', 'ONLINE')
+                    ->orWhere('payment_status', 'paid');
+            });
+
+        $latestId = (int) ((clone $baseQuery)->max('id') ?? 0);
+
+        if ($lastId <= 0) {
+            return response()->json([
+                'has_new' => false,
+                'latest_id' => $latestId,
+                'orders' => [],
+            ]);
+        }
+
+        $newOrders = (clone $baseQuery)
+            ->where('id', '>', $lastId)
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'has_new' => $newOrders->isNotEmpty(),
+            'count' => $newOrders->count(),
+            'latest_id' => $latestId,
+            'orders' => $newOrders->map(fn ($s) => [
+                'id' => $s->id,
+                'transaction_number' => $s->transaction_number,
+                'table_number' => $s->table_number,
+                'customer_name' => $s->customer_name ?? 'Pelanggan',
+                'total_formatted' => 'Rp '.number_format($s->total_amount, 0, ',', '.'),
+                'time' => $s->transaction_date ? $s->transaction_date->format('H:i') : now()->format('H:i'),
+            ]),
+        ]);
     }
 
     /**

@@ -12,15 +12,15 @@ class OrderCancellationController extends Controller
 {
     /**
      * Membatalkan pesanan transaksi penjualan.
-     * Hak akses khusus dan mutlak hanya dimiliki oleh Pemilik Toko (Owner).
-     * Sesuai alur: jika kasir salah input, kasir melapor ke pemilik, dan pemilik yang membatalkan pesanan.
+     * Hak akses wewenang dimiliki oleh Pemilik Toko (Owner) dan Administrator Toko.
+     * Sesuai alur: jika terjadi kesalahan input atau pembatalan, wewenang membatalkan transaksi ada pada pemilik/admin.
      */
     public function cancel(Request $request, Sale $sale): RedirectResponse
     {
         $user = $request->user();
 
-        if (! $user || ! $user->isOwner()) {
-            abort(403, 'Hanya Pemilik Toko (Owner) yang memiliki wewenang untuk membatalkan transaksi pesanan.');
+        if (! $user || (! $user->isOwner() && ! $user->isAdmin())) {
+            abort(403, 'Hanya Administrator atau Pemilik Toko (Owner) yang memiliki wewenang untuk membatalkan transaksi pesanan.');
         }
 
         $validated = $request->validate([
@@ -46,6 +46,8 @@ class OrderCancellationController extends Controller
             ]);
         });
 
-        return back()->with('success', "Pesanan #{$sale->transaction_number} berhasil dibatalkan oleh Pemilik Toko.");
+        $roleLabel = $user->isOwner() ? 'Pemilik Toko' : 'Administrator';
+
+        return back()->with('success', "Pesanan #{$sale->transaction_number} berhasil dibatalkan oleh {$roleLabel}.");
     }
 }

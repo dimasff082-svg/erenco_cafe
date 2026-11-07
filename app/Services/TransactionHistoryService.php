@@ -214,6 +214,40 @@ class TransactionHistoryService
             });
         }
 
+        // Filter Status Transaksi (Lunas/Selesai, Dibatalkan, Belum Bayar)
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $status = $request->input('status');
+            if ($status === 'cancelled') {
+                $salesQuery->where(function ($q) {
+                    $q->where('status', 'cancelled')
+                        ->orWhere('payment_status', 'cancelled');
+                });
+
+                $openBillsQuery->where(function ($q) {
+                    $q->where('status', 'cancelled')
+                        ->orWhereExists(function ($sub) {
+                            $sub->select(DB::raw(1))
+                                ->from('sales')
+                                ->whereColumn('sales.open_bill_id', 'open_bills.id')
+                                ->where(function ($s) {
+                                    $s->where('sales.status', 'cancelled')
+                                        ->orWhere('sales.payment_status', 'cancelled');
+                                });
+                        });
+                });
+            } elseif ($status === 'paid' || $status === 'completed') {
+                $salesQuery->where('status', '!=', 'cancelled')
+                    ->where('payment_status', 'paid');
+
+                $openBillsQuery->where('status', 'paid');
+            } elseif ($status === 'unpaid' || $status === 'pending') {
+                $salesQuery->where('status', '!=', 'cancelled')
+                    ->where('payment_status', '!=', 'paid');
+
+                $openBillsQuery->where('status', '!=', 'paid');
+            }
+        }
+
         // Filter Pencarian (No. Transaksi / Bill, Meja, Nama Pelanggan)
         if ($search = $request->input('search')) {
             $salesQuery->where(function ($q) use ($search) {

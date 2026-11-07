@@ -252,10 +252,10 @@ class OnlineOrderController extends Controller
             ->where('table_number', 'ONLINE')
             ->firstOrFail();
 
-        return view('online_order.status', compact('sale'));
         $midtransClientKey = config('services.midtrans.client_key');
         $midtransSnapUrl = config('services.midtrans.snap_url');
+        $storePhone = Setting::get('store_phone', '082131117996');
 
-        return view('online_order.status', compact('sale', 'midtransClientKey', 'midtransSnapUrl'));
+        return view('online_order.status', compact('sale', 'midtransClientKey', 'midtransSnapUrl', 'storePhone'));
     }
 }

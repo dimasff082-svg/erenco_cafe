@@ -96,6 +96,7 @@ Route::get('/pesan-online', fn () => redirect()->route('online_order.index'));
 // Cashier & Terminal Routes (Customer Order Management & Payment Confirmation)
 Route::middleware(['auth', 'role:cashier,admin,owner'])->prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/dashboard', [CashierDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/orders/check-new', [CashierDashboardController::class, 'checkNewOrders'])->name('orders.check_new');
     Route::post('/orders/{sale}/confirm-payment', [CashierDashboardController::class, 'confirmPayment'])->name('orders.confirm_payment');
 
     // Open Bill Management (Khusus Pengelolaan Tagihan Meja)
@@ -116,6 +117,7 @@ Route::middleware(['auth', 'role:cashier,admin,owner'])->prefix('cashier')->name
 // Kitchen Display System Routes (Dapur - Kelola Status Pesanan: Menunggu -> Diproses -> Selesai)
 Route::middleware(['auth', 'role:kitchen,admin'])->prefix('kitchen')->name('kitchen.')->group(function () {
     Route::get('/', [KitchenController::class, 'index'])->name('index');
+    Route::get('/orders/check-new', [KitchenController::class, 'checkNewOrders'])->name('orders.check_new');
     Route::patch('/orders/{sale}/status', [KitchenController::class, 'updateStatus'])->name('orders.status');
 });
 
@@ -164,6 +166,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Transactions History & Inspection
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{sale}', [AdminTransactionController::class, 'show'])->name('transactions.show');
+    Route::post('/transactions/{sale}/cancel', [OwnerOrderCancellationController::class, 'cancel'])->name('transactions.cancel');
 
     // Sales Reports & Analytics
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');

@@ -16,6 +16,14 @@
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
+                <button type="button" onclick="window.playOrderAlertSound('Halo ada orderan masuk')"
+                    title="Tes Notifikasi Suara: Halo ada orderan masuk"
+                    class="inline-flex items-center gap-2 bg-stone-900/40 hover:bg-stone-900/60 text-amber-200 border border-amber-300/40 text-xs font-bold px-4 py-3 rounded-xl shadow-md transition transform hover:scale-105 active:scale-95">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                    Tes Suara Orderan
+                </button>
                 <a href="{{ route('cashier.open_bills.index') }}" class="inline-flex items-center gap-2 bg-white text-stone-900 hover:bg-amber-50 text-xs font-bold px-4 py-3 rounded-xl shadow-md transition transform hover:scale-105 active:scale-95">
                     <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

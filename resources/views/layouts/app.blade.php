@@ -787,6 +787,200 @@
             }
         });
     </script>
+
+    <!-- Floating Order Alert Toast (Kasir & Dapur) -->
+    <div id="order-alert-toast" class="fixed top-5 right-5 z-[10001] hidden max-w-sm w-full bg-stone-900/95 backdrop-blur-md text-white border-2 border-amber-400 rounded-3xl p-4 shadow-2xl transition-all duration-300 transform translate-y-0 cursor-pointer" onclick="this.classList.add('hidden')">
+        <div class="flex items-start gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500 text-stone-950 flex items-center justify-center font-bold shrink-0 shadow-md">
+                <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">Orderan Baru Masuk!</span>
+                    <span class="text-[10px] text-stone-400" id="order-alert-time">Baru saja</span>
+                </div>
+                <h4 class="font-serif-classic font-bold text-sm text-amber-100 truncate" id="order-alert-title">Halo ada orderan masuk</h4>
+                <p class="text-xs text-stone-300 mt-0.5 truncate" id="order-alert-detail">Pesanan baru siap diproses</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Audio Alert System: Suara "Halo ada orderan masuk" untuk Kasir & Dapur
+        window.playOrderAlertSound = function(customText) {
+            const textToSpeak = customText || 'Halo ada orderan masuk';
+
+            // 1. Dual-tone pleasant POS chime dengan Web Audio API
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    const ctx = new AudioCtx();
+                    const now = ctx.currentTime;
+
+                    // Nada 1: E5 (659.25 Hz)
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(659.25, now);
+                    gain1.gain.setValueAtTime(0.3, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.35);
+
+                    // Nada 2: A5 (880 Hz)
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, now + 0.15);
+                    gain2.gain.setValueAtTime(0.4, now + 0.15);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.15);
+                    osc2.stop(now + 0.6);
+                }
+            } catch (e) {
+                console.warn('Web Audio error:', e);
+            }
+
+            // 2. Suara ucapan bahasa Indonesia "Halo ada orderan masuk" via SpeechSynthesis
+            if ('speechSynthesis' in window) {
+                try {
+                    window.speechSynthesis.cancel();
+                    if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    utterance.lang = 'id-ID';
+                    utterance.rate = 0.95;
+                    utterance.pitch = 1.05;
+                    utterance.volume = 1.0;
+
+                    const voices = window.speechSynthesis.getVoices();
+                    const indonesianVoice = voices.find(v => 
+                        v.lang === 'id-ID' || 
+                        v.lang.startsWith('id') || 
+                        v.name.toLowerCase().includes('indonesia')
+                    );
+                    if (indonesianVoice) {
+                        utterance.voice = indonesianVoice;
+                    }
+
+                    setTimeout(() => {
+                        window.speechSynthesis.speak(utterance);
+                    }, 350);
+                } catch (e) {
+                    console.warn('SpeechSynthesis error:', e);
+                }
+            }
+        };
+
+        window.showOrderToast = function(title, detail, time) {
+            const toast = document.getElementById('order-alert-toast');
+            if (!toast) return;
+            const titleEl = document.getElementById('order-alert-title');
+            const detailEl = document.getElementById('order-alert-detail');
+            const timeEl = document.getElementById('order-alert-time');
+
+            if (titleEl) titleEl.textContent = title || 'Halo ada orderan masuk';
+            if (detailEl) detailEl.textContent = detail || 'Pesanan baru masuk ke sistem';
+            if (timeEl && time) timeEl.textContent = time;
+
+            toast.classList.remove('hidden');
+            clearTimeout(window.orderToastTimeout);
+            window.orderToastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 8000);
+        };
+
+        // Buka kunci AudioContext & Web Speech pada interaksi pertama pengguna
+        document.addEventListener('click', function unlockAudioContext() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    const ctx = new AudioCtx();
+                    ctx.resume();
+                }
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.resume();
+                    window.speechSynthesis.getVoices();
+                }
+            } catch (e) {}
+        }, { once: true });
+    </script>
+
+    @auth
+        @php
+            $isCashierListening = auth()->user()->isCashier() || (auth()->user()->isAdmin() && request()->routeIs('cashier.*'));
+            $isKitchenListening = auth()->user()->isKitchen() || (auth()->user()->isAdmin() && request()->routeIs('kitchen.*'));
+        @endphp
+
+        @if($isCashierListening || $isKitchenListening)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const checkUrl = "{{ $isCashierListening ? route('cashier.orders.check_new') : route('kitchen.orders.check_new') }}";
+                let lastOrderId = 0;
+                let isChecking = false;
+
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.getVoices();
+                    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+                }
+
+                // Ambil ID transaksi terakhir saat ini tanpa membunyikan suara awal
+                fetch(checkUrl + '?last_id=0')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.latest_id) {
+                            lastOrderId = data.latest_id;
+                        }
+                    })
+                    .catch(() => {});
+
+                // Polling berkala setiap 5 detik
+                setInterval(function () {
+                    if (isChecking || lastOrderId <= 0) return;
+                    isChecking = true;
+
+                    fetch(checkUrl + '?last_id=' + lastOrderId)
+                        .then(res => res.json())
+                        .then(data => {
+                            isChecking = false;
+                            if (data && data.has_new && data.orders && data.orders.length > 0) {
+                                lastOrderId = data.latest_id;
+
+                                // Mainkan suara: "Halo ada orderan masuk"
+                                window.playOrderAlertSound('Halo ada orderan masuk');
+
+                                // Tampilkan notifikasi visual toast
+                                const first = data.orders[0];
+                                const tableLabel = first.table_number === 'ONLINE' ? 'Pesanan Online' : (first.table_number === 'TAKEAWAY' ? 'Bawa Pulang' : 'Meja ' + first.table_number);
+                                const extraInfo = first.total_formatted ? (' • ' + first.total_formatted) : '';
+                                window.showOrderToast(first.transaction_number + ' (' + tableLabel + ')', (first.customer_name || 'Pelanggan') + extraInfo, first.time);
+
+                                // Segarkan daftar antrean secara otomatis pada dashboard
+                                @if(request()->routeIs('cashier.dashboard') || request()->routeIs('kitchen.index'))
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
+                                @endif
+                            } else if (data && data.latest_id) {
+                                lastOrderId = Math.max(lastOrderId, data.latest_id);
+                            }
+                        })
+                        .catch(() => {
+                            isChecking = false;
+                        });
+                }, 5000);
+            });
+        </script>
+        @endif
+    @endauth
     @stack('scripts')
 </body>
 </html>

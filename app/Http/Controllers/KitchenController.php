@@ -62,6 +62,58 @@ class KitchenController extends Controller
     }
 
     /**
+     * Polling endpoint untuk mendeteksi orderan baru masuk dapur secara real-time.
+     */
+    public function checkNewOrders(Request $request): JsonResponse
+    {
+        $lastId = (int) $request->input('last_id', 0);
+
+        // Aturan KDS Dapur:
+        // 1. Meja dengan Open Bill langsung masuk dapur.
+        // 2. Meja tanpa Open Bill WAJIB sudah lunas (paid).
+        // 3. Pesanan dibatalkan tidak masuk.
+        $baseQuery = Sale::whereDate('transaction_date', today())
+            ->where('order_status', '!=', 'cancelled')
+            ->where('status', '!=', 'cancelled')
+            ->whereIn('order_status', ['pending', 'processing'])
+            ->where(function ($q) {
+                $q->whereNotNull('open_bill_id')
+                    ->orWhere('payment_status', 'paid');
+            });
+
+        $latestId = (int) ((clone $baseQuery)->max('id') ?? 0);
+
+        if ($lastId <= 0) {
+            return response()->json([
+                'has_new' => false,
+                'latest_id' => $latestId,
+                'orders' => [],
+            ]);
+        }
+
+        $newOrders = (clone $baseQuery)
+            ->where('id', '>', $lastId)
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'has_new' => $newOrders->isNotEmpty(),
+            'count' => $newOrders->count(),
+            'latest_id' => $latestId,
+            'orders' => $newOrders->map(fn ($s) => [
+                'id' => $s->id,
+                'transaction_number' => $s->transaction_number,
+                'table_number' => $s->table_number,
+                'customer_name' => $s->customer_name ?? 'Pelanggan',
+                'order_status' => $s->order_status,
+                'items_count' => $s->items()->count(),
+                'time' => $s->transaction_date ? $s->transaction_date->format('H:i') : now()->format('H:i'),
+            ]),
+        ]);
+    }
+
+    /**
      * Dapur memperbarui status pesanan makanan (Menunggu -> Diproses -> Selesai).
      * PERATURAN: Perubahan status ini TIDAK BOLEH mengubah status pembayaran!
      */

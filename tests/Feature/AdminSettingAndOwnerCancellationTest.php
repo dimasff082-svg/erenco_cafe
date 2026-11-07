@@ -147,7 +147,33 @@ class AdminSettingAndOwnerCancellationTest extends TestCase
         $this->assertEquals('Pelanggan membatalkan pesanan karena salah varian rasa', $sale->cancellation_reason);
     }
 
-    public function test_non_owner_cannot_cancel_order(): void
+    public function test_admin_can_cancel_order_with_reason(): void
+    {
+        $sale = Sale::factory()->create([
+            'user_id' => $this->cashier->id,
+            'status' => 'completed',
+            'order_status' => 'processing',
+            'payment_status' => 'paid',
+            'total_amount' => 75000,
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.transactions.cancel', $sale->id), [
+            'cancellation_reason' => 'Kasir salah input pesanan',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $sale->refresh();
+        $this->assertTrue($sale->isCancelled());
+        $this->assertEquals('cancelled', $sale->status);
+        $this->assertEquals('cancelled', $sale->order_status);
+        $this->assertEquals('cancelled', $sale->payment_status);
+        $this->assertEquals($this->admin->id, $sale->cancelled_by);
+        $this->assertEquals('Kasir salah input pesanan', $sale->cancellation_reason);
+    }
+
+    public function test_unauthorized_roles_cannot_cancel_order(): void
     {
         $sale = Sale::factory()->create([
             'user_id' => $this->cashier->id,
@@ -160,11 +186,39 @@ class AdminSettingAndOwnerCancellationTest extends TestCase
             ])
             ->assertStatus(403);
 
-        $this->actingAs($this->admin)
-            ->post(route('owner.transactions.cancel', $sale->id), [
-                'cancellation_reason' => 'Admin ingin membatalkan',
+        $this->actingAs($this->cashier)
+            ->post(route('admin.transactions.cancel', $sale->id), [
+                'cancellation_reason' => 'Kasir ingin membatalkan',
             ])
             ->assertStatus(403);
+
+        $this->actingAs($this->warehouse)
+            ->post(route('admin.transactions.cancel', $sale->id), [
+                'cancellation_reason' => 'Warehouse ingin membatalkan',
+            ])
+            ->assertStatus(403);
+    }
+
+    public function test_online_order_status_page_links_directly_to_admin_configured_store_phone(): void
+    {
+        Setting::set('store_phone', '082131117996');
+
+        $sale = Sale::factory()->create([
+            'transaction_number' => 'ONL005',
+            'table_number' => 'ONLINE',
+            'customer_name' => 'Dimas Customer',
+            'customer_phone' => '085725890139',
+            'status' => 'completed',
+            'order_status' => 'ready',
+            'payment_status' => 'paid',
+        ]);
+
+        $response = $this->get(route('online_order.status', 'ONL005'));
+
+        $response->assertStatus(200);
+        // Memastikan WhatsApp mengarah langsung ke nomor toko 6282131117996 (bukan tombol share tanpa parameter phone)
+        $response->assertSee('https://api.whatsapp.com/send?phone=6282131117996', false);
+        $response->assertSee('Hubungi Toko via WhatsApp');
     }
 
     public function test_attendance_page_and_submission_respects_dynamic_max_distance(): void
@@ -206,5 +260,52 @@ class AdminSettingAndOwnerCancellationTest extends TestCase
         ]);
 
         $rejectedSubmit->assertSessionHasErrors(['attendance']);
+    }
+
+    public function test_admin_and_owner_can_filter_transactions_by_status(): void
+    {
+        $paidSale = Sale::factory()->create([
+            'transaction_number' => 'TRX-PAID-001',
+            'user_id' => $this->cashier->id,
+            'status' => 'completed',
+            'order_status' => 'completed',
+            'payment_status' => 'paid',
+            'total_amount' => 50000,
+        ]);
+
+        $cancelledSale = Sale::factory()->create([
+            'transaction_number' => 'TRX-CANCEL-001',
+            'user_id' => $this->cashier->id,
+            'status' => 'cancelled',
+            'order_status' => 'cancelled',
+            'payment_status' => 'cancelled',
+            'cancelled_by' => $this->owner->id,
+            'cancellation_reason' => 'Barang habis',
+            'total_amount' => 80000,
+        ]);
+
+        // 1. Owner filter cancelled
+        $responseOwnerCancelled = $this->actingAs($this->owner)->get(route('owner.transactions.index', ['status' => 'cancelled']));
+        $responseOwnerCancelled->assertStatus(200);
+        $responseOwnerCancelled->assertSee('TRX-CANCEL-001');
+        $responseOwnerCancelled->assertDontSee('TRX-PAID-001');
+
+        // 2. Owner filter paid
+        $responseOwnerPaid = $this->actingAs($this->owner)->get(route('owner.transactions.index', ['status' => 'paid']));
+        $responseOwnerPaid->assertStatus(200);
+        $responseOwnerPaid->assertSee('TRX-PAID-001');
+        $responseOwnerPaid->assertDontSee('TRX-CANCEL-001');
+
+        // 3. Admin filter cancelled
+        $responseAdminCancelled = $this->actingAs($this->admin)->get(route('admin.transactions.index', ['status' => 'cancelled']));
+        $responseAdminCancelled->assertStatus(200);
+        $responseAdminCancelled->assertSee('TRX-CANCEL-001');
+        $responseAdminCancelled->assertDontSee('TRX-PAID-001');
+
+        // 4. Admin filter paid
+        $responseAdminPaid = $this->actingAs($this->admin)->get(route('admin.transactions.index', ['status' => 'paid']));
+        $responseAdminPaid->assertStatus(200);
+        $responseAdminPaid->assertSee('TRX-PAID-001');
+        $responseAdminPaid->assertDontSee('TRX-CANCEL-001');
     }
 }
