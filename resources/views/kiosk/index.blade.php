@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pemesanan Mandiri - {{ $storeName }}</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,7 +44,7 @@
     <!-- Top Compact Kiosk Header Bar -->
     <header class="h-13 bg-[#191714] text-[#f7f5f0] border-b border-[#2b261f] px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-md z-30">
         <div class="flex items-center gap-2.5">
-            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-8 h-8 object-contain drop-shadow-sm" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-8 h-8 object-contain drop-shadow-sm" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
             <div class="leading-tight">
                 <div class="flex items-center gap-1.5">
                     <h1 class="font-serif-classic text-xs sm:text-sm font-extrabold tracking-wide text-[#f7f5f0] truncate">

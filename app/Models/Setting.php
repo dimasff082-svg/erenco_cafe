@@ -76,11 +76,15 @@ class Setting extends Model
     public static function getLogoUrl(): string
     {
         $logo = static::get('app_logo');
-        if (! empty($logo)) {
+        if (! empty($logo) && file_exists(public_path('storage/'.$logo))) {
             return asset('storage/'.$logo);
         }
 
-        return asset('images/logo.png');
+        if (file_exists(public_path('images/logo.png'))) {
+            return asset('images/logo.png');
+        }
+
+        return asset('images/default-cake.png');
     }
 
     /**

@@ -28,26 +28,38 @@ use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TakeawayOrderController;
 use App\Http\Controllers\Warehouse\ExpenseController as WarehouseExpenseController;
+use App\Http\Controllers\Warehouse\RawMaterialController as WarehouseRawMaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login or appropriate dashboard
 Route::get('/', function () {
     if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
+        $user = auth()->user();
+        if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        if (auth()->user()->isOwner()) {
+        if ($user->isOwner()) {
             return redirect()->route('owner.dashboard');
         }
-        if (auth()->user()->isKitchen()) {
+        if ($user->isKitchen()) {
             return redirect()->route('kitchen.index');
         }
-        if (auth()->user()->isWarehouse()) {
-            return redirect()->route('warehouse.expenses.index');
+        if ($user->isWarehouse()) {
+            return redirect()->route('warehouse.raw_materials.index');
+        }
+        if ($user->isCashier()) {
+            return redirect()->route('cashier.dashboard');
         }
 
-        return redirect()->route('cashier.dashboard');
+        // Jika role akun tidak dikenali/tidak memiliki izin dashboard
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => "Akun dengan role '{$user->role}' belum memiliki izin akses dashboard. Silakan login kembali.",
+        ]);
     }
 
     return redirect()->route('login');
@@ -59,7 +71,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Customer Self-Order via Table QR Code (Public / Guest)
 Route::prefix('order')->name('order.')->group(function () {
@@ -224,6 +236,17 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 
 // Warehouse Staff Routes (Staf Gudang & Admin/Owner)
 Route::middleware(['auth', 'role:warehouse,admin,owner'])->prefix('warehouse')->name('warehouse.')->group(function () {
+    // Inventori Bahan Baku
+    Route::get('/raw-materials', [WarehouseRawMaterialController::class, 'index'])->name('raw_materials.index');
+    Route::post('/raw-materials', [WarehouseRawMaterialController::class, 'store'])->name('raw_materials.store');
+    Route::put('/raw-materials/{rawMaterial}', [WarehouseRawMaterialController::class, 'update'])->name('raw_materials.update');
+    Route::delete('/raw-materials/{rawMaterial}', [WarehouseRawMaterialController::class, 'destroy'])->name('raw_materials.destroy');
+    Route::post('/raw-materials/{rawMaterial}/restock', [WarehouseRawMaterialController::class, 'restock'])->name('raw_materials.restock');
+    Route::post('/raw-materials/{rawMaterial}/usage', [WarehouseRawMaterialController::class, 'usage'])->name('raw_materials.usage');
+    Route::post('/raw-materials/{rawMaterial}/opname', [WarehouseRawMaterialController::class, 'opname'])->name('raw_materials.opname');
+    Route::get('/raw-materials/mutations', [WarehouseRawMaterialController::class, 'mutations'])->name('raw_materials.mutations');
+    Route::get('/raw-materials/{rawMaterial}/history', [WarehouseRawMaterialController::class, 'history'])->name('raw_materials.history');
+
     // Satu Halaman Transaksi Pengeluaran (Bahan Baku & Operasional)
     Route::get('/expenses', [WarehouseExpenseController::class, 'index'])->name('expenses.index');
     Route::post('/expenses', [WarehouseExpenseController::class, 'store'])->name('expenses.store');

@@ -160,7 +160,16 @@
                             </td>
                             <td class="py-3 px-5">
                                 <span class="font-bold text-[#262017] block text-xs">{{ $exp->title }}</span>
-                                <span class="text-[10px] text-[#8f8573]">{{ $exp->category }}</span>
+                                @if($exp->rawMaterial)
+                                    <span class="inline-flex items-center gap-1 mt-0.5 text-[10.5px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-300">
+                                        <svg class="w-3 h-3 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        +{{ number_format($exp->raw_material_quantity, 0, ',', '.') }} {{ $exp->rawMaterial->unit }} ({{ $exp->rawMaterial->name }})
+                                    </span>
+                                @else
+                                    <span class="text-[10px] text-[#8f8573]">{{ $exp->category }}</span>
+                                @endif
                                 @if($exp->notes)
                                     <span class="block text-[10px] text-stone-500 italic mt-0.5">{{ $exp->notes }}</span>
                                 @endif
@@ -175,14 +184,14 @@
                             </td>
                             <td class="py-3 px-5 text-center">
                                 @if($exp->receipt_proof)
-                                    <a href="{{ asset('storage/' . $exp->receipt_proof) }}" target="_blank"
-                                        class="inline-flex items-center gap-1 text-[11px] font-bold text-[#c59b27] hover:text-[#a98119] underline">
+                                    <button type="button" onclick="openReceiptModal('{{ asset('storage/' . $exp->receipt_proof) }}')"
+                                        class="inline-flex items-center gap-1 text-[11px] font-bold text-[#c59b27] hover:text-[#a98119] underline cursor-pointer">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
                                         Lihat Foto
-                                    </a>
+                                    </button>
                                 @else
                                     <span class="text-[10px] text-stone-400 italic">-</span>
                                 @endif
@@ -275,6 +284,36 @@
                 </div>
             </div>
 
+            <!-- Integrasi Bahan Baku Otomatis -->
+            <div id="rawMaterialFields" class="p-3.5 rounded-2xl bg-[#faf7f0] border border-[#dcd4c5] space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-[#5c5346] font-serif-classic">Integrasi Bahan Baku (Auto-Restock)</span>
+                    <span class="text-[9px] text-amber-900 font-bold bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">Stok Bertambah Otomatis</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#786e60] mb-1">Hubungkan ke Bahan Baku</label>
+                        <select name="raw_material_id" id="expenseRawMaterialSelect" onchange="onRawMaterialChange(this)"
+                            class="w-full bg-white border border-[#dcd4c5] rounded-xl px-2.5 py-2 text-xs text-[#262017] focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
+                            <option value="">-- Bukan Bahan Baku / Mandiri --</option>
+                            @foreach($rawMaterials as $mat)
+                                <option value="{{ $mat->id }}" data-name="{{ $mat->name }}" data-unit="{{ $mat->unit }}" data-category="{{ $mat->category }}">
+                                    {{ $mat->code }} - {{ $mat->name }} (Sisa: {{ number_format($mat->current_stock, 0, ',', '.') }} {{ $mat->unit }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#786e60] mb-1">Jumlah Kuantitas Masuk</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" min="0.01" name="raw_material_quantity" id="expenseRawMaterialQty" placeholder="Contoh: 10"
+                                class="w-full bg-white border border-[#dcd4c5] rounded-xl pl-3 pr-14 py-2 text-xs text-[#262017] font-bold focus:ring-2 focus:ring-[#c59b27] focus:outline-none">
+                            <span id="expenseUnitBadge" class="absolute right-3 top-2.5 text-[11px] font-bold text-[#8f8573]">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Nama Pengeluaran / Barang -->
             <div>
                 <label class="block text-xs font-bold text-[#5c5346] mb-1 font-serif-classic">Nama Pengeluaran / Barang *</label>
@@ -360,6 +399,32 @@
     </div>
 </div>
 
+<!-- Modal Pratinjau Foto Bukti Transaksi -->
+<div id="modal-receipt-preview" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-stone-950/85 backdrop-blur-xs p-4" onclick="closeReceiptModal()" style="display: none;">
+    <!-- Container Presisi yang Mengikuti Ukuran Foto -->
+    <div class="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-stone-800/20 overflow-hidden inline-flex items-center justify-center p-2 sm:p-2.5"
+        style="position: relative; max-width: 90vw; max-height: 88vh; margin: auto;"
+        onclick="event.stopPropagation()">
+
+        <!-- Tombol Tanda Silang X di Sebelah Kanan Atas Foto -->
+        <button type="button" onclick="closeReceiptModal()"
+            style="position: absolute; top: 16px; right: 16px; z-index: 50; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
+            class="rounded-full bg-stone-900/85 hover:bg-stone-950 active:scale-95 text-white shadow-2xl transition cursor-pointer border border-white/25 hover:scale-105"
+            title="Tutup (X)" aria-label="Tutup">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Area Gambar Bukti Foto -->
+        <div class="flex items-center justify-center bg-stone-100 overflow-hidden rounded-xl sm:rounded-2xl">
+            <img id="previewReceiptImg" src="" alt="Bukti Transaksi"
+                style="max-width: 85vw; max-height: 84vh; width: auto; height: auto; object-fit: contain; display: block;"
+                class="rounded-xl sm:rounded-2xl">
+        </div>
+    </div>
+</div>
+
 <script>
     function formatRupiahInput(input, targetHiddenId) {
         let clean = input.value.replace(/\D/g, '');
@@ -377,13 +442,71 @@
     function updateCategorySuggestions(type) {
         const titleInput = document.getElementById('expenseTitleInput');
         const catSelect = document.getElementById('expenseCategorySelect');
+        const rawFields = document.getElementById('rawMaterialFields');
         if (type === 'raw_material') {
-            titleInput.placeholder = "Contoh: Pembelian Tepung Terigu Segitiga 25kg";
-            catSelect.value = "Bahan Baku Kue & Roti";
+            titleInput.placeholder = "Contoh: Pembelian Biji Kopi Arabika 5kg";
+            catSelect.value = "Bahan Baku Minuman & Kopi";
+            if (rawFields) rawFields.classList.remove('hidden');
         } else {
             titleInput.placeholder = "Contoh: Pembayaran Tagihan Listrik PLN Bulan Ini";
             catSelect.value = "Listrik PLN";
+            if (rawFields) rawFields.classList.add('hidden');
         }
     }
+
+    function onRawMaterialChange(select) {
+        const selected = select.options[select.selectedIndex];
+        const titleInput = document.getElementById('expenseTitleInput');
+        const unitBadge = document.getElementById('expenseUnitBadge');
+        if (selected && selected.value) {
+            const name = selected.getAttribute('data-name');
+            const unit = selected.getAttribute('data-unit');
+            const cat = selected.getAttribute('data-category');
+            if (name && (!titleInput.value || titleInput.value.startsWith('Pembelian'))) {
+                titleInput.value = 'Pembelian ' + name;
+            }
+            if (unit && unitBadge) {
+                unitBadge.innerText = unit;
+            }
+            const catSelect = document.getElementById('expenseCategorySelect');
+            if (cat && catSelect) {
+                for (let i = 0; i < catSelect.options.length; i++) {
+                    if (catSelect.options[i].value.includes(cat) || cat.includes(catSelect.options[i].value)) {
+                        catSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        } else {
+            if (unitBadge) unitBadge.innerText = '-';
+        }
+    }
+
+    function openReceiptModal(url) {
+        const img = document.getElementById('previewReceiptImg');
+        if (img) {
+            img.src = url;
+        }
+        const modal = document.getElementById('modal-receipt-preview');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeReceiptModal() {
+        const modal = document.getElementById('modal-receipt-preview');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Tombol ESC di keyboard juga menutup foto bukti
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeReceiptModal();
+        }
+    });
 </script>
 @endsection

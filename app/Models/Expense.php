@@ -13,6 +13,8 @@ class Expense extends Model
     protected $fillable = [
         'expense_number',
         'expense_type',
+        'raw_material_id',
+        'raw_material_quantity',
         'title',
         'category',
         'amount',
@@ -27,6 +29,7 @@ class Expense extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'raw_material_quantity' => 'decimal:2',
             'expense_date' => 'date',
         ];
     }
@@ -34,6 +37,11 @@ class Expense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function rawMaterial(): BelongsTo
+    {
+        return $this->belongsTo(RawMaterial::class);
     }
 
     public function isRawMaterial(): bool

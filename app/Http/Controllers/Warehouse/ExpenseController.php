@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Models\RawMaterial;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -68,7 +69,9 @@ class ExpenseController extends Controller
             'operational_expense' => (float) ($stats->operational_expense ?? 0),
         ];
 
-        return view('warehouse.expenses.index', compact('expenses', 'summary'));
+        $rawMaterials = RawMaterial::orderBy('name')->get();
+
+        return view('warehouse.expenses.index', compact('expenses', 'summary', 'rawMaterials'));
     }
 
     /**
@@ -84,6 +87,8 @@ class ExpenseController extends Controller
 
         $validated = $request->validate([
             'expense_type' => ['required', 'string', 'in:raw_material,operational'],
+            'raw_material_id' => ['nullable', 'exists:raw_materials,id'],
+            'raw_material_quantity' => ['nullable', 'numeric', 'min:0.01'],
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:100'],
             'amount' => ['required', 'numeric', 'min:1'],
@@ -113,9 +118,11 @@ class ExpenseController extends Controller
             $proofPath = $request->file('receipt_proof')->store('expenses', 'public');
         }
 
-        Expense::create([
+        $expense = Expense::create([
             'expense_number' => $expenseNumber,
             'expense_type' => $validated['expense_type'],
+            'raw_material_id' => $validated['expense_type'] === 'raw_material' ? ($validated['raw_material_id'] ?? null) : null,
+            'raw_material_quantity' => $validated['expense_type'] === 'raw_material' ? ($validated['raw_material_quantity'] ?? null) : null,
             'title' => $validated['title'],
             'category' => $validated['category'] ?? ($validated['expense_type'] === 'raw_material' ? 'Bahan Baku' : 'Operasional'),
             'amount' => $validated['amount'],
@@ -126,8 +133,28 @@ class ExpenseController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
+        // Jika terhubung dengan bahan baku, tambah stok otomatis dan catat mutasi masuk
+        if ($expense->raw_material_id && $expense->raw_material_quantity > 0) {
+            $rawMaterial = RawMaterial::find($expense->raw_material_id);
+            if ($rawMaterial) {
+                $rawMaterial->recordMutation(
+                    type: 'in',
+                    quantity: (float) $expense->raw_material_quantity,
+                    referenceNumber: $expenseNumber,
+                    notes: "Restock via Pembelian Nota {$expenseNumber} ({$expense->title})",
+                    userId: $request->user()->id
+                );
+
+                // Update harga beli per unit terakhir
+                $calcUnitPrice = (float) $expense->amount / (float) $expense->raw_material_quantity;
+                if ($calcUnitPrice > 0) {
+                    $rawMaterial->update(['unit_price' => $calcUnitPrice]);
+                }
+            }
+        }
+
         return redirect()->route('warehouse.expenses.index')
-            ->with('success', "Transaksi pengeluaran {$expenseNumber} berhasil dicatat.");
+            ->with('success', "Transaksi pengeluaran {$expenseNumber} berhasil dicatat".($expense->raw_material_id ? ' dan stok bahan baku berhasil ditambahkan.' : '.'));
     }
 
     /**
@@ -135,6 +162,20 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense): RedirectResponse
     {
+        // Revert stok bahan baku jika transaksi ini menambah stok sebelumnya
+        if ($expense->raw_material_id && $expense->raw_material_quantity > 0) {
+            $rawMaterial = $expense->rawMaterial;
+            if ($rawMaterial) {
+                $rawMaterial->recordMutation(
+                    type: 'out',
+                    quantity: (float) $expense->raw_material_quantity,
+                    referenceNumber: $expense->expense_number,
+                    notes: "Pembatalan / Hapus Nota Belanja {$expense->expense_number}",
+                    userId: auth()->id()
+                );
+            }
+        }
+
         if ($expense->receipt_proof) {
             Storage::disk('public')->delete($expense->receipt_proof);
         }
@@ -142,6 +183,6 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return redirect()->route('warehouse.expenses.index')
-            ->with('success', 'Catatan pengeluaran berhasil dihapus.');
+            ->with('success', 'Catatan pengeluaran berhasil dihapus dan mutasi stok telah disesuaikan.');
     }
 }

@@ -12,20 +12,31 @@ class AuthController extends Controller
     public function showLoginForm(): View|RedirectResponse
     {
         if (Auth::check()) {
-            if (Auth::user()->isAdmin()) {
+            $user = Auth::user();
+
+            if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');
             }
-            if (Auth::user()->isOwner()) {
+            if ($user->isOwner()) {
                 return redirect()->route('owner.dashboard');
             }
-            if (Auth::user()->isKitchen()) {
+            if ($user->isKitchen()) {
                 return redirect()->route('kitchen.index');
             }
-            if (Auth::user()->isWarehouse()) {
-                return redirect()->route('warehouse.expenses.index');
+            if ($user->isWarehouse()) {
+                return redirect()->route('warehouse.raw_materials.index');
+            }
+            if ($user->isCashier()) {
+                return redirect()->route('cashier.dashboard');
             }
 
-            return redirect()->route('cashier.dashboard');
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors([
+                'email' => "Akun Anda memiliki role '{$user->role}' yang belum terdaftar untuk hak akses dashboard. Silakan hubungi Administrator.",
+            ]);
         }
 
         return view('auth.login');
@@ -72,10 +83,20 @@ class AuthController extends Controller
         }
 
         if ($user->isWarehouse()) {
-            return redirect()->route('warehouse.expenses.index');
+            return redirect()->route('warehouse.raw_materials.index');
         }
 
-        return redirect()->route('cashier.dashboard');
+        if ($user->isCashier()) {
+            return redirect()->route('cashier.dashboard');
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => "Akun Anda memiliki role '{$user->role}' yang belum memiliki akses dashboard.",
+        ]);
     }
 
     public function logout(Request $request): RedirectResponse

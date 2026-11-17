@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesan Menu - Meja {{ $table->table_number }} | Cafe & Resto</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
@@ -21,7 +22,7 @@
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 shadow-2xs">
         <div class="max-w-2xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-10 h-10 object-contain drop-shadow-sm shrink-0" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-10 h-10 object-contain drop-shadow-sm shrink-0" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
                 <div>
                     <h1 class="text-sm font-extrabold text-slate-900 leading-tight">
                         <span>{{ $storeNameLine1 }}</span>

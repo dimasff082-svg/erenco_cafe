@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Status Pesanan #{{ $sale->transaction_number }} - {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
@@ -27,7 +28,7 @@
         <!-- Top Header -->
         <header class="bg-white border-b border-[#eee7dc] px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-9 h-9 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7]" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-9 h-9 rounded-xl object-contain shadow-2xs border border-[#eee7dc] p-0.5 bg-[#fdfbf7]" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
                 <div class="leading-tight">
                     <h1 class="text-sm font-black text-[#26211a]">
                         <span>{{ $storeNameLine1 }}</span>

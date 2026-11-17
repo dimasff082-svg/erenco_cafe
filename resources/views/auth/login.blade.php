@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - {{ $storeName }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +20,7 @@
         <!-- Brand Header: Store Official Logo & Name -->
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center mb-3">
-                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-24 h-24 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-24 h-24 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
             </div>
             <h1 class="text-2xl font-serif-classic font-bold tracking-tight text-[#f5ebd7] uppercase leading-tight">
                 <span>{{ $storeNameLine1 }}</span>

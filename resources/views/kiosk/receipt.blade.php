@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Struk Pesanan - {{ $sale->transaction_number }} | {{ $storeName }} Kiosk</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -95,7 +96,7 @@
         <div id="printable-receipt" class="bg-white rounded-3xl border border-[#e5dfd3] shadow-xl p-7 font-sans">
             <!-- Header Toko -->
             <div class="text-center pb-4 border-b border-dashed border-slate-300">
-                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-14 h-14 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+                <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-14 h-14 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
                 <h3 class="font-extrabold text-lg text-slate-900 tracking-tight uppercase leading-tight">
                     <span>{{ $storeNameLine1 }}</span>
                     @if(!empty($storeNameLine2))

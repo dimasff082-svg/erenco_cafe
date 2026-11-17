@@ -75,7 +75,7 @@
     <div id="printable-receipt" class="bg-white rounded-3xl border border-slate-200/90 shadow-xl p-8 font-sans max-w-md mx-auto">
         <!-- Store Header -->
         <div class="text-center pb-5 border-b border-dashed border-slate-300">
-            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-16 h-16 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.src='{{ asset('images/default-cake.png') }}'">
+            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-16 h-16 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
             <h3 class="font-extrabold text-lg text-slate-900 tracking-tight uppercase leading-tight">
                 <span>{{ $storeNameLine1 }}</span>
                 @if(!empty($storeNameLine2))
