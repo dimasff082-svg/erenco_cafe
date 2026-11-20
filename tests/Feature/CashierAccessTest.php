@@ -147,4 +147,51 @@ class CashierAccessTest extends TestCase
         ]);
         $createAttempt->assertForbidden();
     }
+
+    public function test_cashier_can_toggle_product_availability(): void
+    {
+        $this->assertTrue($this->product->fresh()->is_available);
+
+        // Kasir menandai menu sebagai HABIS
+        $response = $this->actingAs($this->cashier)
+            ->patch(route('cashier.menu.toggle_availability', $this->product->id));
+
+        $response->assertRedirect();
+        $this->assertFalse($this->product->fresh()->is_available);
+
+        // Tampilan kasir memperlihatkan status HABIS dan tombol tandai tersedia kembali
+        $menuPage = $this->actingAs($this->cashier)->get(route('cashier.menu.index'));
+        $menuPage->assertSee('HABIS');
+        $menuPage->assertSee('Tandai Tersedia Kembali');
+
+        // Kasir mengembalikan menu menjadi TERSEDIA
+        $response2 = $this->actingAs($this->cashier)
+            ->patch(route('cashier.menu.toggle_availability', $this->product->id));
+
+        $response2->assertRedirect();
+        $this->assertTrue($this->product->fresh()->is_available);
+    }
+
+    public function test_customer_cannot_order_unavailable_product(): void
+    {
+        // Tandai produk habis
+        $this->product->update(['is_available' => false]);
+
+        $checkoutResponse = $this->post(route('order.checkout', $this->table->table_number), [
+            'customer_name' => 'John Doe',
+            'payment_choice' => 'cash',
+            'items' => [
+                [
+                    'id' => $this->product->id,
+                    'quantity' => 1,
+                ],
+            ],
+        ], ['Accept' => 'application/json']);
+
+        $checkoutResponse->assertStatus(422);
+        $checkoutResponse->assertJsonFragment([
+            'success' => false,
+        ]);
+        $this->assertStringContainsString('sedang habis dan tidak dapat dipesan', $checkoutResponse->json('message'));
+    }
 }

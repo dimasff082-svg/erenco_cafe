@@ -77,6 +77,17 @@ class SettingController extends Controller
             }
             $logoPath = $request->file('app_logo')->store('settings', 'public');
             Setting::set('app_logo', $logoPath, 'image', 'appearance');
+
+            // Sinkronkan favicon browser dengan logo toko yang baru
+            try {
+                $fullUploadedPath = storage_path('app/public/'.$logoPath);
+                if (file_exists($fullUploadedPath)) {
+                    @copy($fullUploadedPath, public_path('favicon.ico'));
+                    @copy($fullUploadedPath, public_path('images/logo-64.png'));
+                }
+            } catch (\Throwable $e) {
+                // Abaikan jika permission tidak mengizinkan copy langsung
+            }
         }
 
         return redirect()->route('admin.settings.index')->with('success', 'Pengaturan toko dan pesan online berhasil disimpan.');

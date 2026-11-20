@@ -243,6 +243,12 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                         </svg>
                                     </a>
+
+                                    <a href="{{ $sale->receipt_url }}?auto_wa=1" target="_blank"
+                                        title="Kirim Struk via WhatsApp"
+                                        class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-[#25D366] text-white hover:bg-[#20ba59] transition shadow-2xs">
+                                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -419,6 +425,11 @@
                                                         Batalkan Pesanan
                                                     </button>
                                                 @endif
+                                                <a href="{{ $sale->receipt_url }}?auto_wa=1" target="_blank"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-bold transition shadow-xs">
+                                                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                                                    <span>Kirim Struk WA</span>
+                                                </a>
                                                 <a href="{{ $sale->receipt_url }}" target="_blank"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>

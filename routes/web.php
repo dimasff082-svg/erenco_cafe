@@ -122,8 +122,9 @@ Route::middleware(['auth', 'role:cashier,admin,owner'])->prefix('cashier')->name
     Route::get('/transactions', [CashierTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{sale}', [CashierTransactionController::class, 'show'])->name('transactions.show');
 
-    // Data Menu / Katalog Menu (Read-Only untuk Kasir Menjelaskan Menu ke Pelanggan)
+    // Data Menu / Katalog Menu & Tandai Stok Habis oleh Kasir
     Route::get('/menu', [CashierMenuController::class, 'index'])->name('menu.index');
+    Route::patch('/menu/{product}/toggle-availability', [CashierMenuController::class, 'toggleAvailability'])->name('menu.toggle_availability');
 });
 
 // Kitchen Display System Routes (Dapur - Kelola Status Pesanan: Menunggu -> Diproses -> Selesai)

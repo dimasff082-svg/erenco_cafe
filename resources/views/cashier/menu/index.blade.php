@@ -71,7 +71,9 @@
                 <select name="status" onchange="this.form.submit()"
                     class="w-full px-3.5 py-2.5 rounded-2xl bg-[#faf7f0] border border-[#e5dfd3] text-xs text-[#26211a] focus:outline-none focus:ring-2 focus:ring-[#c59b27] focus:bg-white transition cursor-pointer">
                     <option value="">Semua Status</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif (Tersedia)</option>
+                    <option value="available" {{ request('status') === 'available' ? 'selected' : '' }}>Tersedia (Bisa Dipesan)</option>
+                    <option value="out_of_stock" {{ request('status') === 'out_of_stock' ? 'selected' : '' }}>Habis (Stok Kosong)</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
                 </select>
             </div>
@@ -152,17 +154,31 @@
 
                         <!-- Status Pill -->
                         <div class="absolute top-3 right-3">
-                            @if($product->is_active)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600/90 text-white backdrop-blur-xs shadow-xs">
+                            @if(!$product->is_active)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-700/90 text-stone-300 backdrop-blur-xs shadow-xs">
+                                    Nonaktif
+                                </span>
+                            @elseif(!$product->is_available)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white backdrop-blur-xs shadow-xs animate-pulse">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                    HABIS
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600/90 text-white backdrop-blur-xs shadow-xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
                                     Tersedia
                                 </span>
-                            @else
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-700/90 text-stone-300 backdrop-blur-xs shadow-xs">
-                                    Nonaktif
-                                </span>
                             @endif
                         </div>
+
+                        @if($product->is_active && !$product->is_available)
+                            <!-- Overlay Banner Menu Habis -->
+                            <div class="absolute inset-0 bg-stone-950/45 backdrop-blur-[1px] flex items-center justify-center pointer-events-none">
+                                <span class="px-3.5 py-1 rounded-xl bg-rose-600/95 text-white font-serif-classic font-extrabold text-xs tracking-wider uppercase shadow-md border border-white/20">
+                                    Menu Habis
+                                </span>
+                            </div>
+                        @endif
 
                         <!-- SKU Badge -->
                         <div class="absolute bottom-2.5 left-3">
@@ -202,8 +218,45 @@
                             </div>
                         </div>
 
-                        <!-- Action Button: Open Detail Consultation Modal -->
-                        <div class="pt-2 border-t border-[#f4efe4]">
+                        <!-- Action Buttons: Toggle Habis/Tersedia & Modal Detail -->
+                        <div class="pt-3 border-t border-[#f4efe4] space-y-2">
+                            <!-- Toggle Ketersediaan Stok (Trigger Modal Pop-up) -->
+                            @if($product->is_available)
+                                <button type="button"
+                                    onclick="openToggleAvailabilityModal({{ json_encode([
+                                        'id' => $product->id,
+                                        'name' => $product->name,
+                                        'sku' => $product->sku,
+                                        'category' => $product->category?->name ?? 'Tanpa Kategori',
+                                        'price_formatted' => 'Rp ' . number_format($product->selling_price, 0, ',', '.') . ' / ' . $product->unit,
+                                        'current_status' => 'available',
+                                        'action_url' => route('cashier.menu.toggle_availability', $product->id),
+                                    ]) }})"
+                                    class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white font-bold text-xs transition border border-rose-200 hover:border-rose-600 shadow-2xs group/btn">
+                                    <svg class="w-3.5 h-3.5 text-rose-600 group-hover/btn:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    Tandai Menu Habis
+                                </button>
+                            @else
+                                <button type="button"
+                                    onclick="openToggleAvailabilityModal({{ json_encode([
+                                        'id' => $product->id,
+                                        'name' => $product->name,
+                                        'sku' => $product->sku,
+                                        'category' => $product->category?->name ?? 'Tanpa Kategori',
+                                        'price_formatted' => 'Rp ' . number_format($product->selling_price, 0, ',', '.') . ' / ' . $product->unit,
+                                        'current_status' => 'out_of_stock',
+                                        'action_url' => route('cashier.menu.toggle_availability', $product->id),
+                                    ]) }})"
+                                    class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold text-xs transition border border-emerald-200 hover:border-emerald-600 shadow-2xs group/btn">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600 group-hover/btn:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Tandai Tersedia Kembali
+                                </button>
+                            @endif
+
                             <button type="button"
                                 onclick="openMenuDetailModal({{ json_encode([
                                     'name' => $product->name,
@@ -212,11 +265,12 @@
                                     'price_formatted' => 'Rp ' . number_format($product->selling_price, 0, ',', '.'),
                                     'unit' => $product->unit,
                                     'is_active' => $product->is_active,
+                                    'is_available' => $product->is_available,
                                     'image_url' => $product->image_url,
                                     'description' => $product->description,
                                 ]) }})"
-                                class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-2xl bg-[#faf7f0] hover:bg-[#c59b27] text-[#4a3e2e] hover:text-stone-950 font-bold text-xs transition border border-[#e5dfd3] hover:border-[#c59b27] shadow-2xs group-hover:bg-[#faf4e6]">
-                                <svg class="w-4 h-4 text-[#8a681c] group-hover:text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#faf7f0] hover:bg-[#c59b27] text-[#4a3e2e] hover:text-stone-950 font-semibold text-xs transition border border-[#e5dfd3] hover:border-[#c59b27] shadow-2xs group-hover:bg-[#faf4e6]">
+                                <svg class="w-3.5 h-3.5 text-[#8a681c] group-hover:text-stone-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
@@ -312,6 +366,81 @@
     </div>
 </div>
 
+<!-- MODAL POP-UP KONFIRMASI KETERSEDIAAN MENU (HABIS / TERSEDIA KEMBALI) -->
+<div id="availability-confirm-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="relative w-full max-w-md bg-white rounded-3xl border border-[#e5dfd3] shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150">
+        <!-- Close (X) button in top-right -->
+        <button type="button" onclick="closeToggleAvailabilityModal()"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-800 flex items-center justify-center transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <form id="availability-confirm-form" method="POST" action="">
+            @csrf
+            @method('PATCH')
+
+            <div class="p-6 text-center space-y-4">
+                <!-- Icon Header (Dynamic: Rose / Emerald) -->
+                <div id="confirm-modal-icon-wrapper" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-xs">
+                    <!-- Rose Icon for Habis -->
+                    <svg id="confirm-modal-icon-habis" class="w-8 h-8 text-rose-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    <!-- Emerald Icon for Tersedia -->
+                    <svg id="confirm-modal-icon-tersedia" class="w-8 h-8 text-emerald-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                <!-- Modal Heading -->
+                <div>
+                    <h3 id="confirm-modal-title" class="font-serif-classic font-extrabold text-lg text-[#26211a]">
+                        Tandai Menu Sebagai Habis?
+                    </h3>
+                    <p id="confirm-modal-subtitle" class="text-xs text-stone-500 mt-1">
+                        Konfirmasi status ketersediaan menu di kasir dan katalog pelanggan.
+                    </p>
+                </div>
+
+                <!-- Target Menu Card Summary -->
+                <div class="bg-[#faf7f0] rounded-2xl p-4 border border-[#e5dfd3] text-left space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <span id="confirm-modal-menu-category" class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-stone-200/80 text-stone-700 font-mono"></span>
+                        <span id="confirm-modal-menu-sku" class="text-[10px] font-mono font-bold text-stone-500"></span>
+                    </div>
+                    <h4 id="confirm-modal-menu-name" class="font-serif-classic font-bold text-base text-[#26211a] leading-tight"></h4>
+                    <div class="flex items-baseline justify-between pt-1 border-t border-[#ede7dc]">
+                        <span class="text-xs text-stone-500">Harga Satuan:</span>
+                        <span id="confirm-modal-menu-price" class="font-serif-classic font-extrabold text-sm text-[#8c6716]"></span>
+                    </div>
+                </div>
+
+                <!-- Informational Warning Banner -->
+                <div id="confirm-modal-alert-box" class="p-3.5 rounded-2xl text-xs text-left flex items-start gap-3">
+                    <svg class="w-4 h-4 shrink-0 mt-0.5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p id="confirm-modal-alert-text" class="text-[11.5px] leading-relaxed"></p>
+                </div>
+
+                <!-- Action Buttons (Batal vs Konfirmasi) -->
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button type="button" onclick="closeToggleAvailabilityModal()"
+                        class="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs transition border border-stone-200 cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" id="confirm-modal-submit-btn"
+                        class="w-full py-2.5 px-4 rounded-xl font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 text-white cursor-pointer">
+                        <span id="confirm-modal-btn-text">Ya, Tandai Habis</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function openMenuDetailModal(data) {
         document.getElementById('modal-menu-name').textContent = data.name;
@@ -334,10 +463,12 @@
 
         // Status
         const statusEl = document.getElementById('modal-menu-status');
-        if (data.is_active) {
-            statusEl.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Status: Menu Tersedia</span>';
-        } else {
+        if (!data.is_active) {
             statusEl.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-300">Status: Nonaktif</span>';
+        } else if (!data.is_available) {
+            statusEl.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300"><span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>Status: Menu Sedang Habis (Tidak dapat dipesan oleh pelanggan)</span>';
+        } else {
+            statusEl.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Status: Menu Tersedia</span>';
         }
 
         // Description
@@ -363,6 +494,73 @@
         document.body.classList.remove('overflow-hidden');
     }
 
+    function openToggleAvailabilityModal(data) {
+        const form = document.getElementById('availability-confirm-form');
+        form.action = data.action_url;
+
+        document.getElementById('confirm-modal-menu-name').textContent = data.name;
+        document.getElementById('confirm-modal-menu-sku').textContent = data.sku;
+        document.getElementById('confirm-modal-menu-category').textContent = data.category;
+        document.getElementById('confirm-modal-menu-price').textContent = data.price_formatted;
+
+        const iconWrapper = document.getElementById('confirm-modal-icon-wrapper');
+        const iconHabis = document.getElementById('confirm-modal-icon-habis');
+        const iconTersedia = document.getElementById('confirm-modal-icon-tersedia');
+        const titleEl = document.getElementById('confirm-modal-title');
+        const subtitleEl = document.getElementById('confirm-modal-subtitle');
+        const alertBox = document.getElementById('confirm-modal-alert-box');
+        const alertText = document.getElementById('confirm-modal-alert-text');
+        const submitBtn = document.getElementById('confirm-modal-submit-btn');
+        const btnText = document.getElementById('confirm-modal-btn-text');
+
+        if (data.current_status === 'available') {
+            // Akan ditandai sebagai Habis
+            iconWrapper.className = 'w-16 h-16 rounded-2xl mx-auto flex items-center justify-center bg-rose-100 border border-rose-200';
+            iconHabis.classList.remove('hidden');
+            iconTersedia.classList.add('hidden');
+
+            titleEl.textContent = 'Tandai Menu Sebagai Habis?';
+            subtitleEl.textContent = 'Konfirmasi bahwa porsi atau bahan menu ini sudah tidak tersedia saat ini.';
+
+            alertBox.className = 'p-3.5 rounded-2xl text-xs text-left flex items-start gap-3 bg-rose-50 border border-rose-200 text-rose-900';
+            alertText.innerHTML = 'Menu akan tetap muncul di katalog pelanggan dengan tanda <strong>HABIS</strong>, namun <strong>tidak dapat dipesan</strong> oleh pelanggan di QR Meja, Kiosk, maupun Pesanan Online.';
+
+            submitBtn.className = 'w-full py-2.5 px-4 rounded-xl font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 text-white bg-rose-600 hover:bg-rose-700 active:scale-95 cursor-pointer';
+            btnText.textContent = 'Ya, Tandai Habis';
+        } else {
+            // Akan ditandai sebagai Tersedia kembali
+            iconWrapper.className = 'w-16 h-16 rounded-2xl mx-auto flex items-center justify-center bg-emerald-100 border border-emerald-200';
+            iconHabis.classList.add('hidden');
+            iconTersedia.classList.remove('hidden');
+
+            titleEl.textContent = 'Tandai Menu Tersedia Kembali?';
+            subtitleEl.textContent = 'Konfirmasi bahwa stok bahan menu ini sudah siap dan dapat disajikan kembali.';
+
+            alertBox.className = 'p-3.5 rounded-2xl text-xs text-left flex items-start gap-3 bg-emerald-50 border border-emerald-200 text-emerald-900';
+            alertText.innerHTML = 'Menu akan kembali berstatus <strong>TERSEDIA</strong> dan pelanggan dapat memesan menu ini seperti biasa.';
+
+            submitBtn.className = 'w-full py-2.5 px-4 rounded-xl font-bold text-xs transition shadow-xs flex items-center justify-center gap-1.5 text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 cursor-pointer';
+            btnText.textContent = 'Ya, Tandai Tersedia';
+        }
+
+        const modal = document.getElementById('availability-confirm-modal');
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeToggleAvailabilityModal() {
+        const modal = document.getElementById('availability-confirm-modal');
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Close on backdrop click
+    document.getElementById('availability-confirm-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeToggleAvailabilityModal();
+        }
+    });
+
     // Close on backdrop click
     document.getElementById('menu-detail-modal')?.addEventListener('click', function(e) {
         if (e.target === this) {
@@ -374,6 +572,7 @@
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeMenuDetailModal();
+            closeToggleAvailabilityModal();
         }
     });
 </script>

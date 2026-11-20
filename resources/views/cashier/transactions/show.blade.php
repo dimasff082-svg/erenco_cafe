@@ -8,6 +8,11 @@
             <p class="text-xs text-slate-500 font-mono mt-0.5">{{ $sale->transaction_number }}</p>
         </div>
         <div class="flex items-center gap-2">
+            <a href="{{ route('pos.receipt', ['sale' => $sale->id, 'auto_wa' => 1]) }}" target="_blank"
+                class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+                Kirim Struk WA
+            </a>
             <a href="{{ route('pos.receipt', $sale->id) }}" target="_blank"
                 class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
                 Cetak Struk
@@ -21,12 +26,15 @@
     <!-- Embedded receipt view -->
     <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl p-8 max-w-md mx-auto">
         <div class="text-center pb-6 border-b border-dashed border-slate-300">
-            <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl mb-3 shadow-md">
-                POS
-            </div>
-            <h3 class="font-extrabold text-lg text-slate-900 tracking-tight">TOKO KASIR MODERN</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Jl. Merdeka No. 45, Indonesia</p>
-            <p class="text-xs text-slate-400">Telp: 0812-3456-7890</p>
+            <img src="{{ $storeLogo }}" alt="{{ $storeName }}" class="w-16 h-16 mx-auto object-contain mb-2 drop-shadow-sm" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
+            <h3 class="font-extrabold text-lg text-slate-900 tracking-tight uppercase leading-tight">
+                <span>{{ $storeNameLine1 }}</span>
+                @if(!empty($storeNameLine2))
+                    <span class="block text-sm font-bold text-slate-700 mt-0.5">{{ $storeNameLine2 }}</span>
+                @endif
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">{{ $storeAddress }}</p>
+            <p class="text-xs font-semibold text-slate-700 mt-0.5">Telp / WA: {{ $storePhone }}</p>
         </div>
 
         <div class="py-4 border-b border-dashed border-slate-300 text-xs space-y-1.5 font-mono">
@@ -42,6 +50,25 @@
                 <span class="text-slate-400">Kasir</span>
                 <span class="text-slate-700 font-semibold">{{ $sale->user->name ?? $sale->confirmer?->name ?? 'Kasir Resto' }}</span>
             </div>
+            @if($sale->customer_name)
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Pelanggan</span>
+                    <span class="text-slate-700 font-semibold">{{ $sale->customer_name }}</span>
+                </div>
+            @endif
+            @if($sale->customer_phone)
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">No. WhatsApp</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-slate-800">{{ $sale->customer_phone }}</span>
+                        <a href="{{ route('pos.receipt', ['sale' => $sale->id, 'auto_wa' => 1]) }}" target="_blank"
+                            class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition">
+                            <i class="fa-brands fa-whatsapp text-xs"></i>
+                            <span>Chat</span>
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="py-4 border-b border-dashed border-slate-300">

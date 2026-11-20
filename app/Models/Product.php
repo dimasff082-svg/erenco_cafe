@@ -21,6 +21,7 @@ class Product extends Model
         'unit',
         'selling_price',
         'is_active',
+        'is_available',
     ];
 
     protected function casts(): array
@@ -28,7 +29,18 @@ class Product extends Model
         return [
             'selling_price' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_available' => 'boolean',
         ];
+    }
+
+    public function isAvailable(): bool
+    {
+        return (bool) $this->is_active && (bool) $this->is_available;
+    }
+
+    public function isOutOfStock(): bool
+    {
+        return ! (bool) $this->is_available;
     }
 
     public function getPriceAttribute(): float
@@ -62,5 +74,10 @@ class Product extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->where('is_active', true)->where('is_available', true);
     }
 }

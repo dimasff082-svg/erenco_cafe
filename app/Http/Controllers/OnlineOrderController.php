@@ -89,6 +89,10 @@ class OnlineOrderController extends Controller
                         throw new Exception("Menu '{$product->name}' sedang tidak tersedia.");
                     }
 
+                    if (! $product->is_available) {
+                        throw new Exception("Menu '{$product->name}' sedang habis dan tidak dapat dipesan.");
+                    }
+
                     $lineTotal = $qty * (float) $product->selling_price;
                     $subtotal += $lineTotal;
 

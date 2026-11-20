@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pemesanan Online - {{ $storeName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
+    <link rel="icon" type="image/png" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="shortcut icon" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="apple-touch-icon" href="{{ $storeLogo }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
@@ -196,19 +198,34 @@
                                     <!-- Gambar / Thumbnail Menu -->
                                     <div class="w-18 h-18 rounded-xl bg-[#faf7f0] border border-[#ede7dc] flex items-center justify-center shrink-0 overflow-hidden relative">
                                         @if($product->image_url)
-                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover {{ !$product->is_available ? 'grayscale opacity-60' : '' }}">
                                         @else
-                                            <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#faf7f0] to-[#eee7dc] text-[#c59b27]">
+                                            <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#faf7f0] to-[#eee7dc] text-[#c59b27] {{ !$product->is_available ? 'opacity-40' : '' }}">
                                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
                                                 </svg>
+                                            </div>
+                                        @endif
+
+                                        @if(!$product->is_available)
+                                            <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                                                <span class="px-1.5 py-0.5 rounded-md bg-rose-600 text-white font-extrabold text-[9px] tracking-wider uppercase shadow-sm border border-white/20">
+                                                    Habis
+                                                </span>
                                             </div>
                                         @endif
                                     </div>
 
                                     <!-- Informasi Nama, Deskripsi, Harga -->
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="text-xs font-bold text-[#26211a] truncate leading-tight">{{ $product->name }}</h3>
+                                        <div class="flex items-center gap-1.5">
+                                            <h3 class="text-xs font-bold text-[#26211a] truncate leading-tight">{{ $product->name }}</h3>
+                                            @if(!$product->is_available)
+                                                <span class="text-[8.5px] font-black text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 shrink-0">
+                                                    Habis
+                                                </span>
+                                            @endif
+                                        </div>
                                         @if($product->description)
                                             <p class="text-[10px] text-[#786e60] line-clamp-1 mt-0.5">{{ $product->description }}</p>
                                         @endif
@@ -222,30 +239,36 @@
 
                                     <!-- Action Stepper (+ / - Button) -->
                                     <div class="shrink-0 flex items-center justify-end">
-                                        <!-- Tombol Tambah Pertama Kali -->
-                                        <button type="button" id="btnAdd-{{ $product->id }}"
-                                            onclick="addToOnlineCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (float)$product->selling_price }})"
-                                            class="px-3 py-1.5 rounded-xl bg-[#c59b27] hover:bg-[#a87f1c] text-stone-950 text-[11px] font-black transition active:scale-95 flex items-center gap-1 shadow-2xs">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                            <span>Pesan</span>
-                                        </button>
-
-                                        <!-- Stepper Jumlah Saat Sudah di Keranjang -->
-                                        <div id="stepper-{{ $product->id }}" class="hidden items-center gap-1.5 bg-[#fbf9f4] border border-[#dcd4c5] p-1 rounded-xl">
-                                            <button type="button" onclick="decrementOnlineItem({{ $product->id }})"
-                                                class="w-6 h-6 rounded-lg bg-white text-[#26211a] hover:bg-stone-200 font-bold flex items-center justify-center transition border border-[#ede7dc] text-xs">
-                                                &minus;
-                                            </button>
-                                            <span id="qtyDisplay-{{ $product->id }}" class="w-5 text-center text-xs font-black text-[#26211a]">
-                                                0
+                                        @if(!$product->is_available)
+                                            <span class="px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-[10.5px] font-bold cursor-not-allowed select-none">
+                                                Habis
                                             </span>
-                                            <button type="button" onclick="incrementOnlineItem({{ $product->id }})"
-                                                class="w-6 h-6 rounded-lg bg-[#c59b27] text-stone-950 hover:bg-[#a87f1c] font-black flex items-center justify-center transition text-xs shadow-2xs">
-                                                +
+                                        @else
+                                            <!-- Tombol Tambah Pertama Kali -->
+                                            <button type="button" id="btnAdd-{{ $product->id }}"
+                                                onclick="addToOnlineCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (float)$product->selling_price }})"
+                                                class="px-3 py-1.5 rounded-xl bg-[#c59b27] hover:bg-[#a87f1c] text-stone-950 text-[11px] font-black transition active:scale-95 flex items-center gap-1 shadow-2xs">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                <span>Pesan</span>
                                             </button>
-                                        </div>
+
+                                            <!-- Stepper Jumlah Saat Sudah di Keranjang -->
+                                            <div id="stepper-{{ $product->id }}" class="hidden items-center gap-1.5 bg-[#fbf9f4] border border-[#dcd4c5] p-1 rounded-xl">
+                                                <button type="button" onclick="decrementOnlineItem({{ $product->id }})"
+                                                    class="w-6 h-6 rounded-lg bg-white text-[#26211a] hover:bg-stone-200 font-bold flex items-center justify-center transition border border-[#ede7dc] text-xs">
+                                                    &minus;
+                                                </button>
+                                                <span id="qtyDisplay-{{ $product->id }}" class="w-5 text-center text-xs font-black text-[#26211a]">
+                                                    0
+                                                </span>
+                                                <button type="button" onclick="incrementOnlineItem({{ $product->id }})"
+                                                    class="w-6 h-6 rounded-lg bg-[#c59b27] text-stone-950 hover:bg-[#a87f1c] font-black flex items-center justify-center transition text-xs shadow-2xs">
+                                                    +
+                                                </button>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

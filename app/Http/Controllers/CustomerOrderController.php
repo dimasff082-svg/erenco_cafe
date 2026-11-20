@@ -88,6 +88,7 @@ class CustomerOrderController extends Controller
 
         $validated = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:100'],
+            'customer_phone' => ['nullable', 'string', 'max:25'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -150,6 +151,7 @@ class CustomerOrderController extends Controller
 
         $validated = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:100'],
+            'customer_phone' => ['nullable', 'string', 'max:25'],
             'notes' => ['nullable', 'string', 'max:500'],
             'payment_choice' => ['nullable', 'string', 'in:midtrans,cash,open_bill'],
             'items' => ['required', 'array', 'min:1'],
@@ -183,6 +185,10 @@ class CustomerOrderController extends Controller
 
                     if (! $product->is_active) {
                         throw new Exception("Menu '{$product->name}' sedang tidak tersedia saat ini.");
+                    }
+
+                    if (! $product->is_available) {
+                        throw new Exception("Menu '{$product->name}' sedang habis dan tidak dapat dipesan.");
                     }
 
                     $lineTotal = $qty * (float) $product->selling_price;
@@ -225,6 +231,7 @@ class CustomerOrderController extends Controller
                     'transaction_number' => $orderNumber,
                     'table_number' => $tableNumber,
                     'customer_name' => $validated['customer_name'] ?? ($activeOpenBill?->customer_name ?? null),
+                    'customer_phone' => $validated['customer_phone'] ?? null,
                     'user_id' => User::getActiveCashierId(), // Dicatat pada kasir yang sedang aktif login
                     'transaction_date' => now(),
                     'subtotal' => $subtotal,

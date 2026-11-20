@@ -15,6 +15,11 @@
                     Batalkan Pesanan
                 </button>
             @endif
+            <a href="{{ route('pos.receipt', ['sale' => $sale->id, 'auto_wa' => 1]) }}" target="_blank"
+                class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+                Kirim Struk WA
+            </a>
             <a href="{{ route('pos.receipt', $sale->id) }}" target="_blank"
                 class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,19 +56,40 @@
     @endif
 
     <!-- Metadata Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Kasir Bertugas</span>
-            <span class="text-base font-bold text-slate-900">{{ $sale->user->name ?? '-' }}</span>
+            <span class="text-base font-bold text-slate-900">{{ $sale->user->name ?? ($sale->confirmer?->name ?? 'Kasir') }}</span>
             <span class="text-xs text-slate-400 block mt-0.5">{{ $sale->user->email ?? '' }}</span>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Pelanggan</span>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-sm font-bold text-slate-900">{{ $sale->customer_name ?: 'Pelanggan Walk-in' }}</span>
+                @if($sale->table_number)
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">{{ str_starts_with($sale->table_number, 'Meja') ? $sale->table_number : 'Meja ' . $sale->table_number }}</span>
+                @endif
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-xs">
+                @if($sale->customer_phone)
+                    <span class="font-mono text-slate-600">{{ $sale->customer_phone }}</span>
+                    <a href="{{ route('pos.receipt', ['sale' => $sale->id, 'auto_wa' => 1]) }}" target="_blank"
+                        class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition">
+                        <i class="fa-brands fa-whatsapp text-xs"></i>
+                        <span>WA</span>
+                    </a>
+                @else
+                    <span class="text-slate-400">Tidak ada nomor WA</span>
+                @endif
+            </div>
         </div>
         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Metode & Status</span>
             <div class="flex items-center gap-2 mt-1">
-                <span class="text-sm font-bold text-slate-900">{{ $sale->payment->methodLabel() ?? 'Tunai' }}</span>
+                <span class="text-sm font-bold text-slate-900">{{ $sale->payment?->methodLabel() ?? 'Tunai' }}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Lunas</span>
             </div>
-            <span class="text-xs text-slate-500 block mt-1">Bayar: Rp {{ number_format($sale->payment->amount_tendered, 0, ',', '.') }} | Kembali: Rp {{ number_format($sale->payment->change_amount, 0, ',', '.') }}</span>
+            <span class="text-xs text-slate-500 block mt-1">Bayar: Rp {{ number_format($sale->payment->amount_tendered ?? $sale->total_amount, 0, ',', '.') }} | Kembali: Rp {{ number_format($sale->payment->change_amount ?? 0, 0, ',', '.') }}</span>
         </div>
         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Total Tagihan</span>

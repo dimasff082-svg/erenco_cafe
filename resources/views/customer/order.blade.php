@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesan Menu - Meja {{ $table->table_number }} | Cafe & Resto</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
+    <link rel="icon" type="image/png" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="shortcut icon" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="apple-touch-icon" href="{{ $storeLogo }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
@@ -284,18 +286,26 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach($category->products as $product)
-                            <div class="menu-item bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-2xs hover:shadow-md transition flex gap-3.5"
+                            <div class="menu-item bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-2xs hover:shadow-md transition flex gap-3.5 {{ !$product->is_available ? 'opacity-90' : '' }}"
                                 data-name="{{ strtolower($product->name) }}" data-category="cat-{{ $category->id }}">
                                 
                                 <!-- Foto Menu -->
-                                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-amber-50/70 border border-slate-200/80 flex items-center justify-center">
+                                <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-amber-50/70 border border-slate-200/80 flex items-center justify-center">
                                     @if($product->image_url)
-                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover {{ !$product->is_available ? 'grayscale opacity-60' : '' }}">
                                     @else
-                                        <div class="text-amber-700/60 flex flex-col items-center justify-center p-2 text-center">
+                                        <div class="text-amber-700/60 flex flex-col items-center justify-center p-2 text-center {{ !$product->is_available ? 'opacity-40' : '' }}">
                                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                             </svg>
+                                        </div>
+                                    @endif
+
+                                    @if(!$product->is_available)
+                                        <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-[1px] flex items-center justify-center">
+                                            <span class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-extrabold text-[10px] tracking-wider uppercase shadow-md border border-white/20">
+                                                Habis
+                                            </span>
                                         </div>
                                     @endif
                                 </div>
@@ -311,6 +321,11 @@
                                             <span class="inline-block text-[9px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded font-medium border border-amber-200/60">
                                                 {{ $category->name }}
                                             </span>
+                                            @if(!$product->is_available)
+                                                <span class="inline-block text-[9px] text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded font-bold border border-rose-200">
+                                                    Stok Habis
+                                                </span>
+                                            @endif
                                         </div>
                                         @if($product->description)
                                             <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">{{ $product->description }}</p>
@@ -322,30 +337,40 @@
                                             Rp {{ number_format($product->selling_price, 0, ',', '.') }}
                                         </span>
 
-                                        <!-- Controller Tambah / Kurangi Menu -->
-                                        <div id="btn-group-{{ $product->id }}">
-                                            <button type="button" id="btn-add-{{ $product->id }}"
-                                                onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->selling_price }})"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition transform hover:scale-105 active:scale-95">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                        @if(!$product->is_available)
+                                            <!-- Label Habis (Tidak Dapat Dipesan) -->
+                                            <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold cursor-not-allowed select-none">
+                                                <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                                 </svg>
-                                                Tambah
-                                            </button>
-                                            <div id="counter-{{ $product->id }}" class="hidden items-center gap-1.5 bg-amber-50 border border-amber-300 rounded-xl p-1 shadow-2xs">
-                                                <button type="button" onclick="decreaseQty({{ $product->id }})"
-                                                    class="w-6 h-6 rounded-lg bg-white text-amber-900 border border-amber-300 flex items-center justify-center font-bold text-xs hover:bg-amber-100">
-                                                    -
+                                                Habis
+                                            </span>
+                                        @else
+                                            <!-- Controller Tambah / Kurangi Menu -->
+                                            <div id="btn-group-{{ $product->id }}">
+                                                <button type="button" id="btn-add-{{ $product->id }}"
+                                                    onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->selling_price }})"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition transform hover:scale-105 active:scale-95">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Tambah
                                                 </button>
-                                                <span id="qty-{{ $product->id }}" class="font-black text-xs text-amber-950 px-1.5 min-w-[1.25rem] text-center">
-                                                    0
-                                                </span>
-                                                <button type="button" onclick="increaseQty({{ $product->id }})"
-                                                    class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold text-xs hover:bg-amber-700">
-                                                    +
-                                                </button>
+                                                <div id="counter-{{ $product->id }}" class="hidden items-center gap-1.5 bg-amber-50 border border-amber-300 rounded-xl p-1 shadow-2xs">
+                                                    <button type="button" onclick="decreaseQty({{ $product->id }})"
+                                                        class="w-6 h-6 rounded-lg bg-white text-amber-900 border border-amber-300 flex items-center justify-center font-bold text-xs hover:bg-amber-100">
+                                                        -
+                                                    </button>
+                                                    <span id="qty-{{ $product->id }}" class="font-black text-xs text-amber-950 px-1.5 min-w-[1.25rem] text-center">
+                                                        0
+                                                    </span>
+                                                    <button type="button" onclick="increaseQty({{ $product->id }})"
+                                                        class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold text-xs hover:bg-amber-700">
+                                                        +
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -414,9 +439,22 @@
                     <!-- Customer Info Input -->
                     <div class="pt-3 border-t border-slate-100 space-y-3">
                         @if(! $activeOpenBill)
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pemesan (Opsional)</label>
+                                    <input type="text" name="customer_name" placeholder="Misal: Dimas / Kakak Meja 1..."
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp (Untuk Struk WA)</label>
+                                    <input type="tel" name="customer_phone" placeholder="Contoh: 081234567890..."
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500">
+                                </div>
+                            </div>
+                        @else
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pemesan (Opsional)</label>
-                                <input type="text" name="customer_name" placeholder="Misal: Dimas / Kakak Meja 1..."
+                                <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp Pelanggan (Untuk Struk WA)</label>
+                                <input type="tel" name="customer_phone" placeholder="Contoh: 081234567890..."
                                     class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500">
                             </div>
                         @endif

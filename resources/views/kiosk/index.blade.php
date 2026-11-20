@@ -6,7 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pemesanan Mandiri - {{ $storeName }}</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-64.png') }}">
+    <link rel="icon" type="image/png" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="shortcut icon" href="{{ $storeLogo }}?v={{ md5($storeLogo) }}">
+    <link rel="apple-touch-icon" href="{{ $storeLogo }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -121,15 +123,24 @@
                                 <!-- Image / Photo (Compact) -->
                                 <div class="relative w-full h-22 sm:h-26 rounded-lg bg-gradient-to-br from-[#faf7f0] to-[#f0e8db] overflow-hidden mb-1.5 flex items-center justify-center border border-[#e8dfcf]">
                                     @if($product->image_url)
-                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 {{ !$product->is_available ? 'grayscale opacity-60' : '' }}">
                                     @else
-                                        <div class="text-center p-1.5 text-stone-300">
+                                        <div class="text-center p-1.5 text-stone-300 {{ !$product->is_available ? 'opacity-50' : '' }}">
                                             <svg class="w-6 h-6 mx-auto mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                             <span class="text-[8.5px] font-bold text-[#8f8573] uppercase tracking-wider block truncate max-w-[90px]">{{ $category->name }}</span>
                                         </div>
                                     @endif
+
+                                    @if(!$product->is_available)
+                                        <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                                            <span class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-black text-[9px] tracking-wider uppercase shadow-sm border border-white/20">
+                                                Habis
+                                            </span>
+                                        </div>
+                                    @endif
+
                                     <span class="absolute top-1.5 left-1.5 bg-[#1f1c18]/80 text-[#eac36c] backdrop-blur-xs text-[8.5px] font-bold px-1.5 py-0.5 rounded font-mono">
                                         {{ $product->sku }}
                                     </span>
@@ -137,9 +148,16 @@
 
                                 <!-- Information (Compact text) -->
                                 <div class="flex-1 flex flex-col">
-                                    <span class="text-[8.5px] font-bold text-[#8f8573] uppercase tracking-wider block truncate">
-                                        {{ $category->name }}
-                                    </span>
+                                    <div class="flex items-center justify-between gap-1">
+                                        <span class="text-[8.5px] font-bold text-[#8f8573] uppercase tracking-wider block truncate">
+                                            {{ $category->name }}
+                                        </span>
+                                        @if(!$product->is_available)
+                                            <span class="text-[8px] font-black text-rose-700 bg-rose-50 px-1 rounded border border-rose-200">
+                                                Habis
+                                            </span>
+                                        @endif
+                                    </div>
                                     <h3 class="text-[11px] sm:text-xs font-bold text-[#26211a] line-clamp-1 mt-0.5 leading-snug group-hover:text-[#a87f1c] transition">
                                         {{ $product->name }}
                                     </h3>
@@ -159,15 +177,21 @@
                                         </span>
                                     </div>
 
-                                    <button type="button"
-                                        onclick="addKioskItem({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (float)$product->selling_price }})"
-                                        class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#c59b27] hover:bg-[#a87f1c] active:scale-95 text-stone-950 font-black text-[10px] sm:text-[10.5px] shadow-2xs transition"
-                                        title="Pesan Menu Ini">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                        </svg>
-                                        <span>Tambah</span>
-                                    </button>
+                                    @if(!$product->is_available)
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9.5px] cursor-not-allowed select-none">
+                                            Habis
+                                        </span>
+                                    @else
+                                        <button type="button"
+                                            onclick="addKioskItem({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (float)$product->selling_price }})"
+                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#c59b27] hover:bg-[#a87f1c] active:scale-95 text-stone-950 font-black text-[10px] sm:text-[10.5px] shadow-2xs transition"
+                                            title="Pesan Menu Ini">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            <span>Tambah</span>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach

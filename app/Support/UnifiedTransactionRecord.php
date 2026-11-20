@@ -39,6 +39,8 @@ class UnifiedTransactionRecord
 
     public ?string $customer_name = null;
 
+    public ?string $customer_phone = null;
+
     public ?string $cashier_name = null;
 
     public ?User $user = null;
@@ -93,6 +95,7 @@ class UnifiedTransactionRecord
         $record->transaction_date = $sale->transaction_date ?? ($sale->created_at ?? now());
         $record->table_number = $record->is_takeaway ? 'Bawa Pulang (Takeaway)' : ($sale->table_number === 'KIOSK' ? 'Layar Mandiri (Kiosk)' : $sale->table_number);
         $record->customer_name = $sale->customer_name;
+        $record->customer_phone = $sale->customer_phone;
         $record->cashier_name = $sale->confirmer?->name ?? ($sale->user?->name ?? 'Kasir');
         $record->user = $sale->user;
         $record->confirmer = $sale->confirmer;
@@ -137,6 +140,7 @@ class UnifiedTransactionRecord
             $customerName = $openBill->sales->pluck('customer_name')->filter()->first();
         }
         $record->customer_name = $customerName;
+        $record->customer_phone = $openBill->sales->pluck('customer_phone')->filter()->first();
 
         // Nama Kasir yang melayani / menutup sesi Open Bill
         $cashierName = $openBill->closer?->name ?? ($openBill->opener?->name ?? null);
